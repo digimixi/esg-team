@@ -14,11 +14,11 @@ export const insight = {
       type: 'string' 
     },
     {
-      name: 'hub',
-      title: '所屬專題 (Hub)',
-      type: 'reference',
-      to: [{ type: 'hub' }],
-      description: '選擇此情報屬於哪個專題生態系 (選填)',
+      name: 'hubs',
+      title: '關聯專題 (Related Hubs)',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'hub' }] }],
+      description: '這篇文章屬於哪些產業專題？',
     },
     { 
       name: 'category', 
@@ -51,6 +51,23 @@ export const insight = {
       name: 'publishedAt', 
       title: '發布時間 (Published At)', 
       type: 'datetime' 
+    },
+    { 
+      name: 'source', 
+      title: '採集來源 (Source)', 
+      type: 'string' 
+    },
+    { 
+      name: 'externalUrl', 
+      title: '原始網址 (Original URL)', 
+      type: 'url' 
+    },
+    { 
+      name: 'isActive', 
+      title: '是否採用 (Adopted)', 
+      type: 'boolean', 
+      initialValue: true, // 預設採集後先顯示，您可以手動關閉
+      description: '只有開啟的情報才會顯示在首頁全球情報網'
     },
     { 
       name: 'isFeatured', 

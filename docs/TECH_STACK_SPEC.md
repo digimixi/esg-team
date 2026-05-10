@@ -34,6 +34,20 @@
 - **功能**：支援「一鍵聯繫團隊」按鈕。
 - **邏輯**：按鈕網址由 Sanity 專題文件中的 `contactUrl` 欄位決定，預設為 Line@ 連結。
 
+### D. 智慧情報採集工具箱 (Intelligence Toolbox)
+- **路徑**：`src/app/admin/sources/page.js` & `/api/ingest-url`
+- **功能**：支援輸入網址，透過 Gemini AI 自動分析網頁並生成 ESG 摘要存入 Sanity。
+- **特性**：具備「全區域點擊」與「自動去重」機制。
+
+### E. 精選情報源書籤系統 (Bookmark System)
+- **路徑**：`src/app/admin/sources/page.js` & `/api/admin/bookmarks`
+- **功能**：允許情報官保存高價值網址，支援一鍵「閃電採集」。
+
+### F. 全系統數據溯源監控 (Data Source Registry)
+- **路徑**：`src/app/admin/sources/page.js`
+- **地位**：**核心透明化組件**。列出所有前台數據（如行情、新聞）的原始來源、更新頻率與連線狀態。
+- **⚠️ 警告**：修改此路徑檔案時，絕對禁止移除此視覺組件。
+
 ---
 
 ## 3. 性能與視覺優化規範 (Performance & UI/UX)

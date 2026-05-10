@@ -1,8 +1,8 @@
 import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
-import { PortableText } from '@portabletext/react';
 
-export const revalidate = 0; // 強制不快取，確保重新整理時立刻抓取最新資料
+export const revalidate = 60; // 每分鐘更新一次資料
+import { PortableText } from '@portabletext/react';
 
 // 自定義 PortableText 渲染樣式
 const ptComponents = {
@@ -21,11 +21,12 @@ export default async function HubHome({ params }) {
 
   // Fetch data from Sanity
   // Get the hub document
+  // Get the hub document - 強制不使用快取
   const hub = await client.fetch(`*[_type == "hub" && slug.current == $slug][0] {
     ...,
     "heroImageUrl": heroImage.asset->url,
     "featureImageUrl": featureImage.asset->url
-  }`, { slug: hubSlug }, { next: { revalidate: 0 } });
+  }`, { slug: hubSlug }, { useCdn: false });
   
   // 如果找不到該專題，或者該專題被明確設定為「關閉 (isActive === false)」
   if (!hub || hub.isActive === false) {
@@ -41,11 +42,37 @@ export default async function HubHome({ params }) {
     );
   }
   
-  const indices = await client.fetch('*[_type == "marketIndex"] | order(order asc)');
+  const indices = await client.fetch('*[_type == "marketIndex"] | order(order asc)', {}, { useCdn: false });
   // Fetch products that are linked to this hub
-  const products = await client.fetch('*[_type == "product" && hub->slug.current == $slug] | order(_createdAt desc)', { slug: hubSlug });
-  // Fetch insights that are linked to this hub
-  const insights = await client.fetch('*[_type == "insight" && hub->slug.current == $slug] | order(publishedAt desc)[0...4]', { slug: hubSlug });
+  const products = await client.fetch('*[_type == "product" && hub->slug.current == $slug] | order(_createdAt desc)', { slug: hubSlug }, { useCdn: false });
+  
+  const keywordsArray = hub.searchKeywords 
+    ? hub.searchKeywords.split(',').map(k => `*${k.trim()}*`).filter(k => k !== '**') 
+    : [];
+
+  // 動態生成關鍵字比對條件
+  const keywordConditions = keywordsArray.length > 0 
+    ? `|| (${keywordsArray.map(k => `title match "${k}" || summary match "${k}" || excerpt match "${k}"`).join(' || ')})`
+    : '';
+  
+  const insights = await client.fetch(`
+    *[_type == "insight" && isActive == true && (
+      references($hubId) 
+      ${keywordConditions}
+    )] | order(publishedAt desc)[0...12] {
+      _id,
+      title,
+      summary,
+      category,
+      isFeatured,
+      authorName,
+      publishedAt,
+      source,
+      externalUrl
+    }
+  `, { 
+    hubId: hub._id 
+  }, { useCdn: false });
 
   const heroTitle = hub?.title || '卓越工業，品質至上';
   const heroTitleColor = hub?.themeColor || '#FFFFFF';
@@ -395,37 +422,61 @@ export default async function HubHome({ params }) {
               {hub?.insightSectionTitle || '供應鏈情報'} 
               <span className="text-label-sm font-normal text-outline ml-2">{hub?.insightSectionTitleEnglish || 'Supply Chain Intelligence'}</span>
             </h2>
-            
-            {insights.length > 0 ? (
+            {insights && insights.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-gutter h-auto md:h-[500px]">
                   {insights.map((insight, index) => {
                     const isFeatured = insight.isFeatured;
+                    const cardHref = insight.externalUrl || '#';
+                    
                     // 若是精選，或者沒有設定精選但它是第一篇，就把它放大
                     if (isFeatured || index === 0) {
                         return (
-                          <div key={insight._id} className="md:col-span-2 md:row-span-2 bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col">
+                          <a 
+                            key={insight._id} 
+                            href={cardHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="md:col-span-2 md:row-span-2 bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col hover:shadow-2xl hover:-translate-y-1 transition-all group"
+                          >
                             <span className="text-on-tertiary-container font-label-sm text-label-sm mb-2">{insight.category}</span>
-                            <h3 className="text-headline-md font-headline-md mb-stack-sm">{insight.title}</h3>
-                            <p className="text-body-base font-body-base text-on-surface-variant mb-stack-lg flex-1">{insight.summary}</p>
-                            <div className="flex items-center justify-between">
+                            <h3 className="text-headline-md font-headline-md mb-stack-sm group-hover:text-esg-emerald transition-colors">{insight.title} <span className="text-error text-xs">[NEW]</span></h3>
+                            <p className="text-body-base font-body-base text-on-surface-variant mb-stack-lg flex-1 line-clamp-6">{insight.summary}</p>
+                            <div className="flex items-center justify-between mt-auto">
                               <div className="flex items-center gap-2">
                                 <div className="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-on-secondary-fixed">
-                                    {insight.authorName ? insight.authorName.charAt(0) : 'E'}
+                                    {insight.source ? insight.source.charAt(0) : 'E'}
                                 </div>
-                                <span className="font-label-sm text-label-sm">{insight.authorName || 'esg.team'}</span>
+                                <span className="font-label-sm text-label-sm">{insight.source || 'esg.team'}</span>
+                              </div>
+                              <div className="flex items-center gap-3 text-outline font-data-mono text-[10px]">
+                                {insight.publishedAt && <span>{new Date(insight.publishedAt).toLocaleDateString('zh-TW')}</span>}
+                                <span className="material-symbols-outlined text-sm">arrow_outward</span>
                               </div>
                             </div>
-                          </div>
+                          </a>
                         );
                     }
                     
                     // 其他小版面
                     return (
-                        <div key={insight._id} className="md:col-span-1 bg-surface-container-lowest border border-outline-variant p-stack-md flex flex-col justify-center">
-                            <span className="text-on-tertiary-container font-label-sm text-label-sm mb-2">{insight.category}</span>
-                            <h4 className="font-body-base font-bold text-primary mb-2">{insight.title}</h4>
-                            <p className="text-label-sm text-on-surface-variant line-clamp-3">{insight.summary}</p>
-                        </div>
+                        <a 
+                            key={insight._id} 
+                            href={cardHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="md:col-span-1 bg-surface-container-lowest border border-outline-variant p-stack-md flex flex-col justify-center hover:shadow-xl hover:-translate-y-0.5 transition-all group"
+                        >
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="text-on-tertiary-container font-label-sm text-label-sm">{insight.category}</span>
+                              {insight.publishedAt && <span className="text-outline font-data-mono text-[10px]">{new Date(insight.publishedAt).toLocaleDateString('zh-TW')}</span>}
+                            </div>
+                            <h4 className="font-body-base font-bold text-primary mb-2 line-clamp-2 group-hover:text-esg-emerald transition-colors">{insight.title}</h4>
+                            <p className="text-label-sm text-on-surface-variant line-clamp-2 mb-3">{insight.summary}</p>
+                            <div className="flex justify-between items-center mt-auto">
+                                <div className="text-outline font-data-mono text-[10px] uppercase truncate max-w-[80px]">{insight.source}</div>
+                                <span className="material-symbols-outlined text-xs text-outline group-hover:text-primary transition-colors">arrow_outward</span>
+                            </div>
+                        </a>
                     );
                   })}
                 </div>

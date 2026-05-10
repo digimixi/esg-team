@@ -53,6 +53,12 @@ export default defineType({
       description: '顯示在卡片上的小標籤'
     }),
     defineField({
+      name: 'searchKeywords',
+      title: '搜尋關鍵字 (Search Keywords)',
+      type: 'text',
+      description: '用於自動關聯文章。請用逗號分隔，例如：石墨, 電極, 針狀焦, 電爐, 煉鋼',
+    }),
+    defineField({
       name: 'heroSubtitle',
       title: '版頭副標題 (Hero Subtitle)',
       type: 'string',

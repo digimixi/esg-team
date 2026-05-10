@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 
 /**
  * This configuration is used to for the Sanity Studio that’s mounted on the `\src\app\studio\[[...tool]]\page.jsx` route
@@ -27,4 +28,19 @@ export default defineConfig({
     visionTool({defaultApiVersion: apiVersion}),
     zhHantLocale(), // 啟用繁體中文語系
   ],
+  tools: (prev) => [
+    ...prev,
+    {
+      name: 'data-ingestion',
+      title: '📡 數據監控',
+      component: () => (
+        <div style={{ height: '100%', width: '100%' }}>
+          <iframe 
+            src="/admin/sources" 
+            style={{ width: '100%', height: '100%', border: 'none' }}
+          />
+        </div>
+      ),
+    }
+  ]
 })

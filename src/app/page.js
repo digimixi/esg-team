@@ -33,6 +33,20 @@ export default async function Home() {
     tags
   } | order(isFeatured desc, _createdAt asc)`);
 
+    // 4. 取得最新採集的情報文章 (只抓「已採用」的最新的 4 篇)
+    const latestInsights = await client.fetch(`*[_type == "insight" && isActive == true] | order(publishedAt desc) [0...4] {
+        _id,
+        title,
+        excerpt,
+        summary,
+        publishedAt,
+        source,
+        externalUrl,
+        category,
+        isActive,
+        "hubTitle": hub->title
+    }`);
+
     return (
         <>
             {/* TopNavBar */}
@@ -206,7 +220,65 @@ export default async function Home() {
                     </div>
                 </section>
 
-                {/* Global ESG Index */}
+                {/* Latest Insights Section - 採集成果展示區 */}
+                <section className="bg-surface-container-lowest py-stack-lg border-t border-outline-variant">
+                    <div className="max-w-container-max mx-auto px-margin">
+                        <div className="flex justify-between items-end mb-10">
+                            <div>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-esg-emerald/10 text-esg-emerald rounded-full mb-3">
+                                    <span className="w-1.5 h-1.5 bg-esg-emerald rounded-full animate-pulse"></span>
+                                    <span className="font-label-sm text-[10px] uppercase tracking-[0.2em] font-bold">Intelligence Hub</span>
+                                </div>
+                                <h2 className="font-display-sm text-display-sm text-primary">全球永續情報網</h2>
+                                <p className="text-secondary text-sm mt-1">由 AI 引擎全時監控、採集並摘要的產業動向。</p>
+                            </div>
+                            <a href="#" className="hidden md:flex items-center gap-2 text-primary font-bold text-sm border-b border-primary/20 hover:border-primary transition-all pb-1">
+                                進入情報中心 <span className="material-symbols-outlined text-sm">open_in_new</span>
+                            </a>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+                            {latestInsights.map((insight) => (
+                                <a 
+                                    key={insight._id} 
+                                    href={insight.externalUrl || '#'} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="flex flex-col bg-surface border border-outline-variant rounded-xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all group relative cursor-pointer"
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <span className="text-[10px] bg-outline-variant/30 text-secondary px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                                            {insight.source || 'Intelligence'}
+                                        </span>
+                                        <span className="text-[10px] text-outline font-mono">
+                                            {new Date(insight.publishedAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                    <h3 className="font-bold text-primary mb-3 line-clamp-2 group-hover:text-esg-emerald transition-colors">
+                                        {insight.title}
+                                    </h3>
+                                    <p className="text-on-surface-variant text-xs leading-relaxed line-clamp-3 mb-6 opacity-80">
+                                        {insight.summary || insight.excerpt || '點擊進入閱讀 AI 生成的專業摘要內容。'}
+                                    </p>
+                                    <div className="mt-auto flex justify-between items-center pt-4 border-t border-outline-variant/50">
+                                        <span className="text-[10px] text-esg-emerald font-bold">
+                                            #{insight.hubTitle || '全域情報'}
+                                        </span>
+                                        <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all">
+                                            <span className="material-symbols-outlined text-sm">arrow_outward</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            ))}
+                            
+                            {latestInsights.length === 0 && (
+                                <div className="col-span-full py-12 text-center bg-surface-container-lowest border border-dashed border-outline-variant rounded-2xl">
+                                    <div className="text-outline text-sm italic">尚無情報，請從後台啟動「全球情報採集盒」</div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
                 <section className="bg-surface-container py-stack-md border-y border-outline-variant">
                     <div className="max-w-container-max mx-auto px-margin">
                         <div className="flex flex-wrap items-center justify-between gap-stack-lg">

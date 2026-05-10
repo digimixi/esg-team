@@ -1,113 +1,151 @@
-import Parser from 'rss-parser';
 import { createClient } from '@sanity/client';
+import Parser from 'rss-parser';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
 
-// 設定 Sanity 連線資訊
+dotenv.config({ path: '.env.local' });
+
 const client = createClient({
-  projectId: process.env.SANITY_PROJECT_ID || '2euox6d1',
-  dataset: process.env.SANITY_DATASET || 'production',
+  projectId: '2euox6d1',
+  dataset: 'production',
   token: process.env.SANITY_WRITE_TOKEN,
   useCdn: false,
   apiVersion: '2026-05-07',
 });
 
-// 設定 Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
 const parser = new Parser();
 
+// 1. 專業行情與新聞源
 const FEEDS = [
-  {
-    url: 'https://worldsteel.org/feed/',
-    hubSlug: 'graphite', 
-    sourceName: 'World Steel Association'
+  { 
+    name: 'SMM (中國行情-最新)', 
+    url: 'https://rss.metal.com/news/the_latest.xml', 
+    category: 'Market Price',
+    hubSlug: 'graphite'
   },
-  {
-    url: 'http://blog.steel-technology.com/feed',
-    hubSlug: 'graphite',
-    sourceName: 'Steel Technology'
+  { 
+    name: 'SMM (中國行情-報價)', 
+    url: 'https://rss.metal.com/news/price_review_forecast.xml', 
+    category: 'Market Price',
+    hubSlug: 'graphite'
+  },
+  { 
+    name: 'MetalMiner (國際行情)', 
+    url: 'https://agmetalminer.com/feed/', 
+    category: 'Global Analysis',
+    hubSlug: 'graphite'
+  },
+  { 
+    name: 'World Steel Association', 
+    url: 'https://worldsteel.org/feed/', 
+    category: 'Industry News',
+    hubSlug: 'steel' 
   }
 ];
 
-async function translateWithAI(title, excerpt) {
+async function processWithAI(title, content) {
   try {
-    const prompt = `你是一位專業的工業與 ESG 產業分析師。請將以下這則產業新聞的標題與摘要翻譯成專業的「繁體中文（台灣）」。
-要求：
-1. 語氣必須具備權威感與專業感。
-2. 標題要簡明扼要。
-3. 摘要請精煉在 150 字以內，保留核心產業洞察。
-4. 輸出格式必須是純 JSON，格式如下：{"title": "中文標題", "excerpt": "中文摘要"}。
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const prompt = `
+      你是一位資深的鋼鐵與石墨產業分析師。請分析以下新聞內容：
+      標題：${title}
+      內容：${content}
 
-原文標題：${title}
-原文摘要：${excerpt}
-
-請直接輸出 JSON 內容：`;
+      請執行以下任務：
+      1. 將內容翻譯為專業的繁體中文。
+      2. 撰寫一段 100 字內的專業摘要。
+      3. **關鍵任務**：如果新聞中提到任何具體的「市場價格」或「漲跌幅（%）」，請以 JSON 格式提取出來。
+      
+      請嚴格按照以下 JSON 格式回覆：
+      {
+        "title": "翻譯後的標題",
+        "summary": "專業摘要",
+        "category": "分類(如：市場行情/供應鏈/政策)",
+        "marketData": {
+          "itemName": "產品名稱(如: 石墨電極)",
+          "price": "提取的價格數字或區間",
+          "trend": "漲跌符號與百分比(如: ▲ 1.2% 或 ▼ 0.5% 或 —)"
+        }
+      }
+    `;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    // 移除可能存在的 Markdown 代碼塊標籤
-    const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJson);
+    const text = result.response.text();
+    // 移除 markdown 區塊標記
+    const jsonStr = text.replace(/```json|```/g, '').trim();
+    return JSON.parse(jsonStr);
   } catch (error) {
-    console.error('AI 翻譯失敗，使用原文替代:', error.message);
-    return { title, excerpt };
+    console.error('AI Processing Error:', error);
+    return null;
   }
 }
 
 async function sync() {
-  console.log('--- 開始同步與 AI 智能翻譯 ---');
+  console.log('--- 開始 AI 產業行情同步任務 ---');
   
-  const hubs = await client.fetch('*[_type == "hub"]{ _id, "slug": slug.current }');
-  const hubMap = Object.fromEntries(hubs.map(h => [h.slug, h._id]));
-
   for (const feed of FEEDS) {
-    console.log(`正在抓取來源: ${feed.sourceName}...`);
+    console.log(`正在抓取: ${feed.name}...`);
     try {
       const feedData = await parser.parseURL(feed.url);
-      const targetHubId = hubMap[feed.hubSlug];
       
-      if (!targetHubId) continue;
+      // 獲取該 Hub 的 ID
+      const hub = await client.fetch('*[_type == "hub" && slug.current == $slug][0]', { slug: feed.hubSlug });
+      if (!hub) continue;
 
-      for (const item of feedData.items.slice(0, 3)) {
+      for (const item of feedData.items.slice(0, 3)) { // 每次每個源取前 3 則
         const docId = `insight-sync-${Buffer.from(item.link).toString('base64').substring(0, 30)}`;
         
-        // 先檢查是否已經存在，避免重複調用 AI 浪費額度
-        const existing = await client.fetch('*[_id == $id][0]', { id: docId });
-        if (existing) {
-          console.log(`跳過已存在的內容: ${item.title}`);
-          continue;
-        }
+        // 檢查是否已存在
+        const exists = await client.fetch('*[_id == $id][0]', { id: docId });
+        if (exists) continue;
 
-        console.log(`正在處理新文章: ${item.title}...`);
+        console.log(`處理新文章: ${item.title}`);
+        const aiResult = await processWithAI(item.title, item.contentSnippet || item.content);
         
-        // 呼叫 Gemini AI 進行翻譯與摘要
-        const translated = await translateWithAI(item.title, item.contentSnippet || item.content);
+        if (aiResult) {
+          // A. 創建 Insight 文檔
+          await client.createOrReplace({
+            _id: docId,
+            _type: 'insight',
+            title: aiResult.title,
+            excerpt: aiResult.summary,
+            category: aiResult.category,
+            publishedAt: item.isoDate || new Date().toISOString(),
+            source: feed.name,
+            externalUrl: item.link,
+            hub: { _type: 'reference', _ref: hub._id },
+            isActive: true, // 預設採用
+            isFeatured: false
+          });
 
-        const insightDoc = {
-          _type: 'insight',
-          _id: docId,
-          title: translated.title,
-          excerpt: translated.excerpt,
-          publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
-          source: feed.sourceName,
-          externalUrl: item.link,
-          hub: {
-            _type: 'reference',
-            _ref: targetHubId
+          // B. 如果有提取到市場數據，更新 Market Index
+          if (aiResult.marketData && aiResult.marketData.price !== "N/A") {
+             console.log(`發現市場行情: ${aiResult.marketData.itemName} -> ${aiResult.marketData.price}`);
+             
+             // 尋找對應的 Market Index
+             const indexDoc = await client.fetch('*[_type == "marketIndex" && name match $name][0]', { 
+               name: `*${aiResult.marketData.itemName.substring(0,2)}*` 
+             });
+
+             if (indexDoc) {
+               await client.patch(indexDoc._id)
+                 .set({ 
+                    value: aiResult.marketData.price, 
+                    trend: aiResult.marketData.trend,
+                    _updatedAt: new Date().toISOString()
+                 })
+                 .commit();
+               console.log(`已自動更新行情指數: ${indexDoc.name}`);
+             }
           }
-        };
-
-        await client.createOrReplace(insightDoc);
-        console.log(`成功發布 AI 編譯內容: ${translated.title}`);
+        }
       }
     } catch (error) {
-      console.error(`處理 ${feed.sourceName} 失敗:`, error.message);
+      console.error(`Feed Error (${feed.name}):`, error);
     }
   }
-  
-  console.log('--- 智能同步完成 ---');
+  console.log('--- 同步完成 ---');
 }
 
 sync();
