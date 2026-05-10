@@ -27,3 +27,4 @@ jobs:
           SANITY_PROJECT_ID: '2euox6d1'
           SANITY_DATASET: 'production'
           SANITY_WRITE_TOKEN: ${{ secrets.SANITY_WRITE_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
