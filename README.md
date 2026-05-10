@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ESG.TEAM - 全球產業綠色轉型聚合平台
 
-## Getting Started
+這是 `esg.team` 專案的核心代碼庫。採用 Next.js + Sanity.io 的現代無頭架構 (Headless Architecture) 建構。
 
-First, run the development server:
+## 🧠 知識庫與規範 (Knowledge Base) - **開發前必讀**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+為確保專案架構的一致性，所有參與開發者（含 AI 助理）必須遵循以下規範：
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+*   **[專案主宣言 (Manifesto)](./docs/ESG_TEAM_MANIFESTO.md)**：定義核心願景與「母子板塊」發展策略。
+*   **[技術架構規範 (Tech Spec)](./docs/TECH_STACK_SPEC.md)**：記錄現有模組（如 RSS 同步、富文本渲染）的實作機制。
+*   **[AI 協作守則 (Charter)](./docs/AI_COLLABORATION_CHARTER.md)**：AI 助理參與開發時必須遵守的指導原則。
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 🚀 快速開始 (Getting Started)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **安裝依賴**：
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. **設定環境變數**：
+   建立 `.env.local` 並加入您的 Sanity `PROJECT_ID` 與 `DATASET`。
 
-To learn more about Next.js, take a look at the following resources:
+3. **啟動開發伺服器**：
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ 技術棧 (Tech Stack)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Frontend**: Next.js 15+ (App Router)
+- **CMS**: Sanity.io (Headless CMS)
+- **Styling**: Tailwind CSS
+- **Automation**: GitHub Actions (RSS Insight Sync)
 
-## Deploy on Vercel
+## 📁 專案結構
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/src/app`: 前端頁面與路由
+- `/src/sanity`: Sanity Schema 與配置
+- `/scripts`: 自動化與工具腳本
+- `/docs`: 專案知識庫與規範文件
