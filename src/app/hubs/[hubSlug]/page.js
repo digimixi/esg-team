@@ -153,9 +153,15 @@ export default async function HubHome({ params }) {
         <section className="bg-surface-container py-stack-md border-b border-outline-variant">
           <div className="max-w-container-max mx-auto px-margin">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-stack-lg">
-              <div className="flex items-center gap-stack-sm shrink-0">
-                <span className="material-symbols-outlined text-secondary">monitoring</span>
-                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">市場實時指數 <span className="hidden sm:inline text-[10px] lowercase opacity-70 ml-1">Market Live Index</span></span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-stack-sm shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary">monitoring</span>
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">市場實時指數 <span className="hidden sm:inline text-[10px] lowercase opacity-70 ml-1">Market Live Index</span></span>
+                </div>
+                <span className="text-[10px] text-outline bg-surface-container-high px-2 py-0.5 rounded flex items-center gap-1 w-fit">
+                  <span className="w-1 h-1 rounded-full bg-esg-emerald animate-pulse"></span>
+                  最後更新: {new Date().toLocaleDateString('zh-TW')} {new Date().getHours()}:00
+                </span>
               </div>
               <div className="flex flex-1 justify-start lg:justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar w-full pb-2 lg:pb-0">
                 {indices.map((index) => {

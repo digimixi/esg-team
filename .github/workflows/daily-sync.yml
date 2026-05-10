@@ -1,0 +1,29 @@
+name: Daily Industrial Insights Sync
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天國際標準時間 00:00 (台灣時間 08:00) 執行
+  workflow_dispatch: # 允許手動從 GitHub 介面觸發
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install rss-parser @sanity/client
+
+      - name: Run sync script
+        run: node scripts/sync-insights.mjs
+        env:
+          SANITY_PROJECT_ID: '2euox6d1'
+          SANITY_DATASET: 'production'
+          SANITY_WRITE_TOKEN: ${{ secrets.SANITY_WRITE_TOKEN }}
