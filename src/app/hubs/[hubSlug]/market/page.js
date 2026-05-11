@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { client } from '@/sanity/lib/client';
 import TradingViewChart from '@/components/TradingViewChart';
 
@@ -10,7 +11,7 @@ export default async function Market({ params }) {
   const hub = await client.fetch('*[_type == "hub" && slug.current == $slug][0]', { slug: hubSlug });
 
   // 2. 抓取市場指數 (用於跑馬燈與趨勢分析)
-  const indices = await client.fetch('*[_type == "marketIndex"] | order(order asc)');
+  const indices = await client.fetch('*[_type == "marketIndex"] | order(order asc)') || [];
 
   // 3. 抓取最新產業情報 (用於專家簡報)
   const insights = await client.fetch(`*[_type == "insight" && hub->slug.current == $slug] | order(publishedAt desc)[0...3]{
@@ -21,7 +22,7 @@ export default async function Market({ params }) {
     publishedAt,
     source,
     externalUrl
-  }`, { slug: hubSlug });
+  }`, { slug: hubSlug }) || [];
 
   // 輔助函式：判斷漲跌顏色
   const getTrendColor = (trend) => {
@@ -153,12 +154,12 @@ export default async function Market({ params }) {
                   <div className="text-3xl font-headline-md text-primary mb-1">{idx.value}</div>
                   <div className="flex justify-between items-end mt-4">
                     <div className={`${getTrendColor(idx.trend)} text-label-sm flex items-center font-data-mono font-bold`}>
-                      {idx.trend !== '—' && (
+                      {idx.trend && idx.trend !== '—' && (
                         <span className="material-symbols-outlined text-sm mr-1">
-                          {idx.trend.includes('▲') ? 'trending_up' : 'trending_down'}
+                          {idx.trend?.includes('▲') ? 'trending_up' : 'trending_down'}
                         </span>
                       )}
-                      {idx.trend}
+                      {idx.trend || '—'}
                     </div>
                     <div className="text-[9px] text-on-surface-variant opacity-50 text-right">
                       更新於: {idx._updatedAt ? new Date(idx._updatedAt).toLocaleDateString('zh-TW') : 'N/A'}<br/>

@@ -34,17 +34,37 @@
 *   **Docker 屏蔽遺失**: 預設的 `.dockerignore` 若屏蔽 `*.mjs`，會導致 `next.config.mjs` 遺失，進而讓 `standalone` 模式失效。
 *   **API 動態性**: 任何讀取 Secret 的 API 必須設定 `force-dynamic`，否則編譯器會嘗試在沒有密鑰的情況下執行靜態渲染而崩潰。
 
-### 2. 標準部署流程
-部署前，請確保 `.env.local` 內容完整，並執行以下 PowerShell 腳本注入：
-```powershell
-# 提取並注入實體 ID 到 Dockerfile ARG 預設值（解決變數固化最穩定的方法）
-$pid = (Select-String -Path .env.local -Pattern "NEXT_PUBLIC_SANITY_PROJECT_ID=(.*)").Matches.Groups[1].Value.Trim()
-$ds = (Select-String -Path .env.local -Pattern "NEXT_PUBLIC_SANITY_DATASET=(.*)").Matches.Groups[1].Value.Trim()
-(Get-Content Dockerfile) -replace "ARG NEXT_PUBLIC_SANITY_PROJECT_ID", "ARG NEXT_PUBLIC_SANITY_PROJECT_ID=$pid" -replace "ARG NEXT_PUBLIC_SANITY_DATASET", "ARG NEXT_PUBLIC_SANITY_DATASET=$ds" | Set-Content Dockerfile
+### 🔧 常見問題與排除 (Troubleshooting)
 
-# 執行部署
-gcloud run deploy esg-team --source . --region asia-east1 --set-env-vars="...所有密鑰..."
-```
+#### 1. 編譯失敗：Signal SIGSEGV (段錯誤)
+*   **現象**：在 Cloud Build 執行 `npm run build` 時崩潰，報錯 `SIGSEGV`。
+*   **原因**：Next.js 16 + Turbopack 在編譯大數據頁面時記憶體耗盡 (OOM)。
+*   **解決**：將 `Dockerfile` 的 builder 階段從 `node:20-alpine` 換成完整的 `node:20` (Debian 基礎)，提供更穩定的記憶體管理。
+
+#### 2. 編譯失敗：Invalid UTF-8 sequence
+*   **現象**：報錯 `failed to convert rope into string`。
+*   **原因**：在 Windows 環境使用 PowerShell 的 `Set-Content` 修改程式碼時，預設編碼可能被轉為 UTF-16 或帶 BOM 的格式，Linux 編譯器無法讀取。
+*   **解決**：確保使用標準 UTF-8 編碼存檔。在 AI 操作時，優先使用 `replace_file_content` 或 `write_to_file` 工具，避免直接執行 Shell 命令修改代碼。
+
+#### 3. 運行時 500 錯誤：window is not defined
+*   **現象**：存取 `/studio` 時出現伺服器端報錯。
+*   **原因**：Sanity Studio 依賴瀏覽器 API，無法在伺服器端渲染 (SSR)。
+*   **解決**：建立 `Studio.jsx` 客戶端組件，並使用 `useState` + `useEffect` 的 `isMounted` 檢查，確保 Studio 僅在瀏覽器端掛載。
+
+#### 4. 編譯失敗：Failed to collect page data
+*   **現象**：編譯期報錯 `Failed to collect page data for /api/...` 或 `/sitemap.xml`。
+*   **原因**：Next.js 嘗試在編譯時預執行動態路由，但環境中缺少 API Key 或網路權限。
+*   **解決**：在所有 API 路由和動態數據頁面頂部加上 `export const dynamic = 'force-dynamic';`。
+
+---
+
+### 🚀 部署流程 (Deploy Process)
+1.  **環境檢查**：確保 `.env.local` 具備所有 `NEXT_PUBLIC_` 變數及 `SANITY_WRITE_TOKEN`。
+2.  **執行部署腳本**：
+    ```powershell
+    # 腳本會自動提取變數並注入 Dockerfile 進行編譯
+    # 詳見上述「環境變數注入」說明
+    ```
 
 ## 🌐 域名管理 (esg.team)
 *   **DNS 解析商**: 阿里雲
