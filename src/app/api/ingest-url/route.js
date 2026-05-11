@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import crypto from 'crypto';
 
 // 建立具備寫入權限的客戶端
 const writeClient = createClient({
@@ -93,28 +94,35 @@ export async function POST(req) {
     text = text.replace(/```json\n?|\n?```/g, '').trim();
     const extractedData = JSON.parse(text);
 
-    // 3. 將資料寫入 Sanity
+    // 3. 將資料寫入 Sanity (加入去重機制)
     const results = [];
     for (const item of extractedData) {
+      // 補全相對路徑 (例如 /news/123 -> https://udn.com/news/123)
+      const targetUrl = item.externalUrl && item.externalUrl.startsWith('http') 
+        ? item.externalUrl 
+        : (item.externalUrl && !item.externalUrl.startsWith('#') ? new URL(item.externalUrl, url).href : url);
+
+      // 使用 URL 生成唯一 ID，防止重複採集
+      const urlHash = crypto.createHash('md5').update(targetUrl).digest('hex');
+      const deterministicId = `insight-${urlHash}`;
+
       const doc = {
+        _id: deterministicId, // 這是關鍵：有了固定 ID，重複寫入會被忽略
         _type: 'insight',
         title: item.title,
         summary: item.summary,
-        // 補全相對路徑 (例如 /news/123 -> https://udn.com/news/123)
-        externalUrl: item.externalUrl && item.externalUrl.startsWith('http') 
-          ? item.externalUrl 
-          : (item.externalUrl && !item.externalUrl.startsWith('#') ? new URL(item.externalUrl, url).href : url),
+        externalUrl: targetUrl,
         source: item.source || '外部採集',
         publishedAt: new Date().toISOString(),
-        category: 'Market Update',
+        category: item.category || 'Market Update',
         isActive: true,
-        // 將 AI 挑選的 ID 轉換為 Sanity 引用格式
         hubs: item.hubIds && item.hubIds.length > 0 
           ? item.hubIds.map(id => ({ _type: 'reference', _ref: id }))
           : []
       };
       
-      const created = await writeClient.create(doc);
+      // 使用 createIfNotExists 確保不重複
+      const created = await writeClient.createIfNotExists(doc);
       results.push(created);
     }
 

@@ -6,6 +6,8 @@ import { sourceBookmark } from './sourceBookmark'
 import hub from './hub'
 import partner from './partner'
 
+import eduPage from './eduPage'
+
 export const schema = {
-  types: [siteSettings, hub, partner, marketIndex, product, insight, sourceBookmark],
+  types: [siteSettings, hub, partner, marketIndex, product, insight, sourceBookmark, eduPage],
 }

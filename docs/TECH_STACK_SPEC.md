@@ -43,10 +43,23 @@
 - **路徑**：`src/app/admin/sources/page.js` & `/api/admin/bookmarks`
 - **功能**：允許情報官保存高價值網址，支援一鍵「閃電採集」。
 
-### F. 全系統數據溯源監控 (Data Source Registry)
-- **路徑**：`src/app/admin/sources/page.js`
-- **地位**：**核心透明化組件**。列出所有前台數據（如行情、新聞）的原始來源、更新頻率與連線狀態。
-- **⚠️ 警告**：修改此路徑檔案時，絕對禁止移除此視覺組件。
+### G. 市場數據模組化引擎 (Market Data Engine)
+- **路徑**：`src/lib/market/` & `scripts/sync-market-data.mjs`
+- **架構**：採用「轉接器模式 (Adapter Pattern)」。
+    - **核心引擎 (Engine)**：負責讀取配置、調度不同 Provider 並統一寫入 Sanity。
+    - **供應商模組 (Providers)**：獨立的數據抓取模組（如 Yahoo Finance, Investing Scraper）。
+- **特性**：支援「熱插拔」，若需更換數據源，僅需修改 Provider 模組，前端與資料庫結構無需變動。
+
+### H. 工業科普引擎 (Industry Education Engine)
+- **路徑**：`src/app/hubs/[hubSlug]/edu/[eduSlug]/page.js`
+- **架構特性**：
+    - **共用模版 (Shared Template)**：採用動態路由架構，全站產業共用同一套高品質 UI 邏輯。
+    - **數據驅動 (Data-Driven)**：內容完全由 Sanity `eduPage` Schema 定義，支援無限新增科普主題。
+    - **Stitch 設計對齊**：遵循 Google Stitch 工業設計規範，整合 Bento Grid、技術參數表與互動式 FAQ。
+- **核心組件**：
+    - `EduImageGallery`：支援多圖切換與縮圖導航的客戶端藝廊組件。
+    - **Bento Grid**：支持四種視覺樣式（Primary, Secondary, Surface, White）的優勢卡片矩陣。
+- **維護指南**：若需新增產業科普，僅需在 Sanity 後台建立 `eduPage` 文檔並連結至對應的 `hub`。
 
 ---
 
@@ -67,5 +80,5 @@
 - **環境變數要求**：新環境部署必須配置 `.env.local` 中的 `PROJECT_ID` 與 `DATASET`。
 
 ---
-**更新日期：2026/05/10**
+**更新日期：2026/05/11**
 **由 AI 建構師與 ESG Team 共同維護**

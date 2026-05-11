@@ -16,6 +16,39 @@ const ptComponents = {
   },
 };
 
+export async function generateMetadata({ params }) {
+  const { hubSlug } = await params;
+  const hub = await client.fetch(`*[_type == "hub" && slug.current == $slug][0] {
+    title,
+    heroDescription,
+    description,
+    heroImage
+  }`, { slug: hubSlug });
+
+  if (!hub) return { title: 'ESG Intelligence Hub' };
+
+  const title = hub.title;
+  const description = hub.heroDescription || hub.description || `深入分析 ${hub.title} 的全球動向、ESG 轉型趨勢與供應鏈情報。`;
+  const ogImage = hub.heroImage ? urlFor(hub.heroImage).width(1200).height(630).fit('crop').url() : null;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ogImage ? [ogImage] : [],
+    },
+  };
+}
+
 export default async function HubHome({ params }) {
   const { hubSlug } = await params;
 
@@ -183,24 +216,56 @@ export default async function HubHome({ params }) {
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-stack-sm shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-secondary">monitoring</span>
-                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">市場實時指數 <span className="hidden sm:inline text-[10px] lowercase opacity-70 ml-1">Market Live Index</span></span>
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">市場實時指數 <span className="hidden sm:inline text-[10px] lowercase opacity-70 ml-1">Market Live Index</span></span>
                 </div>
                 <span className="text-[10px] text-outline bg-surface-container-high px-2 py-0.5 rounded flex items-center gap-1 w-fit">
                   <span className="w-1 h-1 rounded-full bg-esg-emerald animate-pulse"></span>
-                  最後更新: {new Date().toLocaleDateString('zh-TW')} {new Date().getHours()}:00
+                  最後更新: {indices[0]?.lastSync ? new Date(indices[0].lastSync).toLocaleString('zh-TW', { hour12: false }) : `${new Date().toLocaleDateString('zh-TW')} ${new Date().getHours()}:00`}
                 </span>
               </div>
-              <div className="flex flex-1 justify-start lg:justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar w-full pb-2 lg:pb-0">
+              <div className="flex flex-1 justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar w-full pb-2 lg:pb-0">
                 {indices.map((index) => {
                     const isUp = index.trendStatus === 'up';
                     const isDown = index.trendStatus === 'down';
-                    const trendColor = isUp ? 'text-[#059669]' : (isDown ? 'text-[#dc2626]' : 'text-on-surface-variant');
+                    const trendColor = isUp ? '#059669' : (isDown ? '#dc2626' : '#6b7280');
+                    const history = index.history || [];
+
+                    const renderSparkline = (data, color) => {
+                      if (!data || data.length < 2) return null;
+                      const min = Math.min(...data);
+                      const max = Math.max(...data);
+                      const range = (max - min) || 1;
+                      const width = 60;
+                      const height = 16;
+                      const points = data.map((v, i) => ({
+                        x: (i / (data.length - 1)) * width,
+                        y: height - ((v - min) / range) * (height - 4) - 2
+                      }));
+                      const path = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+                      return (
+                        <svg width={width} height={height} className="ml-2">
+                          <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      );
+                    };
                     
                     return (
-                        <div key={index._id} className="px-gutter text-center min-w-[150px]">
-                            <div className="font-label-sm text-label-sm text-on-surface-variant">{index.name} {index.unit && `(${index.unit})`}</div>
-                            <div className="font-data-mono text-data-mono text-primary flex items-center justify-center gap-1">
-                                {index.value} <span className={trendColor}>{index.trendPercentage}</span>
+                        <div key={index._id} className="px-gutter text-center min-w-[180px] group">
+                            <div className="font-label-sm text-[10px] text-on-surface-variant mb-1 flex items-center justify-center gap-1">
+                                {index.name} {index.unit && <span className="opacity-60">{index.unit}</span>}
+                            </div>
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="font-data-mono text-data-mono text-primary font-bold">
+                                    {index.value}
+                                </div>
+                                <div className={`flex items-center text-[11px] font-bold`} style={{ color: trendColor }}>
+                                    {isUp && <span className="material-symbols-outlined text-[14px]">trending_up</span>}
+                                    {isDown && <span className="material-symbols-outlined text-[14px]">trending_down</span>}
+                                    {index.trendPercentage}
+                                </div>
+                            </div>
+                            <div className="mt-1 flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
+                                {renderSparkline(history, trendColor)}
                             </div>
                         </div>
                     );
@@ -220,7 +285,13 @@ export default async function HubHome({ params }) {
           <div className="mb-stack-lg text-center max-w-3xl mx-auto">
             <span className="bg-secondary-container text-on-secondary-container px-3 py-1 font-label-sm text-label-sm rounded-full mb-4 inline-block">Industry Primer 產業科普</span>
             <h2 className="font-display-lg text-display-lg text-primary mb-4">解碼核心資產價值</h2>
-            <p className="font-body-base text-body-base text-on-surface-variant">專為供應鏈夥伴、中間商與跨領域投資者設計的快速入門指南。</p>
+            <p className="font-body-base text-body-base text-on-surface-variant mb-6">專為供應鏈夥伴、中間商與跨領域投資者設計的快速入門指南。</p>
+            {hubSlug === 'graphite' && (
+              <a href={`/hubs/${hubSlug}/edu/graphite-eaf-science`} className="inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-3 rounded-full font-bold text-sm hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                探索完整科普：電弧爐中的石墨電極
+                <span className="material-symbols-outlined text-sm">open_in_new</span>
+              </a>
+            )}
           </div>
 
           {/* 1. Core Features (Image 3 equivalent) */}
@@ -370,41 +441,60 @@ export default async function HubHome({ params }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             {products.map((product) => (
-              <div key={product._id} className="bg-surface-container-lowest border border-outline-variant hover:shadow-lg transition-all flex flex-col">
-                <div className="h-48 overflow-hidden bg-surface-variant">
+              <a 
+                key={product._id} 
+                href={`/hubs/${hubSlug}/products/${product.slug?.current || '#'}`}
+                className="group bg-surface-container-lowest border border-outline-variant hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden"
+              >
+                <div className="h-56 overflow-hidden bg-surface-variant relative">
                   {product.image ? (
                     <img 
-                      className="w-full h-full object-cover" 
-                      src={urlFor(product.image).width(600).height(400).url()} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                      src={urlFor(product.image).width(600).height(450).url()} 
                       alt={product.name} 
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-outline">No Image</div>
                   )}
+                  {/* Badge */}
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-primary/90 text-on-primary px-2 py-1 font-label-sm text-[10px] rounded backdrop-blur-sm shadow-lg">
+                      {product.gradeBadge || 'STANDARD GRADE'}
+                    </span>
+                  </div>
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="bg-white/90 text-primary px-4 py-2 rounded-full font-bold text-xs shadow-xl scale-90 group-hover:scale-100 transition-transform">
+                      查看完整詳情 VIEW DETAILS
+                    </span>
+                  </div>
                 </div>
                 <div className="p-stack-md flex-1 flex flex-col">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="bg-secondary-container text-on-secondary-container px-2 py-1 font-label-sm text-label-sm rounded">{product.gradeBadge || 'STANDARD GRADE'}</span>
+                  <div className="mb-2">
+                    <h3 className="font-headline-md text-headline-md text-primary leading-tight group-hover:text-esg-emerald transition-colors">
+                      {product.title}
+                    </h3>
+                    <span className="text-[10px] font-bold text-outline uppercase tracking-widest block mt-1">
+                      {product.subtitle}
+                    </span>
                   </div>
-                  <h3 className="font-headline-md text-headline-md text-primary mb-2">{product.title}<br/><span className="text-label-sm font-normal text-on-surface-variant">{product.subtitle}</span></h3>
-                  <p className="font-body-base text-body-base text-on-surface-variant mb-stack-md flex-1 whitespace-pre-line line-clamp-4 overflow-hidden">{product.description}</p>
-                  <div className="pt-stack-md border-t border-outline-variant flex justify-between items-center">
-                    <span className="font-data-mono text-data-mono text-primary">In Stock: {product.stock || 'N/A'}</span>
-                    <a 
-                      href={hub?.contactUrl || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary font-bold font-label-sm text-label-sm flex items-center hover:opacity-70 transition-opacity"
-                    >
-                      {hub?.quoteButtonText || '獲取報價'} 
-                      <span className="text-[10px] ml-1 font-normal opacity-70 uppercase">
-                        {hub?.quoteButtonTextEnglish || 'REQUEST QUOTE'}
-                      </span> 
-                      <span className="material-symbols-outlined ml-1">chevron_right</span>
-                    </a>
+                  
+                  <p className="font-body-base text-sm text-on-surface-variant mb-stack-md flex-1 line-clamp-3 leading-relaxed whitespace-pre-line">
+                    {product.description}
+                  </p>
+                  
+                  <div className="pt-stack-md border-t border-outline-variant/50 flex justify-between items-center">
+                    <div className="flex flex-col">
+                       <span className="text-[9px] text-outline uppercase">Inventory Status</span>
+                       <span className="font-data-mono text-xs text-primary font-bold">{product.stock || 'In Stock'}</span>
+                    </div>
+                    <div className="text-primary font-bold font-label-sm text-label-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                      進入頁面
+                      <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </a>
             ))}
             
             {products.length === 0 && (

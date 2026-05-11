@@ -289,16 +289,48 @@ export default async function Home() {
                             <div className="flex flex-1 justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar">
                                 {/* 2. 把剛剛要到的資料 (indices) 迴圈印出來 */}
                                 {indices.map((index) => {
-                                    // 判斷漲跌顏色
                                     const isUp = index.trendStatus === 'up';
                                     const isDown = index.trendStatus === 'down';
-                                    const trendColor = isUp ? 'text-[#059669]' : (isDown ? 'text-[#dc2626]' : 'text-on-surface-variant');
+                                    const trendColor = isUp ? '#059669' : (isDown ? '#dc2626' : '#6b7280');
+                                    const history = index.history || [];
+
+                                    // 繪製簡單的 Sparkline
+                                    const renderSparkline = (data, color) => {
+                                      if (!data || data.length < 2) return null;
+                                      const min = Math.min(...data);
+                                      const max = Math.max(...data);
+                                      const range = (max - min) || 1;
+                                      const width = 60;
+                                      const height = 16;
+                                      const points = data.map((v, i) => ({
+                                        x: (i / (data.length - 1)) * width,
+                                        y: height - ((v - min) / range) * (height - 4) - 2
+                                      }));
+                                      const path = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+                                      return (
+                                        <svg width={width} height={height} className="ml-2">
+                                          <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                      );
+                                    };
 
                                     return (
-                                        <div key={index._id} className="px-gutter text-center min-w-[150px]">
-                                            <div className="font-label-sm text-label-sm text-on-surface-variant">{index.name} {index.unit && `(${index.unit})`}</div>
-                                            <div className="font-data-mono text-data-mono text-primary flex items-center justify-center gap-1">
-                                                {index.value} <span className={trendColor}>{index.trendPercentage}</span>
+                                        <div key={index._id} className="px-gutter text-center min-w-[180px] group">
+                                            <div className="font-label-sm text-[10px] text-on-surface-variant mb-1 flex items-center justify-center gap-1">
+                                                {index.name} {index.unit && <span className="opacity-60">{index.unit}</span>}
+                                            </div>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="font-data-mono text-data-mono text-primary font-bold">
+                                                    {index.value}
+                                                </div>
+                                                <div className={`flex items-center text-[11px] font-bold`} style={{ color: trendColor }}>
+                                                    {isUp && <span className="material-symbols-outlined text-[14px]">trending_up</span>}
+                                                    {isDown && <span className="material-symbols-outlined text-[14px]">trending_down</span>}
+                                                    {index.trendPercentage}
+                                                </div>
+                                            </div>
+                                            <div className="mt-1 flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
+                                                {renderSparkline(history, trendColor)}
                                             </div>
                                         </div>
                                     );

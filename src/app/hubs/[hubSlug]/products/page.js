@@ -114,7 +114,7 @@ export default async function Products({ params }) {
                     <div className="flex justify-between items-start mb-2">
                       <h2 className="text-headline-md font-headline-md text-primary">{product.title}</h2>
                     </div>
-                    <p className="text-on-surface-variant text-body-base mb-stack-md flex-1">{product.description}</p>
+                    <p className="text-on-surface-variant text-body-base mb-stack-md flex-1 whitespace-pre-line">{product.description}</p>
                     
                     <div className="grid grid-cols-2 gap-4 mb-stack-md bg-surface-container-low p-3">
                       <div>
