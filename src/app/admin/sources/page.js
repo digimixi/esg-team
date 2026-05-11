@@ -66,9 +66,14 @@ export default function AdminSources() {
     }
   };
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     fetchData();
   }, []);
+
+  if (!mounted) return <div className="min-h-screen bg-[#0f172a] p-8 text-white">Loading Command Center...</div>;
 
   const toggleInsight = async (id, currentStatus) => {
     try {

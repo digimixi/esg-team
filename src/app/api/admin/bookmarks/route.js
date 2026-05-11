@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
 
+export const dynamic = 'force-dynamic';
+
 const writeClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,

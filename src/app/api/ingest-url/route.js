@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
+
+export const dynamic = 'force-dynamic';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import crypto from 'crypto';
 
