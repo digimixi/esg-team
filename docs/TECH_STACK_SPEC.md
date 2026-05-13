@@ -61,6 +61,23 @@
     - **Bento Grid**：支持四種視覺樣式（Primary, Secondary, Surface, White）的優勢卡片矩陣。
 - **維護指南**：若需新增產業科普，僅需在 Sanity 後台建立 `eduPage` 文檔並連結至對應的 `hub`。
 
+### I. 高密度數據儀表板 (Compact Benchmark Dashboard)
+- **路徑**：`src/app/hubs/[hubSlug]/page.js`
+- **設計規範**：採用「小而美」的極簡佈局。
+    - **左側資訊區**：整合標題、Data Tags 與斜體行動指引 (Call to Action)。
+    - **右側數據區**：橫向單列展示所有數據條 (Single Row Layout)，數據條厚度固定為 `3px`，配備 Data-Mono 專用字體。
+- **目的**：在不佔用垂直空間的前提下，提供專業級的數據對比體驗。
+
+### J. 智能數據鏈路與 AI 洞察引擎 (Intelligent AI Pipeline)
+- **核心文件**：
+    - `src/app/api/ingest/route.js`：調度中心，支援同步觸發採集與分析。
+    - `src/lib/ai/analyst.js`：AI 邏輯大腦，負責從數值中提取市場趨勢。
+- **運作模式**：
+    1. **Data Sensing**：讀取專題下的碳強度基準。
+    2. **Logic Mapping**：根據預設的永續發展邏輯（如平均碳強度門檻）進行趨勢分類（看多、風險、穩定）。
+    3. **Automated Synthesis**：生成帶有打字機動態效果的分析文字與信心指數。
+- **視覺規範 (Neural UI Pattern)**：AI 區塊必須具備「發光神經網絡背景」與「即時處理呼吸燈」，以視覺方式強調系統的智能化特質。
+
 ---
 
 ## 3. 性能與視覺優化規範 (Performance & UI/UX)

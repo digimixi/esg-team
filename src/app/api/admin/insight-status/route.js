@@ -30,3 +30,19 @@ export async function PATCH(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(req) {
+  try {
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
+    }
+
+    await writeClient.delete(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete failed:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

@@ -7,7 +7,24 @@ import hub from './hub'
 import partner from './partner'
 
 import eduPage from './eduPage'
+import industryBenchmark from './industryBenchmark'
+import { company } from './company'
+import { emissionFactor } from './emissionFactor'
+import { inventoryEntry } from './inventoryEntry'
 
 export const schema = {
-  types: [siteSettings, hub, partner, marketIndex, product, insight, sourceBookmark, eduPage],
+  types: [
+    siteSettings, 
+    hub, 
+    partner, 
+    marketIndex, 
+    product, 
+    insight, 
+    sourceBookmark, 
+    eduPage,
+    industryBenchmark,
+    company,
+    emissionFactor,
+    inventoryEntry
+  ],
 }

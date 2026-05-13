@@ -250,6 +250,19 @@ export default defineType({
       type: 'string',
       initialValue: 'Supply Chain Intelligence'
     }),
+    defineField({
+      name: 'aiInsight',
+      title: 'AI 即時洞察 (AI Market Insight)',
+      type: 'object',
+      fields: [
+        { name: 'isActive', title: '啟用 AI 洞察', type: 'boolean', initialValue: true },
+        { name: 'trendLabel', title: '趨勢判斷', type: 'string', description: '例如：看多、警戒、穩定轉型' },
+        { name: 'insightText', title: '分析文字', type: 'text', rows: 4 },
+        { name: 'confidenceScore', title: '信心指數 (%)', type: 'number', validation: Rule => Rule.min(0).max(100) },
+        { name: 'analysisDate', title: '分析日期', type: 'datetime', initialValue: (new Date()).toISOString() }
+      ],
+      description: '由 AI 根據全球數據生成的自動分析摘要'
+    }),
   ],
   orderings: [
     {

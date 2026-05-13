@@ -28,6 +28,10 @@ export default defineConfig({
     visionTool({defaultApiVersion: apiVersion}),
     zhHantLocale(), // 啟用繁體中文語系
   ],
+  document: {
+    // 確保所有標準動作（發布、刪除、取消發布）都可用
+    actions: (prev) => prev
+  },
   tools: (prev) => [
     ...prev,
     {

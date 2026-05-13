@@ -1,6 +1,6 @@
 export const insight = {
   name: 'insight',
-  title: '供應鏈情報 (Supply Chain Insight)',
+  title: '產業最新動態 (Industry News)',
   type: 'document',
   fields: [
     { 

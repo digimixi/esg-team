@@ -93,6 +93,22 @@ export default function AdminSources() {
     }
   };
 
+  const deleteInsight = async (id) => {
+    if (!confirm('確定要刪除這筆採集紀錄嗎？')) return;
+    try {
+      const res = await fetch('/api/admin/insight-status', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        setInsights(prev => prev.filter(item => item._id !== id));
+      }
+    } catch (error) {
+      console.error('Delete failed:', error);
+    }
+  };
+
   const handleIngest = async () => {
     setLoading(true);
     setStatus('🔍 正在連線並解析網頁...');
@@ -306,9 +322,18 @@ export default function AdminSources() {
                       </button>
                     </td>
                     <td className="px-6 py-4">
-                      <a href={item.externalUrl} target="_blank" className="text-emerald-400 hover:underline text-xs flex items-center gap-1">
-                        查看原文 <span className="material-symbols-outlined text-[10px]">open_in_new</span>
-                      </a>
+                      <div className="flex items-center gap-4">
+                        <a href={item.externalUrl} target="_blank" className="text-emerald-400 hover:underline text-xs flex items-center gap-1">
+                          查看原文 <span className="material-symbols-outlined text-[10px]">open_in_new</span>
+                        </a>
+                        <button 
+                          onClick={() => deleteInsight(item._id)}
+                          className="text-slate-500 hover:text-rose-500 transition-colors"
+                          title="刪除此條目"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

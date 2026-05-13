@@ -71,6 +71,30 @@
 *   **設定紀錄**: 需配置 4 條 A 記錄 (`@`) 與 1 條 CNAME (`www`) 指向 Google。
 *   **證書更新**: Google Cloud 負責自動管理 SSL 證書，DNS 更新後需等待約 30 分鐘生效。
 
+## 🤖 智能數據鏈路與 AI 洞察架構 (Intelligent Data & AI Pipeline)
+
+本平台整合了自動化採集與 AI 分析引擎，實現了從「原始數據」到「市場洞察」的自動化生產線。這使得 `esg.team` 不僅是一個資訊聚合站，更是一個具備「思考能力」的決策門戶。
+
+### 1. 架構組成 (Core Components)
+*   **數據採集引擎 (`/src/lib/ingestion`)**：負責從外部權威接口（如 IEA, GridIntensity API）提取最新數值。
+*   **AI 分析大腦 (`/src/lib/ai/analyst.js`)**：
+    *   **數據感應**：讀取專題 (Hub) 下的基準數值（如電力碳強度）。
+    *   **趨勢判定**：根據預設的永續發展邏輯進行「看多/風險預警」之市場判定。
+    *   **自動寫入**：透過 Sanity Client 將生成內容、趨勢標籤與信心指數即時 Patch 回 CMS 文件。
+*   **視覺展示層 (AI UX)**：
+    *   **神經網絡背景**：使用動態 CSS 模擬 AI 運算節點，強化「數據處理中」的心理暗示。
+    *   **打字機效果**：營造內容即時生成的交互感。
+    *   **AI Disclaimer**：明確標註內容來源，確保專業性與合規性。
+
+### 2. 自動化工作流 (Automated Workflow)
+*   **觸發機制**：存取 `GET /api/ingest?source={SOURCE}&ai=true`。
+*   **執行路徑**：數據採集 -> 資料庫寫入 -> AI 邏輯分析 -> 市場洞察發佈。
+
+### 3. 未來演進規劃 (Roadmap)
+*   **真實 LLM 接入**：串接 OpenAI / Gemini API 實現真正深度的產業報告生成。
+*   **自動化排程 (Cron Jobs)**：設定每日自動同步數據並重新執行 AI 趨勢分析。
+*   **付費數據牆 (Gating)**：針對 AI 生成的高價值趨勢報告實作權限控制。
+
 ## 🛠️ 技術棧 (Tech Stack)
 
 - **Frontend**: Next.js 15+ (App Router)

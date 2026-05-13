@@ -24,11 +24,12 @@ export default {
       validation: (Rule) => Rule.required(),
     },
     {
-      name: 'hub',
-      title: '所屬產業專案 (Belongs to Hub)',
-      type: 'reference',
-      to: [{ type: 'hub' }],
-      validation: (Rule) => Rule.required(),
+      name: 'relatedHubs',
+      title: '關聯產業專案 (Related Hubs)',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'hub' }] }],
+      description: '可以選擇多個關聯產業，該科普文章將會出現在所有選中的產業專頁中。',
+      validation: (Rule) => Rule.required().min(1),
     },
     {
       name: 'publishDate',

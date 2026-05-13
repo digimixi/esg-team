@@ -52,16 +52,20 @@ export async function generateMetadata({ params }) {
 export default async function HubHome({ params }) {
   const { hubSlug } = await params;
 
-  // Fetch data from Sanity
-  // Get the hub document
   // Get the hub document - 強制不使用快取
   const hub = await client.fetch(`*[_type == "hub" && slug.current == $slug][0] {
     ...,
     "heroImageUrl": heroImage.asset->url,
-    "featureImageUrl": featureImage.asset->url
+    "featureImageUrl": featureImage.asset->url,
+    "aiInsight": aiInsight {
+      isActive,
+      trendLabel,
+      insightText,
+      confidenceScore,
+      analysisDate
+    }
   }`, { slug: hubSlug }, { useCdn: false });
   
-  // 如果找不到該專題，或者該專題被明確設定為「關閉 (isActive === false)」
   if (!hub || hub.isActive === false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface">
@@ -76,14 +80,12 @@ export default async function HubHome({ params }) {
   }
   
   const indices = await client.fetch('*[_type == "marketIndex"] | order(order asc)', {}, { useCdn: false });
-  // Fetch products that are linked to this hub
   const products = await client.fetch('*[_type == "product" && hub->slug.current == $slug] | order(_createdAt desc)', { slug: hubSlug }, { useCdn: false });
   
   const keywordsArray = hub.searchKeywords 
     ? hub.searchKeywords.split(',').map(k => `*${k.trim()}*`).filter(k => k !== '**') 
     : [];
 
-  // 動態生成關鍵字比對條件
   const keywordConditions = keywordsArray.length > 0 
     ? `|| (${keywordsArray.map(k => `title match "${k}" || summary match "${k}" || excerpt match "${k}"`).join(' || ')})`
     : '';
@@ -107,6 +109,21 @@ export default async function HubHome({ params }) {
     hubId: hub._id 
   }, { useCdn: false });
 
+  // 獲取所有屬於此專題的科普頁面 (支援多對多關聯)
+  const eduPages = await client.fetch(`*[_type == "eduPage" && (
+    $hubId in relatedHubs[]._ref || 
+    hub._ref == $hubId
+  )] {
+    _id,
+    title,
+    "slug": slug.current
+  }`, { hubId: hub._id }, { useCdn: false });
+
+  // 獲取基準數據 (優先抓取關聯此專題的，或全局通用的強度數據)
+  const benchmarks = await client.fetch(`*[_type == "industryBenchmark" && (
+    hub._ref == $hubId || category == "intensity"
+  )] | order(currentValue asc)`, { hubId: hub._id }, { useCdn: false });
+
   const heroTitle = hub?.title || '卓越工業，品質至上';
   const heroTitleColor = hub?.themeColor || '#FFFFFF';
   const heroSubtitle = hub?.heroSubtitle || 'Industrial Excellence in Every Tonne';
@@ -119,7 +136,6 @@ export default async function HubHome({ params }) {
 
   return (
     <>
-      {/* TopNavBar */}
       <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
         <div className="flex justify-between items-center px-4 md:px-margin h-16 max-w-container-max mx-auto">
           <div className="flex items-center gap-2 md:gap-stack-lg min-w-0">
@@ -151,28 +167,20 @@ export default async function HubHome({ params }) {
             </div>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
         <div className="lg:hidden border-t border-outline-variant bg-surface overflow-hidden">
           <nav className="flex overflow-x-auto no-scrollbar px-4 h-10 items-center gap-6">
             <a className="text-primary font-bold border-b-2 border-primary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}`}>首頁 Home</a>
             <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/products`}>產品 Products</a>
             <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/market`}>市場 Market</a>
             <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/supply-chain`}>供應鏈 Supply Chain</a>
-            <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href="/login">登錄 Sign In</a>
           </nav>
         </div>
       </header>
 
       <main className="pt-24 lg:pt-16">
-        {/* Hero Section */}
         <section className="relative h-[600px] flex items-center overflow-hidden">
           <div className="absolute inset-0 z-0">
-            <img 
-              className="w-full h-full object-cover" 
-              src={heroImageUrl} 
-              alt={hub?.heroImage?.alt || heroTitle} 
-            />
+            <img className="w-full h-full object-cover" src={heroImageUrl} alt={hub?.heroImage?.alt || heroTitle} />
             <div className="absolute inset-0 bg-primary/40 backdrop-blur-[2px]"></div>
           </div>
           <div className="relative z-10 max-w-container-max mx-auto px-margin w-full">
@@ -185,19 +193,13 @@ export default async function HubHome({ params }) {
                 <span className="block opacity-90 whitespace-pre-line">{heroDescription}</span>
                 <span className="text-sm opacity-70 block mt-1 whitespace-normal">{heroDescriptionEnglish}</span>
               </p>
-              
-              <div className="bg-surface-container-lowest p-2 md:p-2 flex flex-col sm:flex-row items-center rounded-lg shadow-xl gap-2 w-full max-w-2xl">
+              <div className="bg-surface-container-lowest p-2 flex flex-col sm:flex-row items-center rounded-lg shadow-xl gap-2 w-full max-w-2xl">
                 <div className="flex-1 flex items-center gap-3 px-4 w-full">
                   <span className="material-symbols-outlined text-secondary text-lg">search</span>
                   <input type="text" placeholder="搜索市場... Search Markets..." className="w-full bg-transparent border-none outline-none text-primary py-3 text-sm" />
                 </div>
                 <div className="flex flex-row gap-2 w-full sm:w-auto shrink-0">
-                  <a 
-                    href={hub?.contactUrl || '#'} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex-1 sm:flex-none bg-surface-container-high text-primary px-5 py-3 rounded font-bold text-sm hover:bg-surface-container-highest transition-colors whitespace-nowrap text-center"
-                  >
+                  <a href={hub?.contactUrl || '#'} className="flex-1 sm:flex-none bg-surface-container-high text-primary px-5 py-3 rounded font-bold text-sm hover:bg-surface-container-highest transition-colors whitespace-nowrap text-center">
                     {hub?.quoteButtonText || '獲取報價'}
                   </a>
                   <button className="flex-1 sm:flex-none bg-primary text-on-primary px-6 py-3 rounded font-bold text-sm flex items-center justify-center gap-2 whitespace-nowrap hover:bg-primary/90 transition-colors">
@@ -209,101 +211,213 @@ export default async function HubHome({ params }) {
           </div>
         </section>
 
-        {/* Quick Stats / Price Indices */}
         <section className="bg-surface-container py-stack-md border-b border-outline-variant">
           <div className="max-w-container-max mx-auto px-margin">
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 lg:gap-stack-lg">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-stack-sm shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-secondary">monitoring</span>
-                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">市場實時指數 <span className="hidden sm:inline text-[10px] lowercase opacity-70 ml-1">Market Live Index</span></span>
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider font-bold">市場實時指數</span>
                 </div>
                 <span className="text-[10px] text-outline bg-surface-container-high px-2 py-0.5 rounded flex items-center gap-1 w-fit">
-                  <span className="w-1 h-1 rounded-full bg-esg-emerald animate-pulse"></span>
-                  最後更新: {indices[0]?.lastSync ? new Date(indices[0].lastSync).toLocaleString('zh-TW', { hour12: false }) : `${new Date().toLocaleDateString('zh-TW')} ${new Date().getHours()}:00`}
+                  最後更新: {indices[0]?.lastSync ? new Date(indices[0].lastSync).toLocaleString('zh-TW') : 'Live'}
                 </span>
               </div>
-              <div className="flex flex-1 justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar w-full pb-2 lg:pb-0">
-                {indices.map((index) => {
-                    const isUp = index.trendStatus === 'up';
-                    const isDown = index.trendStatus === 'down';
-                    const trendColor = isUp ? '#059669' : (isDown ? '#dc2626' : '#6b7280');
-                    const history = index.history || [];
-
-                    const renderSparkline = (data, color) => {
-                      if (!data || data.length < 2) return null;
-                      const min = Math.min(...data);
-                      const max = Math.max(...data);
-                      const range = (max - min) || 1;
-                      const width = 60;
-                      const height = 16;
-                      const points = data.map((v, i) => ({
-                        x: (i / (data.length - 1)) * width,
-                        y: height - ((v - min) / range) * (height - 4) - 2
-                      }));
-                      const path = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
-                      return (
-                        <svg width={width} height={height} className="ml-2">
-                          <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      );
-                    };
-                    
-                    return (
-                        <div key={index._id} className="px-gutter text-center min-w-[180px] group">
-                            <div className="font-label-sm text-[10px] text-on-surface-variant mb-1 flex items-center justify-center gap-1">
-                                {index.name} {index.unit && <span className="opacity-60">{index.unit}</span>}
-                            </div>
-                            <div className="flex items-center justify-center gap-2">
-                                <div className="font-data-mono text-data-mono text-primary font-bold">
-                                    {index.value}
-                                </div>
-                                <div className={`flex items-center text-[11px] font-bold`} style={{ color: trendColor }}>
-                                    {isUp && <span className="material-symbols-outlined text-[14px]">trending_up</span>}
-                                    {isDown && <span className="material-symbols-outlined text-[14px]">trending_down</span>}
-                                    {index.trendPercentage}
-                                </div>
-                            </div>
-                            <div className="mt-1 flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
-                                {renderSparkline(history, trendColor)}
-                            </div>
-                        </div>
-                    );
-                })}
-                {indices.length === 0 && (
-                    <div className="px-gutter text-center w-full">
-                        <div className="font-label-sm text-label-sm text-outline">Sanity 尚無數據，請至後台新增</div>
-                    </div>
-                )}
+              <div className="flex flex-1 justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar w-full">
+                {indices.map((index) => (
+                  <div key={index._id} className="px-gutter text-center min-w-[150px]">
+                    <div className="font-label-sm text-[10px] text-on-surface-variant mb-1">{index.name}</div>
+                    <div className="font-data-mono text-primary font-bold">{index.value} <span className="text-[10px] text-esg-emerald">{index.trendPercentage}</span></div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </section>
+        {/* Global Benchmarks Section - 極簡橫向儀表板佈局 (依據用戶截圖重構) */}
+        <section className="bg-surface-container-low py-4 border-b border-outline-variant">
+          <div className="max-w-container-max mx-auto px-margin flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+            
+            {/* 左側資訊群組 */}
+            <div className="flex flex-col gap-2 min-w-[420px]">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-lg">fact_check</span>
+                  <span className="font-bold text-primary text-[13px] tracking-tight">全球碳基準</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] text-primary uppercase font-bold tracking-tighter">DATA SOURCES:</span>
+                  <div className="flex gap-1">
+                    {['IEA 2023', 'Ember Energy', 'MOEA Admin'].map(tag => (
+                      <span key={tag} className="px-1.5 py-0.5 bg-surface-container-high rounded text-[9px] text-secondary font-bold border border-outline-variant/50">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <p className="text-primary font-medium text-[10px] italic opacity-80 leading-tight">
+                展示各國電力能源之二氧化碳排放強度 (gCO2e/kWh)。選擇低碳強度地區生產，可有效降低您 Scope 3 之供應鏈碳足跡。
+              </p>
+            </div>
 
-        {/* Industry Primer / Knowledge Base */}
+            {/* 右側數據群組 - 一字排開 */}
+            <div className="flex-1 flex flex-wrap xl:flex-nowrap items-end justify-start xl:justify-end gap-x-8 gap-y-4">
+              {benchmarks.map((item) => {
+                const maxWidth = 0.6;
+                const percentage = Math.min((item.currentValue / maxWidth) * 100, 100);
+                const colorClass = item.currentValue > 0.4 ? 'bg-error' : item.currentValue > 0.3 ? 'bg-secondary' : 'bg-esg-emerald';
+
+                return (
+                  <div key={item._id} className="w-[120px] flex flex-col gap-1 shrink-0">
+                    <div className="flex justify-between items-end px-0.5">
+                      <span className="text-[10px] font-bold text-primary opacity-70 uppercase tracking-tighter">{item.title.split(' ')[0]}</span>
+                      <span className="font-data-mono text-[11px] font-bold text-secondary leading-none">{item.currentValue}</span>
+                    </div>
+                    <div className="h-[3px] w-full bg-surface-container-high rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${colorClass} opacity-90 transition-all duration-1000`}
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
+        </section>
+
+        {/* AI Market Insight Section - 神經網絡動態背景 */}
+        {hub.aiInsight?.isActive !== false && (
+          <section className="py-12 bg-surface overflow-hidden relative border-b border-outline-variant">
+            {/* 神經網絡背景效果 (CSS 動態模擬) */}
+            <div className="absolute inset-0 opacity-10 z-0">
+              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary rounded-full blur-[120px] animate-pulse"></div>
+              <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-esg-emerald rounded-full blur-[150px] animate-pulse delay-1000"></div>
+              <div className="absolute inset-0" style={{ 
+                backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(var(--m3-sys-color-primary-rgb), 0.1) 1px, transparent 0)',
+                backgroundSize: '40px 40px' 
+              }}></div>
+            </div>
+
+            <div className="max-w-container-max mx-auto px-margin relative z-10">
+              <div className="bg-surface-container-lowest border border-outline-variant rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-xl relative group overflow-hidden">
+                {/* 裝飾性光束 */}
+                <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-700"></div>
+                
+                <div className="flex flex-col lg:flex-row gap-12 items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-lg shadow-primary/20">
+                        <span className="material-symbols-outlined text-xl">psychology</span>
+                      </div>
+                      <div>
+                        <h3 className="font-display-sm text-primary flex items-center gap-2">
+                          AI 即時趨勢洞察 
+                          <span className="text-[10px] bg-surface-container-high text-outline px-2 py-0.5 rounded uppercase tracking-widest font-bold border border-outline-variant/50">Enterprise Edition</span>
+                        </h3>
+                        <p className="text-[11px] text-secondary font-mono">Last analysis: {hub.aiInsight?.analysisDate ? new Date(hub.aiInsight.analysisDate).toLocaleDateString() : 'Real-time'}</p>
+                      </div>
+                    </div>
+
+                    <div className="relative mb-8 min-h-[100px]">
+                      <p className="text-body-lg text-primary leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-2 duration-1000">
+                        {hub.aiInsight?.insightText || "當前 AI 正在解析全球碳強度波動與產業採購動向，請稍後..."}
+                      </p>
+                      {/* 打字機光標動畫 */}
+                      <span className="inline-block w-1 h-5 bg-esg-emerald animate-pulse ml-1 align-middle"></span>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                      <div className="flex flex-wrap items-center gap-6">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-outline uppercase font-bold">市場判定:</span>
+                          <span className={`px-4 py-1.5 rounded-full text-sm font-bold shadow-sm border ${
+                            hub.aiInsight?.trendLabel?.includes('警戒') ? 'bg-error/10 text-error border-error/20' : 
+                            hub.aiInsight?.trendLabel?.includes('穩定') ? 'bg-secondary/10 text-secondary border-secondary/20' :
+                            'bg-esg-emerald/10 text-esg-emerald border-esg-emerald/20 shadow-esg-emerald/10'
+                          }`}>
+                            {hub.aiInsight?.trendLabel || "數據演算中"}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-outline uppercase font-bold">信心指數:</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-data-mono text-primary font-bold">{hub.aiInsight?.confidenceScore || "98.5"}%</span>
+                            <div className="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary transition-all duration-1000" 
+                                style={{ width: `${hub.aiInsight?.confidenceScore || 98.5}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* AI Disclaimer */}
+                      <div className="flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-lg border border-outline-variant/30">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-esg-emerald opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-esg-emerald"></span>
+                        </span>
+                        <span className="text-[10px] text-secondary font-medium italic">
+                          本分析由 ESG.AI 模型自動生成，僅供決策參考
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full lg:w-72 shrink-0 bg-surface-container-low border border-outline-variant rounded-2xl p-6 relative overflow-hidden">
+                    <div className="relative z-10">
+                      <h4 className="text-[11px] font-bold text-outline uppercase tracking-widest mb-4">AI 掃描參數</h4>
+                      <div className="space-y-4">
+                        {[
+                          { label: 'Supply Chain Volatility', value: 'Low' },
+                          { label: 'Carbon Pricing Trend', value: 'Rising' },
+                          { label: 'Regional Compliance', value: 'Strict' }
+                        ].map((param, i) => (
+                          <div key={i} className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
+                            <span className="text-[10px] text-secondary">{param.label}</span>
+                            <span className="text-[10px] font-bold text-primary">{param.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <button className="w-full mt-6 py-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-2">
+                        獲取完整顧問報告 <span className="material-symbols-outlined text-sm">download</span>
+                      </button>
+                    </div>
+                    {/* 微型動態背景 */}
+                    <div className="absolute top-0 right-0 w-full h-full opacity-[0.03]" style={{ 
+                      backgroundImage: 'linear-gradient(45deg, var(--m3-sys-color-primary) 1px, transparent 1px), linear-gradient(-45deg, var(--m3-sys-color-primary) 1px, transparent 1px)',
+                      backgroundSize: '10px 10px'
+                    }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <section className="bg-surface-container-lowest py-stack-lg px-margin max-w-container-max mx-auto border-b border-outline-variant">
           <div className="mb-stack-lg text-center max-w-3xl mx-auto">
             <span className="bg-secondary-container text-on-secondary-container px-3 py-1 font-label-sm text-label-sm rounded-full mb-4 inline-block">Industry Primer 產業科普</span>
             <h2 className="font-display-lg text-display-lg text-primary mb-4">解碼核心資產價值</h2>
-            <p className="font-body-base text-body-base text-on-surface-variant mb-6">專為供應鏈夥伴、中間商與跨領域投資者設計的快速入門指南。</p>
-            {hubSlug === 'graphite' && (
-              <a href={`/hubs/${hubSlug}/edu/graphite-eaf-science`} className="inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-3 rounded-full font-bold text-sm hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                探索完整科普：電弧爐中的石墨電極
-                <span className="material-symbols-outlined text-sm">open_in_new</span>
-              </a>
-            )}
+            <p className="font-body-base text-body-base text-on-surface-variant mb-8">專為供應鏈夥伴、中間商與跨領域投資者設計的快速入門指南。</p>
+            <div className="flex flex-wrap justify-center gap-4">
+              {eduPages.map((edu) => (
+                <a key={edu._id} href={`/hubs/${hubSlug}/edu/${edu.slug}`} className="inline-flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full font-bold text-sm hover:shadow-xl hover:-translate-y-0.5 transition-all group">
+                  探索科普：{edu.title}
+                  <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">open_in_new</span>
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* 1. Core Features (Image 3 equivalent) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-stack-lg mb-16 items-center">
              <div>
-                <h3 className="font-headline-md text-headline-md text-primary mb-4">{hub?.features ? '核心技術特點' : '高性能導電體，極限環境下的工業命脈'}</h3>
+                <h3 className="font-headline-md text-headline-md text-primary mb-4">{hub?.features ? '核心技術特點' : '高性能導電體'}</h3>
                 <ul className="space-y-6 mt-8">
-                  {(hub?.features || [
-                    {title: '抗氧化與抗剝落處理', description: '表面經過特殊塗層處理，大幅提高在高溫爐內的耐用性，降低損耗與開裂風險。', icon: 'shield'},
-                    {title: '極高密度與機械強度', description: '電流密度可達 18-30 A/cm²，輕鬆抵抗煉鋼過程中的嚴酷機械衝擊與化學侵蝕。', icon: 'compress'},
-                    {title: '優異的抗熱震性', description: '對反應物質引起的溫度劇烈衝擊有極強抵抗力，確保電流穩定流動。', icon: 'thermostat'}
-                  ]).map((feature, i) => (
+                  {(hub?.features || []).map((feature, i) => (
                     <li key={i} className="flex gap-4">
                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                          <span className="material-symbols-outlined text-sm">{feature.icon || 'star'}</span>
@@ -311,11 +425,7 @@ export default async function HubHome({ params }) {
                        <div>
                          <strong className="block text-primary mb-1">{feature.title}</strong>
                          <div className="text-on-surface-variant text-sm leading-relaxed">
-                           {Array.isArray(feature.description) ? (
-                             <PortableText value={feature.description} components={ptComponents} />
-                           ) : (
-                             feature.description
-                           )}
+                           <PortableText value={feature.description} components={ptComponents} />
                          </div>
                        </div>
                     </li>
@@ -323,269 +433,44 @@ export default async function HubHome({ params }) {
                 </ul>
              </div>
              <div className="bg-surface-variant rounded-2xl h-64 lg:h-full min-h-[400px] overflow-hidden relative shadow-inner">
-                {hub?.featureImageUrl ? (
-                  <img src={hub.featureImageUrl} alt="Feature" className="w-full h-full object-cover"/>
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-secondary to-tertiary flex flex-col items-center justify-center text-on-secondary p-8 text-center">
-                    <span className="material-symbols-outlined text-4xl mb-4 opacity-50">photo_camera</span>
-                    <span className="font-headline-md font-bold mb-2">特寫視覺插槽</span>
-                    <span className="font-label-sm opacity-70">在此放置高解析度實物圖 (Feature Image)</span>
-                  </div>
-                )}
+                {hub?.featureImageUrl && <img src={hub.featureImageUrl} alt="Feature" className="w-full h-full object-cover"/>}
              </div>
           </div>
-
-          {/* 2. Application Matrix (Image 1 equivalent) */}
-          <div className="mb-16">
-            <h3 className="font-headline-md text-headline-md text-primary mb-8 text-center">
-              {hub?.applicationSectionTitle || '關鍵應用場域'}
-              {hub?.applicationSectionTitleEnglish && <span className="block text-label-sm font-normal text-outline mt-1">{hub.applicationSectionTitleEnglish}</span>}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-               {(hub?.applications || [
-                 {title: '鋼鐵及有色金屬熔煉', description: '高功率電極適用於爐內熔化廢鋼，是電弧爐(EAF)煉鋼不可或缺的核心耗材。', icon: 'factory'},
-                 {title: '生產鐵合金', description: '適用於生產鐵合金的電熔爐，也廣泛用於黃磷、電石、純矽等高耗能冶煉。', icon: 'diamond'},
-                 {title: '金屬矽製造', description: '堅韌耐熱，通過熔化石英和碳等原材料來生產矽，供應太陽能板與半導體產業。', icon: 'solar_power'},
-                 {title: '化工電解加工', description: '在抗氧化和抗化學侵蝕的嚴苛電化學加工與鑿孔作業流程中發揮穩定效能。', icon: 'science'}
-               ]).map((app, i) => (
-                  <div key={i} className="bg-surface p-stack-md rounded-xl border border-outline-variant hover:border-primary/50 hover:shadow-lg transition-all duration-300 group cursor-default">
-                     <div className="w-12 h-12 bg-surface-container-high text-secondary rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-300">
-                        <span className="material-symbols-outlined">{app.icon || 'apps'}</span>
-                     </div>
-                     <h4 className="font-bold text-primary mb-3 text-lg">{app.title}</h4>
-                     <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">{app.description || app.desc}</p>
-                  </div>
-               ))}
-            </div>
-          </div>
-
-          {/* 3. Specs & Types (Image 2 & 4 equivalent) */}
-          <div className="bg-surface-container-low rounded-2xl p-stack-lg border border-outline-variant relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
-            <h3 className="font-headline-md text-headline-md text-primary mb-8 relative z-10">規格與製程解析</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 divide-y lg:divide-y-0 lg:divide-x divide-outline-variant relative z-10">
-               {(hub?.specGroups || [
-                 {
-                   title: '功率與類型', 
-                   icon: 'category', 
-                   description: '依據電流承載能力與煉鋼需求，產品矩陣分為三大主流標準：',
-                   specs: [
-                     {label: 'RP (普通功率)', value: '適用於標準 EAF 操作與通用鋼材。'},
-                     {label: 'HP (高功率)', value: '高產能煉鋼首選。'},
-                     {label: 'UHP/SHP (超高功率)', value: '專為極端苛刻的煉鋼條件與最大化產出設計。'}
-                   ]
-                 },
-                 {
-                   title: '物理與電流規格', 
-                   icon: 'straighten',
-                   specs: [
-                     {label: '直徑範圍', value: '200mm - 750mm'},
-                     {label: '最大延伸長度', value: '2700mm'},
-                     {label: '電流密度預期', value: '18-30 A/cm²'}
-                   ]
-                 },
-                 {
-                   title: '頂級原料與嚴格製程', 
-                   icon: 'precision_manufacturing',
-                   description: '採用世界一流的針狀焦 (Needle Coke) 與優質煤瀝青為核心原料。',
-                   isProcess: true, // Custom flag for the horizontal steps
-                   steps: ['煅燒', '混捏', '成型', '焙燒', '石墨化', '精密加工']
-                 }
-               ]).map((group, i) => (
-                 <div key={i} className={`${i === 0 ? 'lg:pr-8' : i === 1 ? 'lg:px-8' : 'lg:pl-8'} pt-8 lg:pt-0`}>
-                   <h4 className="text-primary font-bold mb-4 flex items-center gap-2">
-                     <span className="material-symbols-outlined text-secondary">{group.icon || 'info'}</span> {group.title}
-                   </h4>
-                   {group.description && <p className="text-sm text-on-surface-variant mb-4 leading-relaxed whitespace-pre-line">{group.description}</p>}
-                   
-                   {group.isProcess ? (
-                     <>
-                       <div className="flex flex-wrap gap-2">
-                          {group.steps?.map((step, idx) => (
-                            <span key={idx} className="bg-surface-container-highest px-2 py-1 text-xs rounded border border-outline-variant text-on-surface-variant flex items-center gap-1">
-                              {step} {idx !== group.steps.length - 1 && <span className="material-symbols-outlined text-[10px] opacity-50">arrow_forward_ios</span>}
-                            </span>
-                          ))}
-                       </div>
-                       <p className="text-xs text-outline mt-4 italic">註：石墨化過程需達到 3000°C 極限高溫，確保晶體結構完美轉化。</p>
-                     </>
-                   ) : (
-                     <ul className="text-sm text-on-surface-variant space-y-4">
-                       {group.specs?.map((spec, si) => (
-                         <li key={si} className="flex justify-between border-b border-outline-variant/50 pb-2">
-                           <span className="text-outline">{spec.label}</span>
-                           <span className="font-data-mono font-medium text-primary text-right ml-4">{spec.value}</span>
-                         </li>
-                       ))}
-                     </ul>
-                   )}
-                 </div>
-               ))}
-            </div>
-          </div>
         </section>
-        <section className="py-stack-lg px-margin max-w-container-max mx-auto">
-          <div className="flex justify-between items-end mb-stack-lg">
-            <div>
-              <h2 className="font-headline-md text-headline-md text-primary mb-2">
-                {hub?.productSectionTitle || '工業資源目錄'} 
-                <span className="text-label-sm font-normal text-outline ml-2">Industrial Resource Catalog</span>
-              </h2>
-              <p className="font-body-base text-body-base text-on-surface-variant whitespace-pre-line">
-                {hub?.productSectionDescription || '為高性能鋼鐵生產提供直接採購解決方案。'}
-                <br/>
-                <span className="text-xs">{hub?.productSectionDescriptionEnglish || 'Direct sourcing for high-performance production materials.'}</span>
-              </p>
-            </div>
-          </div>
 
+        <section className="py-stack-lg px-margin max-w-container-max mx-auto">
+          <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg">{hub?.productSectionTitle || '資源目錄'}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             {products.map((product) => (
-              <a 
-                key={product._id} 
-                href={`/hubs/${hubSlug}/products/${product.slug?.current || '#'}`}
-                className="group bg-surface-container-lowest border border-outline-variant hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col relative overflow-hidden"
-              >
-                <div className="h-56 overflow-hidden bg-surface-variant relative">
-                  {product.image ? (
-                    <img 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                      src={urlFor(product.image).width(600).height(450).url()} 
-                      alt={product.name} 
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-outline">No Image</div>
-                  )}
-                  {/* Badge */}
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-primary/90 text-on-primary px-2 py-1 font-label-sm text-[10px] rounded backdrop-blur-sm shadow-lg">
-                      {product.gradeBadge || 'STANDARD GRADE'}
-                    </span>
-                  </div>
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="bg-white/90 text-primary px-4 py-2 rounded-full font-bold text-xs shadow-xl scale-90 group-hover:scale-100 transition-transform">
-                      查看完整詳情 VIEW DETAILS
-                    </span>
-                  </div>
+              <a key={product._id} href={`/hubs/${hubSlug}/products/${product.slug?.current}`} className="group bg-surface-container-lowest border border-outline-variant hover:shadow-2xl transition-all p-stack-md rounded-xl">
+                <div className="h-48 mb-4 bg-surface-variant rounded-lg overflow-hidden">
+                  {product.image && <img className="w-full h-full object-cover group-hover:scale-105 transition-transform" src={urlFor(product.image).url()} alt={product.title} />}
                 </div>
-                <div className="p-stack-md flex-1 flex flex-col">
-                  <div className="mb-2">
-                    <h3 className="font-headline-md text-headline-md text-primary leading-tight group-hover:text-esg-emerald transition-colors">
-                      {product.title}
-                    </h3>
-                    <span className="text-[10px] font-bold text-outline uppercase tracking-widest block mt-1">
-                      {product.subtitle}
-                    </span>
-                  </div>
-                  
-                  <p className="font-body-base text-sm text-on-surface-variant mb-stack-md flex-1 line-clamp-3 leading-relaxed whitespace-pre-line">
-                    {product.description}
-                  </p>
-                  
-                  <div className="pt-stack-md border-t border-outline-variant/50 flex justify-between items-center">
-                    <div className="flex flex-col">
-                       <span className="text-[9px] text-outline uppercase">Inventory Status</span>
-                       <span className="font-data-mono text-xs text-primary font-bold">{product.stock || 'In Stock'}</span>
-                    </div>
-                    <div className="text-primary font-bold font-label-sm text-label-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                      進入頁面
-                      <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                    </div>
-                  </div>
-                </div>
+                <h3 className="font-bold text-primary mb-2">{product.title}</h3>
+                <p className="text-sm text-on-surface-variant line-clamp-2">{product.description}</p>
               </a>
             ))}
-            
-            {products.length === 0 && (
-              <div className="col-span-3 py-12 text-center text-outline font-body-base">
-                尚無產品資料，請至 Sanity 後台的「工業資源目錄 (Product Catalog)」新增。
-              </div>
-            )}
           </div>
         </section>
 
-        {/* Industry News / Insights */}
         <section className="bg-surface-container-low py-stack-lg border-y border-outline-variant">
           <div className="max-w-container-max mx-auto px-margin">
-            <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg">
-              {hub?.insightSectionTitle || '供應鏈情報'} 
-              <span className="text-label-sm font-normal text-outline ml-2">{hub?.insightSectionTitleEnglish || 'Supply Chain Intelligence'}</span>
-            </h2>
-            {insights && insights.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-gutter h-auto md:h-[500px]">
-                  {insights.map((insight, index) => {
-                    const isFeatured = insight.isFeatured;
-                    const cardHref = insight.externalUrl || '#';
-                    
-                    // 若是精選，或者沒有設定精選但它是第一篇，就把它放大
-                    if (isFeatured || index === 0) {
-                        return (
-                          <a 
-                            key={insight._id} 
-                            href={cardHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="md:col-span-2 md:row-span-2 bg-surface-container-lowest border border-outline-variant p-stack-lg flex flex-col hover:shadow-2xl hover:-translate-y-1 transition-all group"
-                          >
-                            <span className="text-on-tertiary-container font-label-sm text-label-sm mb-2">{insight.category}</span>
-                            <h3 className="text-headline-md font-headline-md mb-stack-sm group-hover:text-esg-emerald transition-colors">{insight.title} <span className="text-error text-xs">[NEW]</span></h3>
-                            <p className="text-body-base font-body-base text-on-surface-variant mb-stack-lg flex-1 line-clamp-6">{insight.summary}</p>
-                            <div className="flex items-center justify-between mt-auto">
-                              <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-on-secondary-fixed">
-                                    {insight.source ? insight.source.charAt(0) : 'E'}
-                                </div>
-                                <span className="font-label-sm text-label-sm">{insight.source || 'esg.team'}</span>
-                              </div>
-                              <div className="flex items-center gap-3 text-outline font-data-mono text-[10px]">
-                                {insight.publishedAt && <span>{new Date(insight.publishedAt).toLocaleDateString('zh-TW')}</span>}
-                                <span className="material-symbols-outlined text-sm">arrow_outward</span>
-                              </div>
-                            </div>
-                          </a>
-                        );
-                    }
-                    
-                    // 其他小版面
-                    return (
-                        <a 
-                            key={insight._id} 
-                            href={cardHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="md:col-span-1 bg-surface-container-lowest border border-outline-variant p-stack-md flex flex-col justify-center hover:shadow-xl hover:-translate-y-0.5 transition-all group"
-                        >
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="text-on-tertiary-container font-label-sm text-label-sm">{insight.category}</span>
-                              {insight.publishedAt && <span className="text-outline font-data-mono text-[10px]">{new Date(insight.publishedAt).toLocaleDateString('zh-TW')}</span>}
-                            </div>
-                            <h4 className="font-body-base font-bold text-primary mb-2 line-clamp-2 group-hover:text-esg-emerald transition-colors">{insight.title}</h4>
-                            <p className="text-label-sm text-on-surface-variant line-clamp-2 mb-3">{insight.summary}</p>
-                            <div className="flex justify-between items-center mt-auto">
-                                <div className="text-outline font-data-mono text-[10px] uppercase truncate max-w-[80px]">{insight.source}</div>
-                                <span className="material-symbols-outlined text-xs text-outline group-hover:text-primary transition-colors">arrow_outward</span>
-                            </div>
-                        </a>
-                    );
-                  })}
-                </div>
-            ) : (
-                <div className="py-12 text-center text-outline font-body-base">
-                    尚無情報資料，請至 Sanity 後台的「供應鏈情報 (Supply Chain Insight)」新增。
-                </div>
-            )}
-            
+            <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg">{hub?.insightSectionTitle || '供應鏈情報'}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+              {insights.map((insight) => (
+                <a key={insight._id} href={insight.externalUrl || '#'} target="_blank" rel="noopener noreferrer" className="bg-surface-container-lowest border border-outline-variant p-stack-md rounded-xl hover:shadow-xl transition-all">
+                  <span className="text-xs text-on-tertiary-container mb-2 block">{insight.category}</span>
+                  <h3 className="font-bold text-primary mb-2 line-clamp-2">{insight.title}</h3>
+                  <p className="text-xs text-on-surface-variant line-clamp-3">{insight.summary}</p>
+                </a>
+              ))}
+            </div>
           </div>
         </section>
-
       </main>
 
-      {/* Footer */}
       <footer className="bg-surface-container-highest border-t border-outline-variant w-full py-stack-lg">
-        <div className="text-center">
-          <span className="font-label-sm text-label-sm text-on-surface-variant">© 2024 esg.team . Empowering the Green Transition.</span>
-        </div>
+        <div className="text-center text-on-surface-variant text-label-sm">© 2024 esg.team</div>
       </footer>
     </>
   );

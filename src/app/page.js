@@ -47,6 +47,10 @@ export default async function Home() {
         "hubTitle": hub->title
     }`);
 
+    // 5. 獲取全球碳基準數據 (用於首頁展示)
+    const benchmarks = await client.fetch(`*[_type == "industryBenchmark" && category == "intensity"] | order(currentValue asc)`, {}, { useCdn: false });
+
+
     return (
         <>
             {/* TopNavBar */}
@@ -101,6 +105,126 @@ export default async function Home() {
                             {homeHeroDescription}
                         </p>
                     </div>
+                </section>
+
+                <section className="bg-surface-container py-stack-md border-b border-outline-variant">
+                    <div className="max-w-container-max mx-auto px-margin">
+                        <div className="flex flex-wrap items-center justify-between gap-stack-lg">
+                            <div className="flex items-center gap-stack-sm">
+                                <span className="material-symbols-outlined text-secondary">public</span>
+                                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">{macroTitle} <span className="text-[10px] lowercase opacity-70 ml-1">{macroSubtitle}</span></span>
+                            </div>
+                            <div className="flex flex-1 justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar">
+                                {/* 2. 把剛剛要到的資料 (indices) 迴圈印出來 */}
+                                {indices.map((index) => {
+                                    const isUp = index.trendStatus === 'up';
+                                    const isDown = index.trendStatus === 'down';
+                                    const trendColor = isUp ? '#059669' : (isDown ? '#dc2626' : '#6b7280');
+                                    const history = index.history || [];
+
+                                    // 繪製簡單的 Sparkline
+                                    const renderSparkline = (data, color) => {
+                                      if (!data || data.length < 2) return null;
+                                      const min = Math.min(...data);
+                                      const max = Math.max(...data);
+                                      const range = (max - min) || 1;
+                                      const width = 60;
+                                      const height = 16;
+                                      const points = data.map((v, i) => ({
+                                        x: (i / (data.length - 1)) * width,
+                                        y: height - ((v - min) / range) * (height - 4) - 2
+                                      }));
+                                      const path = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+                                      return (
+                                        <svg width={width} height={height} className="ml-2">
+                                          <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                      );
+                                    };
+
+                                    return (
+                                        <div key={index._id} className="px-gutter text-center min-w-[180px] group">
+                                            <div className="font-label-sm text-[10px] text-on-surface-variant mb-1 flex items-center justify-center gap-1">
+                                                {index.name} {index.unit && <span className="opacity-60">{index.unit}</span>}
+                                            </div>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="font-data-mono text-data-mono text-primary font-bold">
+                                                    {index.value}
+                                                </div>
+                                                <div className={`flex items-center text-[11px] font-bold`} style={{ color: trendColor }}>
+                                                    {isUp && <span className="material-symbols-outlined text-[14px]">trending_up</span>}
+                                                    {isDown && <span className="material-symbols-outlined text-[14px]">trending_down</span>}
+                                                    {index.trendPercentage}
+                                                </div>
+                                            </div>
+                                            <div className="mt-1 flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
+                                                {renderSparkline(history, trendColor)}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                                {/* 如果後台還沒建資料，顯示提示 */}
+                                {indices.length === 0 && (
+                                    <div className="px-gutter text-center w-full">
+                                        <div className="font-label-sm text-label-sm text-outline">Sanity 尚無數據，請至後台新增</div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Global Benchmarks Section - 極簡橫向儀表板佈局 (依據用戶截圖重構) */}
+                <section className="bg-surface-container-low py-4 border-b border-outline-variant">
+                  <div className="max-w-container-max mx-auto px-margin flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+                    
+                    {/* 左側資訊群組 */}
+                    <div className="flex flex-col gap-2 min-w-[420px]">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="material-symbols-outlined text-secondary text-lg">fact_check</span>
+                          <span className="font-bold text-primary text-[13px] tracking-tight">全球碳基準</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[9px] text-primary uppercase font-bold tracking-tighter">DATA SOURCES:</span>
+                          <div className="flex gap-1">
+                            {['IEA 2023', 'Ember Energy', 'MOEA Admin'].map(tag => (
+                              <span key={tag} className="px-1.5 py-0.5 bg-surface-container-high rounded text-[9px] text-secondary font-bold border border-outline-variant/50">{tag}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-primary font-medium text-[10px] italic opacity-80 leading-tight">
+                        展示各國電力能源之二氧化碳排放強度 (gCO2e/kWh)。選擇低碳強度地區生產，可有效降低您 Scope 3 之供應鏈碳足跡。
+                      </p>
+                    </div>
+
+                    {/* 右側數據群組 - 一字排開 */}
+                    <div className="flex-1 flex flex-wrap xl:flex-nowrap items-end justify-start xl:justify-end gap-x-8 gap-y-4">
+                      {benchmarks.map((item) => {
+                        const maxWidth = 0.6;
+                        const percentage = Math.min((item.currentValue / maxWidth) * 100, 100);
+                        const colorClass = item.currentValue > 0.4 ? 'bg-error' : item.currentValue > 0.3 ? 'bg-secondary' : 'bg-esg-emerald';
+
+                        return (
+                          <div key={item._id} className="w-[120px] flex flex-col gap-1 shrink-0">
+                            <div className="flex justify-between items-end px-0.5">
+                              <span className="text-[10px] font-bold text-primary opacity-70 uppercase tracking-tighter">{item.title.split(' ')[0]}</span>
+                              <span className="font-data-mono text-[11px] font-bold text-secondary leading-none">{item.currentValue}</span>
+                            </div>
+                            <div className="h-[3px] w-full bg-surface-container-high rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full ${colorClass} opacity-90 transition-all duration-1000`}
+                                style={{ width: `${percentage}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                  </div>
                 </section>
 
                 {/* Industry Hubs Section */}
@@ -276,73 +400,6 @@ export default async function Home() {
                                     <div className="text-outline text-sm italic">尚無情報，請從後台啟動「全球情報採集盒」</div>
                                 </div>
                             )}
-                        </div>
-                    </div>
-                </section>
-                <section className="bg-surface-container py-stack-md border-y border-outline-variant">
-                    <div className="max-w-container-max mx-auto px-margin">
-                        <div className="flex flex-wrap items-center justify-between gap-stack-lg">
-                            <div className="flex items-center gap-stack-sm">
-                                <span className="material-symbols-outlined text-secondary">public</span>
-                                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">{macroTitle} <span className="text-[10px] lowercase opacity-70 ml-1">{macroSubtitle}</span></span>
-                            </div>
-                            <div className="flex flex-1 justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar">
-                                {/* 2. 把剛剛要到的資料 (indices) 迴圈印出來 */}
-                                {indices.map((index) => {
-                                    const isUp = index.trendStatus === 'up';
-                                    const isDown = index.trendStatus === 'down';
-                                    const trendColor = isUp ? '#059669' : (isDown ? '#dc2626' : '#6b7280');
-                                    const history = index.history || [];
-
-                                    // 繪製簡單的 Sparkline
-                                    const renderSparkline = (data, color) => {
-                                      if (!data || data.length < 2) return null;
-                                      const min = Math.min(...data);
-                                      const max = Math.max(...data);
-                                      const range = (max - min) || 1;
-                                      const width = 60;
-                                      const height = 16;
-                                      const points = data.map((v, i) => ({
-                                        x: (i / (data.length - 1)) * width,
-                                        y: height - ((v - min) / range) * (height - 4) - 2
-                                      }));
-                                      const path = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
-                                      return (
-                                        <svg width={width} height={height} className="ml-2">
-                                          <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                      );
-                                    };
-
-                                    return (
-                                        <div key={index._id} className="px-gutter text-center min-w-[180px] group">
-                                            <div className="font-label-sm text-[10px] text-on-surface-variant mb-1 flex items-center justify-center gap-1">
-                                                {index.name} {index.unit && <span className="opacity-60">{index.unit}</span>}
-                                            </div>
-                                            <div className="flex items-center justify-center gap-2">
-                                                <div className="font-data-mono text-data-mono text-primary font-bold">
-                                                    {index.value}
-                                                </div>
-                                                <div className={`flex items-center text-[11px] font-bold`} style={{ color: trendColor }}>
-                                                    {isUp && <span className="material-symbols-outlined text-[14px]">trending_up</span>}
-                                                    {isDown && <span className="material-symbols-outlined text-[14px]">trending_down</span>}
-                                                    {index.trendPercentage}
-                                                </div>
-                                            </div>
-                                            <div className="mt-1 flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
-                                                {renderSparkline(history, trendColor)}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-
-                                {/* 如果後台還沒建資料，顯示提示 */}
-                                {indices.length === 0 && (
-                                    <div className="px-gutter text-center w-full">
-                                        <div className="font-label-sm text-label-sm text-outline">Sanity 尚無數據，請至後台新增</div>
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </div>
                 </section>
