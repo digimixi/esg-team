@@ -1,189 +1,147 @@
 import { client } from '@/sanity/lib/client';
-import { urlFor } from '@/sanity/lib/image';
-import { notFound } from 'next/navigation';
+import Navbar from '@/components/Navbar';
+import Link from 'next/link';
+import SolutionHero from '@/components/solutions/SolutionHero';
 
-export const revalidate = 60;
+export const revalidate = 0;
 
-export async function generateMetadata({ params }) {
-  const { hubSlug, productSlug } = await params;
-  const product = await client.fetch(`*[_type == "product" && slug.current == $slug && hub->slug.current == $hubSlug][0]`, { 
-    slug: productSlug,
-    hubSlug 
-  });
-
-  if (!product) return { title: 'Product Not Found' };
-
-  return {
-    title: `${product.title} | ${product.subtitle || ''}`,
-    description: product.description,
-  };
-}
-
-export default async function ProductDetail({ params }) {
+export default async function ProductDetailPage({ params }) {
   const { hubSlug, productSlug } = await params;
 
-  // 抓取產品詳情及所屬專題資料
-  const product = await client.fetch(`
-    *[_type == "product" && slug.current == $slug && hub->slug.current == $hubSlug][0] {
-      ...,
-      hub-> {
-        title,
-        contactUrl,
-        quoteButtonText,
-        quoteButtonTextEnglish
-      }
-    }
-  `, { slug: productSlug, hubSlug }, { useCdn: false });
+  // 1. 抓取產品詳情
+  const product = await client.fetch(`*[_type == "product" && slug.current == $slug][0] {
+    title,
+    subtitle,
+    category,
+    gradeBadge,
+    description,
+    "imageUrl": image.asset->url,
+    "gallery": images[].asset->url,
+    specifications,
+    applications,
+    stock
+  }`, { slug: productSlug });
 
-  if (!product) notFound();
+  // 2. 抓取所屬專題資訊 (用於導航與麵包屑)
+  const hub = await client.fetch(`*[_type == "hub" && slug.current == $slug][0] {
+    title,
+    themeColor
+  }`, { slug: hubSlug });
 
-  const hub = product.hub;
+  if (!product) {
+    return <div className="py-20 text-center">產品不存在</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
-      {/* 導航列 */}
-      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
-        <div className="flex justify-between items-center px-margin h-16 max-w-container-max mx-auto">
-          <div className="flex items-center gap-4">
-            <a href={`/hubs/${hubSlug}`} className="text-secondary hover:text-primary transition-colors flex items-center gap-2">
-              <span className="material-symbols-outlined">arrow_back</span>
-              <span className="font-label-sm font-bold uppercase tracking-wider">{hub?.title || 'Back to Hub'}</span>
-            </a>
-          </div>
-          <div className="flex items-center gap-4">
-             <a href={hub?.contactUrl || '#'} className="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-sm shadow-lg hover:shadow-primary/20 transition-all">
-                {hub?.quoteButtonText || '立即詢價'}
-             </a>
+    <>
+      <Navbar />
+      <main className="pt-16 min-h-screen bg-surface">
+        {/* Hub 專屬頁面導航 */}
+        <div className="bg-surface-container-high border-b border-outline-variant sticky top-16 z-30">
+          <div className="max-w-container-max mx-auto px-margin h-14 flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <Link href={`/hubs/${hubSlug}`} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase tracking-wider">
+                首頁
+              </Link>
+              <Link href={`/hubs/${hubSlug}/products`} className="text-primary font-bold border-b-2 border-primary h-14 flex items-center font-label-sm text-label-sm uppercase tracking-wider">
+                產品目錄
+              </Link>
+              <Link href={`/hubs/${hubSlug}/market`} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase tracking-wider">
+                市場情報
+              </Link>
+              <Link href={`/hubs/${hubSlug}/supply-chain`} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase tracking-wider">
+                供應鏈
+              </Link>
+            </div>
           </div>
         </div>
-      </header>
 
-      <main className="pt-24 max-w-container-max mx-auto px-margin">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-stack-xl items-start">
-          {/* 左側：產品大圖 */}
-          <div className="space-y-gutter">
-            <div className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant shadow-inner aspect-[4/3] relative">
-              {product.image ? (
-                <img 
-                  src={urlFor(product.image).width(1200).url()} 
-                  alt={product.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-outline gap-4">
-                   <span className="material-symbols-outlined text-6xl">inventory_2</span>
-                   <p>暫無產品圖片 No Image Available</p>
+        <section className="py-12 bg-surface-container-low border-b border-outline-variant">
+          <div className="max-w-container-max mx-auto px-margin">
+            <div className="flex flex-col lg:flex-row gap-12">
+              {/* 左側：圖片展示 */}
+              <div className="flex-1 space-y-4">
+                <div className="aspect-[4/3] bg-white border border-outline-variant rounded-xl overflow-hidden shadow-inner">
+                  <img src={product.imageUrl} className="w-full h-full object-cover" alt={product.title} />
                 </div>
+                {product.gallery && product.gallery.length > 0 && (
+                  <div className="grid grid-cols-4 gap-4">
+                    {product.gallery.map((url, idx) => (
+                      <div key={idx} className="aspect-square bg-white border border-outline-variant rounded-lg overflow-hidden cursor-pointer hover:border-primary transition-all">
+                        <img src={url} className="w-full h-full object-cover" alt={`Gallery ${idx}`} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 右側：基本資訊與詢價 */}
+              <div className="flex-1 space-y-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-secondary font-bold text-xs uppercase tracking-widest px-2 py-1 bg-secondary/10 rounded">{product.category}</span>
+                    {product.gradeBadge && (
+                      <span className="text-primary font-bold text-xs uppercase tracking-widest px-2 py-1 bg-primary/10 rounded">{product.gradeBadge}</span>
+                    )}
+                  </div>
+                  <h1 className="text-display-sm font-display-sm text-primary mb-2">{product.title}</h1>
+                  <p className="text-headline-sm font-headline-sm text-secondary opacity-70 uppercase tracking-tight">{product.subtitle}</p>
+                </div>
+
+                <p className="text-body-base text-on-surface-variant leading-relaxed border-l-2 border-outline-variant pl-6 italic">
+                  {product.description}
+                </p>
+
+                <div className="bg-surface-container p-6 rounded-xl border border-outline-variant flex justify-between items-end">
+                  <div>
+                    <div className="text-label-sm text-on-surface-variant mb-1 uppercase tracking-tighter">當前庫存狀態 (Stock Status)</div>
+                    <div className="text-display-sm font-data-mono font-bold text-primary">{product.stock || '詢價確認'}</div>
+                  </div>
+                  <button className="bg-primary text-on-primary px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-lg">
+                    獲取即時報價 <span className="material-symbols-outlined">request_quote</span>
+                  </button>
+                </div>
+
+                {/* 應用場景標籤 */}
+                {product.applications && (
+                  <div className="space-y-3">
+                    <h4 className="text-label-sm font-bold text-secondary uppercase tracking-widest">Key Applications</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {product.applications.map((app, idx) => (
+                        <span key={idx} className="px-3 py-1 bg-surface-container-high border border-outline-variant rounded-full text-xs font-medium">
+                          {app}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 技術規格詳情 */}
+        <section className="py-24">
+          <div className="max-w-container-max mx-auto px-margin">
+            <div className="flex items-center gap-4 mb-12">
+              <h2 className="text-headline-lg font-headline-lg text-primary">技術規格與參數</h2>
+              <div className="h-px bg-outline-variant flex-grow"></div>
+              <span className="text-label-sm font-mono text-outline uppercase">Technical Specs v1.0</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+              {product.specifications ? product.specifications.map((spec, idx) => (
+                <div key={idx} className="flex justify-between items-center py-4 border-b border-outline-variant/30 group hover:bg-surface-container-lowest px-4 transition-colors">
+                  <span className="text-on-surface-variant font-medium">{spec.label}</span>
+                  <span className="text-primary font-bold font-data-mono">{spec.value}</span>
+                </div>
+              )) : (
+                <div className="col-span-full py-8 text-outline italic">尚無詳細規格數據。</div>
               )}
-              <div className="absolute top-6 left-6">
-                <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm shadow-lg border border-white/20 uppercase tracking-widest">
-                  {product.gradeBadge || 'Standard'}
-                </span>
-              </div>
-            </div>
-
-            {/* 工業屬性標籤 */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-stack-md">
-              <div className="bg-surface-container p-stack-md rounded-xl border border-outline-variant">
-                <span className="text-[10px] text-outline uppercase block mb-1">Stock Status</span>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-esg-emerald animate-pulse"></span>
-                  <span className="font-data-mono text-primary font-bold">{product.stock || 'In Stock'}</span>
-                </div>
-              </div>
-              <div className="bg-surface-container p-stack-md rounded-xl border border-outline-variant">
-                <span className="text-[10px] text-outline uppercase block mb-1">Origin</span>
-                <span className="font-label-sm text-primary font-bold">Global Sourcing</span>
-              </div>
-              <div className="bg-surface-container p-stack-md rounded-xl border border-outline-variant">
-                <span className="text-[10px] text-outline uppercase block mb-1">Compliance</span>
-                <span className="font-label-sm text-primary font-bold">ISO Certified</span>
-              </div>
             </div>
           </div>
-
-          {/* 右側：文字內容 */}
-          <div className="space-y-stack-lg lg:sticky lg:top-24">
-            <div>
-              <h1 className="font-display-lg text-display-lg text-primary mb-2 leading-tight">
-                {product.title}
-              </h1>
-              <p className="text-headline-md font-headline-md text-secondary opacity-80 uppercase tracking-widest">
-                {product.subtitle}
-              </p>
-            </div>
-
-            <div className="bg-surface-container-lowest p-stack-lg rounded-2xl border border-outline-variant shadow-sm">
-               <h3 className="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant pb-2">
-                 <span className="material-symbols-outlined text-secondary">description</span>
-                 產品概覽 Product Overview
-               </h3>
-               <p className="text-body-base leading-relaxed text-on-surface-variant whitespace-pre-line">
-                 {product.description}
-               </p>
-            </div>
-
-            <div className="bg-surface-container-lowest p-stack-lg rounded-2xl border border-outline-variant shadow-sm">
-               <h3 className="font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant pb-2">
-                 <span className="material-symbols-outlined text-secondary">fact_check</span>
-                 技術規範 Technical Specs
-               </h3>
-               <div className="space-y-3">
-                  <div className="flex justify-between items-center text-sm py-2 border-b border-outline-variant/30">
-                    <span className="text-outline">Product Grade</span>
-                    <span className="font-medium text-primary uppercase">{product.gradeBadge || 'Industrial'}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm py-2 border-b border-outline-variant/30">
-                    <span className="text-outline">Logistics</span>
-                    <span className="font-medium text-primary">Global Freight Ready</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm py-2">
-                    <span className="text-outline">Certification</span>
-                    <span className="font-medium text-primary">Quality Guaranteed</span>
-                  </div>
-               </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 pt-stack-md">
-               <a 
-                 href={hub?.contactUrl || '#'} 
-                 target="_blank" 
-                 className="flex-1 bg-primary text-on-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all active:scale-95"
-               >
-                 <span className="material-symbols-outlined">mail</span>
-                 {hub?.quoteButtonText || '立即獲取報價'}
-                 <span className="text-xs opacity-70 font-normal ml-1">REQUEST QUOTE</span>
-               </a>
-               <button className="flex-1 bg-surface border border-primary text-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 transition-all">
-                 <span className="material-symbols-outlined">download</span>
-                 下載規格書
-               </button>
-            </div>
-            
-            <p className="text-[11px] text-outline text-center">
-              * 產品規格及庫存可能隨市場情況波動，請聯繫銷售獲取最新確認。
-            </p>
-          </div>
-        </div>
-
-        {/* 底部相關提示 */}
-        <section className="mt-24 border-t border-outline-variant pt-stack-lg">
-           <div className="bg-secondary-container/30 p-stack-lg rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-6">
-                 <div className="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
-                    <span className="material-symbols-outlined text-3xl">verified_user</span>
-                 </div>
-                 <div>
-                    <h4 className="font-bold text-primary text-xl">供應鏈安全與品質承諾</h4>
-                    <p className="text-on-surface-variant text-sm">我們提供的每一批工業資源均通過嚴格的第三方檢測與溯源認證。</p>
-                 </div>
-              </div>
-              <button className="bg-secondary text-on-secondary px-8 py-3 rounded-full font-bold text-sm whitespace-nowrap">
-                 了解我們的品質標準
-              </button>
-           </div>
         </section>
       </main>
-    </div>
+    </>
   );
 }

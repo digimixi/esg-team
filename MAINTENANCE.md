@@ -30,7 +30,17 @@ gcloud run deploy esg-team --source . --region asia-east1 --allow-unauthenticate
 
 ### 3. Docker 規範
 - `.dockerignore` **不得** 屏蔽 `next.config.mjs`。
-- `Dockerfile` 必須包含 `ARG` 與 `ENV` 的雙重聲明。
+### 4. UI 組件架構 (UI Component Architecture)
+- **目錄結構**：通用解決方案組件存放於 `@/components/solutions/`。
+- **組件命名**：採用大駝峰命名，如 `BentoCard.js`、`SolutionHero.js`。
+- **樣式管理**：優先使用 Tailwind Utility Classes 配合 `globals.css` 的變數。禁止在組件中使用 `style={{ color: '#xxx' }}` 等硬編碼。
+- **數據隔離**：組件應盡量只接收數據（Props），不應在小組件內部直接發送 API 請求。
+
+## ⚙️ 解決方案 (Solutions) 更新流程
+當需要修改解決方案詳情頁時：
+1. **檢查通用組件**：先確認 `@/components/solutions/` 是否有現成組件可覆用。
+2. **局部修改原則**：如果只有微小差異，請透過 Props 控制；如果差異超過 50%，應建立新組件。
+3. **Dispatcher 更新**：在 `src/app/solutions/[slug]/page.js` 中按需導入與組合。
 
 ## 🌐 網域與 DNS 設定
 - **網域**：`esg.team`

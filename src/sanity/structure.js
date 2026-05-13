@@ -34,6 +34,18 @@ export const structure = (S) =>
 
       S.divider(),
 
+      // 2.5 解決方案矩陣 (Solution Matrix)
+      S.listItem()
+        .id('solution_matrix_center')
+        .title('🏗️ 解決方案矩陣 (Solution Matrix)')
+        .child(
+          S.documentTypeList('solution')
+            .id('solution_list')
+            .title('企業服務方案')
+        ),
+
+      S.divider(),
+
       // 3. 工業資源與數據 (Industrial Data)
       S.listItem()
         .id('industrial_data_center')

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Strategy &amp; Finance | SteelStream ESG.team</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d8dadc",
+                        "surface": "#f7f9fb",
+                        "on-secondary-container": "#57657b",
+                        "outline-variant": "#c6c6cd",
+                        "tertiary-fixed": "#cce5ff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-fixed": "#001d31",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-tint": "#565e74",
+                        "inverse-on-surface": "#eff1f3",
+                        "inverse-surface": "#2d3133",
+                        "on-surface": "#191c1e",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline": "#76777d",
+                        "surface-container-highest": "#e0e3e5",
+                        "primary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1e",
+                        "primary-container": "#131b2e",
+                        "on-tertiary-container": "#188ace",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container-low": "#f2f4f6",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#7c839b",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#dae2fd",
+                        "tertiary": "#000000",
+                        "on-surface-variant": "#45464d",
+                        "secondary": "#515f74",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004b73",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "tertiary-fixed-dim": "#93ccff",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "error-container": "#ffdad6",
+                        "background": "#f7f9fb",
+                        "secondary-container": "#d5e3fd",
+                        "secondary-fixed": "#d5e3fd",
+                        "tertiary-container": "#001d31",
+                        "surface-variant": "#e0e3e5",
+                        "surface-container": "#eceef0",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "margin": "32px",
+                        "stack-lg": "32px",
+                        "gutter": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-base": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "data-mono": ["14px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-base": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-base antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-surface border-b border-outline-variant dark:border-outline h-16">
+<div class="flex justify-between items-center px-margin h-full max-w-container-max mx-auto">
+<div class="text-headline-md font-headline-md text-primary dark:text-on-primary-fixed">SteelStream</div>
+<nav class="hidden md:flex space-x-gutter items-center">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-base text-body-base" href="#">Home</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-base text-body-base" href="#">Products</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-base text-body-base" href="#">Market</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-body-base text-body-base" href="#">Supply Chain</a>
+</nav>
+<div class="flex items-center space-x-stack-md">
+<button class="px-gutter py-2 text-on-surface-variant font-label-sm text-label-sm hover:underline cursor-pointer">Sign In</button>
+<button class="px-gutter py-2 bg-primary text-on-primary font-label-sm text-label-sm rounded-lg cursor-pointer active:scale-95 duration-150">Contact Sales</button>
+</div>
+</div>
+</header>
+<main class="mt-16">
+<!-- Hero Section -->
+<section class="relative h-[600px] flex items-center overflow-hidden bg-primary-container">
+<div class="absolute inset-0 z-0 opacity-40">
+<img class="w-full h-full object-cover" data-alt="A sophisticated architectural shot of a modern glass skyscraper in a global financial district during the blue hour. The lighting is cool and industrial, with sharp reflections on the metallic and glass surfaces, projecting a sense of stability and professional corporate integrity. The overall mood is serious, clean, and high-stakes, fitting for a top-tier ESG consulting firm." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiLolKKf0Xw51gYxpLUrRQ2kT7JuyZCOXzVy2EktJVgSOGYrcgHvroE9cp-9nyaZMHYmyMIP3r5fJw4TyYq53g9rkhgys7E398J62qhQZ9fDCV67IP5qVVS0yLW0wmrRhnp8RgOsKbts07Fxsy4UWoAsnUXuNFnfI0PACuvRbSqI4Y0zayhFEdenSXmHbTLWPMeZ8z7qM7BkcvMf0LUjBzQK_zuRbFz8MAn6V0YxW3ezT4UpARAsFY-foNL_wQEqzSJZr3wXKgaz24"/>
+</div>
+<div class="relative z-10 max-w-container-max mx-auto px-margin w-full">
+<div class="max-w-2xl">
+<span class="inline-block bg-on-tertiary-container text-tertiary-fixed px-3 py-1 rounded-full font-label-sm text-label-sm mb-stack-md">STRATEGY &amp; FINANCE</span>
+<h1 class="font-display-lg text-[48px] leading-tight text-white mb-stack-md">
+                        ESG Transformation Advisory<br/>
+<span class="font-normal text-surface-variant">企業永續轉型與融資顧問</span>
+</h1>
+<p class="text-on-primary-container text-body-base font-body-base mb-stack-lg max-w-xl">
+                        Empowering industrial leaders with data-driven ESG strategies, superior rating performance, and optimized green financing structures.
+                        我們協助產業領導者透過數據驅動的 ESG 策略、提升評級表現並優化綠色融資架構。
+                    </p>
+<div class="flex gap-gutter">
+<button class="bg-white text-primary px-8 py-3 font-label-sm text-label-sm rounded-lg hover:bg-surface-container-low transition-all">Request Consultation</button>
+<button class="border border-white text-white px-8 py-3 font-label-sm text-label-sm rounded-lg hover:bg-white/10 transition-all">View Roadmap</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Core Services Bento Grid -->
+<section class="py-24 max-w-container-max mx-auto px-margin">
+<div class="mb-16">
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Strategic Pillar Services</h2>
+<div class="w-16 h-1 bg-primary"></div>
+</div>
+<div class="bento-grid">
+<!-- ESG Rating Improvement -->
+<div class="col-span-12 md:col-span-8 bg-white border border-outline-variant p-10 flex flex-col justify-between hover:shadow-lg transition-all">
+<div>
+<div class="flex items-center gap-stack-sm mb-stack-lg">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="trending_up">trending_up</span>
+<h3 class="font-headline-md text-headline-md">ESG Rating Improvement (評級提升)</h3>
+</div>
+<p class="text-on-surface-variant mb-gutter max-w-2xl">
+                            Navigate complex global frameworks including MSCI, Sustainalytics, and CDP. We provide gap analysis, disclosure optimization, and materiality assessments to secure premium investment rankings.
+                            精準導航 MSCI、Sustainalytics 及 CDP 等全球評級架構。提供差異分析、披露優化與重大性評估，助力企業獲取頂尖投資評級。
+                        </p>
+</div>
+<div class="grid grid-cols-2 gap-gutter border-t border-outline-variant pt-8 mt-8">
+<div>
+<p class="font-label-sm text-label-sm text-secondary mb-2">KPI ORIENTED</p>
+<p class="font-body-base text-body-base font-bold">Gap Disclosure Strategy</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-secondary mb-2">FRAMEWORKS</p>
+<p class="font-body-base text-body-base font-bold">MSCI, CDP, TCFD, ISSB</p>
+</div>
+</div>
+</div>
+<!-- Green Finance -->
+<div class="col-span-12 md:col-span-4 bg-primary text-on-primary p-10 flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-4xl mb-stack-lg" data-icon="account_balance">account_balance</span>
+<h3 class="font-headline-md text-headline-md mb-stack-md">Green Finance &amp; Loans (綠色金融)</h3>
+<p class="text-on-primary-container text-body-base opacity-80">
+                            Facilitating sustainability-linked loans and green bond issuance for industrial infrastructure.
+                            協助產業基礎設施之永續發展連結貸款與綠色債券發行。
+                        </p>
+</div>
+<a class="flex items-center gap-stack-sm font-label-sm text-label-sm text-tertiary-fixed hover:underline mt-8" href="#">
+                        LEARN MORE <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<!-- Training & Talent -->
+<div class="col-span-12 md:col-span-4 bg-surface-container border border-outline-variant p-10">
+<span class="material-symbols-outlined text-secondary text-4xl mb-stack-lg" data-icon="school">school</span>
+<h3 class="font-headline-md text-headline-md mb-stack-md">Corporate Training (人才培訓)</h3>
+<p class="text-on-surface-variant text-body-base mb-stack-lg">
+                        Capacity building for executive leadership and ESG task forces.
+                        高階主管與 ESG 專案小組的實戰賦能與知識建構。
+                    </p>
+<ul class="space-y-2 font-label-sm text-label-sm text-secondary">
+<li class="flex items-center gap-2"><span class="w-1 h-1 bg-secondary rounded-full"></span> Executive ESG Strategy</li>
+<li class="flex items-center gap-2"><span class="w-1 h-1 bg-secondary rounded-full"></span> Carbon Accounting Pro</li>
+<li class="flex items-center gap-2"><span class="w-1 h-1 bg-secondary rounded-full"></span> Regulatory Compliance</li>
+</ul>
+</div>
+<!-- Case Study Preview -->
+<div class="col-span-12 md:col-span-8 bg-surface-container-high relative overflow-hidden group">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" data-alt="A high-density data visualization dashboard displayed on a large screen in a minimalist corporate boardroom. The dashboard shows complex ESG metrics, bar charts, and global maps with emerald green and amber accents. The environment is clean, with cold lighting and sharp lines, reflecting a high-performance industrial logistics and data analytics focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlCvwJ44gP__rdzGLQVE7bADEPwB_bqn5DqmOTntCNAy9OkPNVB0Mn7VmK6sFWjktOwTVpPWA_b0M11WnjorZYfiVEoKsvuk6Q0Yaueiquje3jJwyqI9km5DVqFxG9g6j1x4YLVfL4SQ1Se00w_Njo58Sa90zvRJIGuctrkyYFzFbmQtGTKkobQDyoHDYKsbJmaPk2yUSgJd27FJbFgP9GqXPqGvfyX_tvaIhvm4ADR_120sGkRq8Bme6LAYAw0xNNlO46o7jionOI"/>
+<div class="relative z-10 p-10 h-full flex flex-col justify-center">
+<h4 class="font-label-sm text-label-sm text-primary mb-2">SUCCESS STORY</h4>
+<h3 class="font-headline-md text-headline-md mb-stack-md">Securing $500M in Sustainable Financing for Industrial Logistics</h3>
+<p class="max-w-md text-on-surface-variant mb-stack-lg">How we optimized disclosure for a major steel distributor to lower interest rates via sustainability-linked benchmarks.</p>
+<button class="w-fit px-6 py-2 border border-primary text-primary font-label-sm text-label-sm rounded-lg hover:bg-primary hover:text-white transition-all">Read Case Study</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Transformation Roadmap -->
+<section class="bg-on-surface text-surface py-24">
+<div class="max-w-container-max mx-auto px-margin">
+<div class="text-center mb-20">
+<h2 class="font-display-lg text-display-lg mb-4">The ESG Transformation Roadmap</h2>
+<p class="text-surface-variant max-w-2xl mx-auto italic">A precise four-stage framework for long-term structural resilience.</p>
+</div>
+<div class="relative">
+<!-- Roadmap Line -->
+<div class="absolute top-1/2 left-0 w-full h-[1px] bg-outline opacity-30 hidden md:block"></div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter relative z-10">
+<!-- Stage 1 -->
+<div class="bg-on-primary-fixed-variant p-8 rounded-lg border border-outline/20">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold mb-stack-lg">01</div>
+<h4 class="font-headline-md text-headline-md mb-2">Audit &amp; Baseline</h4>
+<p class="font-label-sm text-label-sm text-surface-variant mb-stack-md">現況審核與基準建立</p>
+<p class="text-body-base text-body-base text-surface-dim opacity-70">Materiality assessment and comprehensive carbon footprint audit across Scope 1, 2, and 3.</p>
+</div>
+<!-- Stage 2 -->
+<div class="bg-on-primary-fixed-variant p-8 rounded-lg border border-outline/20">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold mb-stack-lg">02</div>
+<h4 class="font-headline-md text-headline-md mb-2">Strategic Design</h4>
+<p class="font-label-sm text-label-sm text-surface-variant mb-stack-md">轉型策略設計</p>
+<p class="text-body-base text-body-base text-surface-dim opacity-70">Defining science-based targets (SBTi) and long-term decarbonization pathways for industrial operations.</p>
+</div>
+<!-- Stage 3 -->
+<div class="bg-on-primary-fixed-variant p-8 rounded-lg border border-outline/20">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold mb-stack-lg">03</div>
+<h4 class="font-headline-md text-headline-md mb-2">Capital Alignment</h4>
+<p class="font-label-sm text-label-sm text-surface-variant mb-stack-md">資本結構調整</p>
+<p class="text-body-base text-body-base text-surface-dim opacity-70">Integrating ESG performance metrics into debt structures and corporate financing vehicles.</p>
+</div>
+<!-- Stage 4 -->
+<div class="bg-on-primary-fixed-variant p-8 rounded-lg border border-outline/20">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-bold mb-stack-lg">04</div>
+<h4 class="font-headline-md text-headline-md mb-2">Optimized Disclosure</h4>
+<p class="font-label-sm text-label-sm text-surface-variant mb-stack-md">優化績效披露</p>
+<p class="text-body-base text-body-base text-surface-dim opacity-70">High-fidelity reporting and proactive investor engagement to drive multi-year rating improvements.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Partnership Logos -->
+<section class="py-16 bg-surface border-b border-outline-variant">
+<div class="max-w-container-max mx-auto px-margin text-center">
+<p class="font-label-sm text-label-sm text-secondary mb-10 tracking-[0.2em] uppercase">Trusted By Global Industrial Partners</p>
+<div class="flex flex-wrap justify-center items-center gap-16 grayscale opacity-60">
+<div class="flex items-center gap-2 font-bold text-headline-md">
+<span class="material-symbols-outlined" data-icon="factory">factory</span> TECH-STEEL
+                    </div>
+<div class="flex items-center gap-2 font-bold text-headline-md">
+<span class="material-symbols-outlined" data-icon="hub">hub</span> LOGI-CHAIN
+                    </div>
+<div class="flex items-center gap-2 font-bold text-headline-md">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span> BANCORP
+                    </div>
+<div class="flex items-center gap-2 font-bold text-headline-md">
+<span class="material-symbols-outlined" data-icon="public">public</span> GLOBAL-ENV
+                    </div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-stack-lg bg-surface-container-highest">
+<div class="max-w-container-max mx-auto px-margin">
+<div class="bg-white border border-outline p-12 flex flex-col md:flex-row justify-between items-center gap-gutter">
+<div class="max-w-xl text-center md:text-left">
+<h2 class="font-display-lg text-display-lg mb-stack-md">Ready to Lead the Next Industrial Revolution?</h2>
+<p class="text-on-surface-variant text-body-base">Schedule a preliminary materiality assessment with our senior consulting team. 預約由資深顧問團隊進行的初步重大性評估。</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-stack-md">
+<button class="px-10 py-4 bg-primary text-on-primary font-label-sm text-label-sm rounded-lg hover:shadow-lg transition-all">Book Strategy Session</button>
+<button class="px-10 py-4 border border-outline text-primary font-label-sm text-label-sm rounded-lg hover:bg-surface transition-all">Download ESG Deck</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-lg bg-surface-container-highest dark:bg-on-surface border-t border-outline-variant dark:border-outline">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin max-w-container-max mx-auto space-y-4 md:space-y-0">
+<div class="text-body-base font-bold text-on-surface dark:text-surface-bright">SteelStream Industrial Logistics</div>
+<div class="flex space-x-gutter">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim font-label-sm text-label-sm cursor-pointer transition-all" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim font-label-sm text-label-sm cursor-pointer transition-all" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim font-label-sm text-label-sm cursor-pointer transition-all" href="#">Compliance</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim font-label-sm text-label-sm cursor-pointer transition-all" href="#">Investor Relations</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim font-label-sm text-label-sm cursor-pointer transition-all" href="#">Global Support</a>
+</div>
+<div class="text-on-surface-variant dark:text-surface-variant font-label-sm text-label-sm">
+                © 2024 SteelStream Industrial Logistics. All rights reserved.
+            </div>
+</div>
+</footer>
+</body></html>

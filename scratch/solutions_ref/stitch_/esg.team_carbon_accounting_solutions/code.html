@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-secondary-fixed": "#0d1c2f",
+                "surface-container-highest": "#e0e3e5",
+                "inverse-primary": "#bec6e0",
+                "inverse-on-surface": "#eff1f3",
+                "tertiary-container": "#001d31",
+                "on-error": "#ffffff",
+                "on-secondary-container": "#57657b",
+                "surface-bright": "#f7f9fb",
+                "on-primary-fixed": "#131b2e",
+                "outline-variant": "#c6c6cd",
+                "surface-container-high": "#e6e8ea",
+                "on-surface-variant": "#45464d",
+                "on-secondary": "#ffffff",
+                "on-background": "#191c1e",
+                "surface-container-low": "#f2f4f6",
+                "surface-tint": "#565e74",
+                "on-primary": "#ffffff",
+                "on-error-container": "#93000a",
+                "surface": "#f7f9fb",
+                "secondary-container": "#d5e3fd",
+                "secondary-fixed-dim": "#b9c7e0",
+                "on-tertiary-container": "#188ace",
+                "on-primary-fixed-variant": "#3f465c",
+                "primary-fixed": "#dae2fd",
+                "primary": "#000000",
+                "surface-variant": "#e0e3e5",
+                "surface-dim": "#d8dadc",
+                "secondary": "#515f74",
+                "outline": "#76777d",
+                "on-primary-container": "#7c839b",
+                "on-secondary-fixed-variant": "#3a485c",
+                "secondary-fixed": "#d5e3fd",
+                "on-surface": "#191c1e",
+                "primary-fixed-dim": "#bec6e0",
+                "primary-container": "#131b2e",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-fixed-dim": "#93ccff",
+                "background": "#f7f9fb",
+                "on-tertiary-fixed-variant": "#004b73",
+                "error": "#ba1a1a",
+                "tertiary": "#000000",
+                "on-tertiary": "#ffffff",
+                "error-container": "#ffdad6",
+                "tertiary-fixed": "#cce5ff",
+                "surface-container": "#eceef0",
+                "inverse-surface": "#2d3133",
+                "on-tertiary-fixed": "#001d31"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "margin": "32px",
+                "unit": "4px",
+                "stack-lg": "32px",
+                "stack-md": "16px",
+                "gutter": "24px",
+                "container-max": "1440px",
+                "stack-sm": "8px"
+            },
+            "fontFamily": {
+                "data-mono": ["Inter"],
+                "headline-md": ["Inter"],
+                "body-base": ["Inter"],
+                "label-sm": ["Inter"],
+                "display-lg": ["Inter"]
+            },
+            "fontSize": {
+                "data-mono": ["14px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                "body-base": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "600"}],
+                "display-lg": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .px-margin { padding-left: 32px; padding-right: 32px; }
+        .max-w-container-max { max-width: 1440px; }
+        .py-stack-lg { padding-top: 32px; padding-bottom: 32px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-base">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-surface border-b border-outline-variant dark:border-outline h-16">
+<div class="flex justify-between items-center px-margin h-16 max-w-container-max mx-auto">
+<div class="text-headline-md font-headline-md text-primary dark:text-on-primary-fixed">SteelStream</div>
+<nav class="hidden md:flex items-center space-x-gutter">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-base text-body-base" href="#">Home</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-body-base text-body-base" href="#">Products</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-base text-body-base" href="#">Market</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-base text-body-base" href="#">Supply Chain</a>
+</nav>
+<div class="flex items-center space-x-stack-md">
+<button class="text-secondary font-label-sm text-label-sm hover:underline cursor-pointer">Sign In</button>
+<button class="bg-primary text-on-primary px-stack-md py-unit rounded hover:bg-on-primary-fixed transition-all cursor-pointer active:scale-95 duration-150 font-label-sm text-label-sm">Contact Sales</button>
+</div>
+</div>
+</header>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative h-[600px] flex items-center overflow-hidden bg-primary-container">
+<img class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay" data-alt="A sophisticated industrial digital twin dashboard overlaying a high-tech manufacturing facility. The scene is bathed in deep industrial blues and sleek metallic grays, reflecting a professional and high-performance carbon accounting software. Soft ambient lighting illuminates data points and complex graphs, conveying a sense of precision, reliability, and modern technological advancement in the steel industry." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbuGFg4KQYV3346_xbmMzIuvQGLIwT-EhgNGMlWqg6bzjb_aibnzCr008_8ywa-7iAjkg0Y_vtptMgAoDK9gyBn3LtXS-uFVNNK-lPP_O73wyR7WtizutAAAQ09W5XWQhWnpkWb8mla6SXUkUSs3u0eWqIuJsWLayw3Xn061XCZhq2PmtoQ_LBT3SFHDfgr9Hx0-JAl4sygIqq7xVmXu2jeMZoqf-kEERV7VE7-6CUB_MNn2lXHt9hG9K0AiMaTjHg1yKp06Vv9G25"/>
+<div class="relative px-margin max-w-container-max mx-auto w-full">
+<div class="max-w-2xl">
+<span class="text-primary-fixed-dim font-label-sm text-label-sm tracking-widest border-l-4 border-primary-fixed-dim pl-stack-sm mb-stack-md block">ESG.TEAM PORTAL</span>
+<h1 class="font-display-lg text-display-lg text-on-primary-fixed mb-stack-md leading-tight">Carbon Accounting / 碳盤查</h1>
+<p class="font-body-base text-body-base text-on-primary-container mb-stack-lg leading-relaxed">
+                        Simplify complex industrial emissions data into actionable compliance reports. Our enterprise-grade solution bridges the gap between raw logistics data and international sustainability standards.
+                    </p>
+<div class="flex flex-wrap gap-stack-md">
+<button class="bg-primary-fixed text-on-primary-fixed px-stack-lg py-3 rounded-lg font-label-sm text-label-sm flex items-center gap-2 hover:bg-white transition-all">
+                            Request a Demo <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="border border-outline-variant text-on-primary px-stack-lg py-3 rounded-lg font-label-sm text-label-sm hover:bg-on-primary-fixed-variant transition-all">
+                            View Solution Guide
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Methodology & Standards -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="px-margin max-w-container-max mx-auto text-center mb-16">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-sm">Methodology &amp; Global Standards</h2>
+<p class="font-body-base text-body-base text-on-surface-variant max-w-2xl mx-auto">Rigorous adherence to international frameworks ensuring your data is audit-ready and compliant with global market demands.</p>
+</div>
+<div class="px-margin max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<div class="p-stack-lg bg-surface border border-outline-variant rounded hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-4xl text-primary mb-stack-md">verified_user</span>
+<h3 class="font-label-sm text-label-sm text-primary mb-2">ISO 14064-1/2/3</h3>
+<p class="font-body-base text-[14px] text-on-surface-variant">Full lifecycle carbon footprint verification across organizational and project levels.</p>
+</div>
+<div class="p-stack-lg bg-surface border border-outline-variant rounded hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-4xl text-primary mb-stack-md">assignment_turned_in</span>
+<h3 class="font-label-sm text-label-sm text-primary mb-2">GHG Protocol</h3>
+<p class="font-body-base text-[14px] text-on-surface-variant">Standardized reporting for direct and indirect emissions across all operational scopes.</p>
+</div>
+<div class="p-stack-lg bg-surface border border-outline-variant rounded hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-4xl text-primary mb-stack-md">account_balance</span>
+<h3 class="font-label-sm text-label-sm text-primary mb-2">CBAM Ready</h3>
+<p class="font-body-base text-[14px] text-on-surface-variant">Automated calculation of embedded emissions for Carbon Border Adjustment Mechanism compliance.</p>
+</div>
+<div class="p-stack-lg bg-surface border border-outline-variant rounded hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-4xl text-primary mb-stack-md">security</span>
+<h3 class="font-label-sm text-label-sm text-primary mb-2">Audit-Proof</h3>
+<p class="font-body-base text-[14px] text-on-surface-variant">Comprehensive trail of evidence for third-party verification and assurance.</p>
+</div>
+</div>
+</section>
+<!-- Automated Data Collection -->
+<section class="py-24 bg-surface">
+<div class="px-margin max-w-container-max mx-auto flex flex-col lg:flex-row items-center gap-16">
+<div class="lg:w-1/2">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Seamless Automated Data Integration</h2>
+<p class="font-body-base text-body-base text-on-surface-variant mb-stack-lg leading-relaxed">
+                        Eliminate manual entry errors with our AI-driven validation engine. We pull data directly from your industrial ecosystem to create a real-time carbon profile.
+                    </p>
+<ul class="space-y-stack-md">
+<li class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base">Direct ERP &amp; SAP Integration</span>
+</li>
+<li class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base">Real-time IoT Sensor Stream</span>
+</li>
+<li class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base">Utility Bill OCR Processing</span>
+</li>
+<li class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-base text-body-base">AI-driven Outlier &amp; Validation Checks</span>
+</li>
+</ul>
+</div>
+<div class="lg:w-1/2 bg-surface-container rounded-xl p-stack-lg border border-outline-variant relative overflow-hidden">
+<img class="rounded shadow-xl" data-alt="A detailed technical schematic showing data flowing from server racks and factory sensors into a centralized cloud processor. The visual uses a monochromatic slate gray and industrial blue palette, emphasizing data security and high-speed processing. Thin, elegant neon lines represent the data streams, creating a sophisticated and precise industrial tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPt2GNjiX0RsaM8hQyvbSlXKzogjj48pFzRwIVGCbcZjHUxBwvarLqRzmhC3JzDuYLaN8ES1C7Tfdi_LIoRs_Lajrpj1lDlA1kF1b8fVhrwJaxcuZhGYN8om8q_1tZAdOhb4B6I4TZg5lA6tqhv_x1_4KqsCCOSXa7e7pFZv-BMEAyLSyFcCr1-G_GapbXFd9XO81ypYI6Zbn_vwNAxGZddkb4-L_f2dIhIc-OaVxrGORCy3tGmpZQy8xy2vw0nHgzFKADq7RScUzL"/>
+</div>
+</div>
+</section>
+<!-- Scope Breakdown -->
+<section class="py-24 bg-surface-container-low">
+<div class="px-margin max-w-container-max mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-sm">Multi-Dimensional Emission Scopes</h2>
+<p class="font-body-base text-body-base text-on-surface-variant">Holistic visibility across your entire value chain.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Scope 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-stack-lg">
+<div class="flex justify-between items-start mb-stack-md">
+<div>
+<h3 class="font-headline-md text-[20px] mb-1">Scope 1</h3>
+<p class="text-label-sm text-outline uppercase tracking-wider">Direct Emissions</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded text-label-sm font-data-mono">24% Total</span>
+</div>
+<div class="space-y-stack-sm mt-stack-lg">
+<div class="flex justify-between font-body-base text-[14px]"><span>Stationary Combustion</span><span class="font-data-mono">420 tCO2e</span></div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden"><div class="bg-primary h-full" style="width: 65%"></div></div>
+<div class="flex justify-between font-body-base text-[14px] mt-2"><span>Mobile Sources</span><span class="font-data-mono">180 tCO2e</span></div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden"><div class="bg-primary h-full" style="width: 35%"></div></div>
+</div>
+</div>
+<!-- Scope 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-stack-lg">
+<div class="flex justify-between items-start mb-stack-md">
+<div>
+<h3 class="font-headline-md text-[20px] mb-1">Scope 2</h3>
+<p class="text-label-sm text-outline uppercase tracking-wider">Indirect Energy</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded text-label-sm font-data-mono">15% Total</span>
+</div>
+<div class="space-y-stack-sm mt-stack-lg">
+<div class="flex justify-between font-body-base text-[14px]"><span>Purchased Electricity</span><span class="font-data-mono">310 tCO2e</span></div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden"><div class="bg-primary h-full" style="width: 80%"></div></div>
+<div class="flex justify-between font-body-base text-[14px] mt-2"><span>Steam &amp; Heating</span><span class="font-data-mono">45 tCO2e</span></div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden"><div class="bg-primary h-full" style="width: 20%"></div></div>
+</div>
+</div>
+<!-- Scope 3 -->
+<div class="bg-primary-container border border-primary text-white rounded-lg p-stack-lg relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-stack-md">
+<div>
+<h3 class="font-headline-md text-[20px] mb-1 text-on-primary-fixed">Scope 3</h3>
+<p class="text-label-sm text-on-primary-container uppercase tracking-wider">Value Chain</p>
+</div>
+<span class="bg-inverse-primary text-on-primary-fixed px-2 py-1 rounded text-label-sm font-data-mono">61% Total</span>
+</div>
+<p class="text-body-base text-[14px] text-on-primary-container mb-stack-md italic">The industry's greatest challenge, simplified.</p>
+<div class="space-y-stack-sm">
+<div class="flex justify-between font-body-base text-[14px] text-on-primary-fixed"><span>Logistics &amp; Transport</span><span class="font-data-mono">1,240 tCO2e</span></div>
+<div class="w-full bg-on-primary-fixed-variant h-1 rounded overflow-hidden"><div class="bg-white h-full" style="width: 75%"></div></div>
+<div class="flex justify-between font-body-base text-[14px] text-on-primary-fixed mt-2"><span>Purchased Goods</span><span class="font-data-mono">480 tCO2e</span></div>
+<div class="w-full bg-on-primary-fixed-variant h-1 rounded overflow-hidden"><div class="bg-white h-full" style="width: 25%"></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Reporting & Insights -->
+<section class="py-24 bg-surface">
+<div class="px-margin max-w-container-max mx-auto flex flex-col lg:flex-row-reverse items-center gap-16">
+<div class="lg:w-1/2">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">One-Click Professional Reporting</h2>
+<p class="font-body-base text-body-base text-on-surface-variant mb-stack-lg leading-relaxed">
+                        Generate audit-ready PDF reports formatted to meet the specific requirements of international bodies and financial stakeholders. Save hundreds of manual labor hours with automated data synthesis.
+                    </p>
+<div class="grid grid-cols-2 gap-stack-md">
+<div class="p-stack-sm border border-outline-variant rounded flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">picture_as_pdf</span>
+<span class="font-label-sm text-label-sm">Standard ESG PDF</span>
+</div>
+<div class="p-stack-sm border border-outline-variant rounded flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">table_chart</span>
+<span class="font-label-sm text-label-sm">Raw CSV Export</span>
+</div>
+</div>
+<button class="mt-stack-lg bg-primary text-on-primary px-stack-lg py-3 rounded hover:bg-on-secondary-fixed transition-all font-label-sm text-label-sm">Preview Report Sample</button>
+</div>
+<div class="lg:w-1/2">
+<div class="bg-surface-container-high p-stack-lg rounded-xl shadow-2xl border border-outline-variant">
+<div class="bg-white p-12 rounded shadow-sm">
+<div class="flex justify-between border-b pb-8 mb-8 border-outline-variant">
+<div>
+<p class="font-bold text-headline-md">Emissions Disclosure Report</p>
+<p class="text-outline text-label-sm">REPORT NO: SS-2024-001</p>
+</div>
+<div class="text-right">
+<div class="text-primary font-bold">SteelStream</div>
+<div class="text-outline text-label-sm">Audited: Dec 2024</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="h-4 bg-surface-container-highest rounded w-3/4"></div>
+<div class="h-4 bg-surface-container-highest rounded w-full"></div>
+<div class="h-32 bg-surface-container-low rounded border border-dashed border-outline-variant flex items-center justify-center">
+<span class="text-outline font-data-mono">Visualization: Total Carbon Intensity (tCO2e/MT)</span>
+</div>
+<div class="h-4 bg-surface-container-highest rounded w-2/3"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Carbon Ledger / Blockchain -->
+<section class="py-24 bg-primary-container text-white">
+<div class="px-margin max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row items-center gap-stack-lg">
+<div class="md:w-1/3 text-center md:text-left">
+<span class="material-symbols-outlined text-6xl text-inverse-primary mb-stack-md">database</span>
+<h2 class="font-headline-md text-headline-md mb-stack-sm text-white">Immutable Carbon Ledger</h2>
+<p class="font-body-base text-on-primary-container">Blockchain-backed security ensures your environmental data is transparent, tamper-proof, and fully traceable for future audits.</p>
+</div>
+<div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<div class="bg-on-primary-fixed-variant p-stack-md rounded border border-on-secondary-container">
+<h4 class="font-label-sm text-label-sm text-inverse-primary mb-2">Proof of Origin</h4>
+<p class="font-body-base text-[14px] text-on-primary-container">Every emission data point is timestamped and cryptographically linked to its source device or ledger entry.</p>
+</div>
+<div class="bg-on-primary-fixed-variant p-stack-md rounded border border-on-secondary-container">
+<h4 class="font-label-sm text-label-sm text-inverse-primary mb-2">Auditor Access Node</h4>
+<p class="font-body-base text-[14px] text-on-primary-container">Securely invite third-party verifiers to view specific data chains without compromising core enterprise security.</p>
+</div>
+<div class="bg-on-primary-fixed-variant p-stack-md rounded border border-on-secondary-container">
+<h4 class="font-label-sm text-label-sm text-inverse-primary mb-2">Zero-Knowledge Verification</h4>
+<p class="font-body-base text-[14px] text-on-primary-container">Share compliance status with partners without exposing sensitive operational volume data.</p>
+</div>
+<div class="bg-on-primary-fixed-variant p-stack-md rounded border border-on-secondary-container">
+<h4 class="font-label-sm text-label-sm text-inverse-primary mb-2">Smart Contract Automation</h4>
+<p class="font-body-base text-[14px] text-on-primary-container">Trigger internal alerts or market credits automatically based on verified emission thresholds.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-32 bg-surface text-center">
+<div class="px-margin max-w-container-max mx-auto">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-stack-md">Accelerate Your Path to Net Zero</h2>
+<p class="font-body-base text-body-base text-on-surface-variant max-w-2xl mx-auto mb-stack-lg">
+                    Join leading industrial enterprises using SteelStream to manage their carbon accounting with precision and confidence.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center gap-stack-md">
+<button class="bg-primary text-on-primary px-12 py-4 rounded-lg font-label-sm text-label-sm hover:bg-on-secondary-fixed transition-all flex items-center justify-center gap-2">
+                        Request a Demo <span class="material-symbols-outlined">rocket_launch</span>
+</button>
+<button class="bg-surface-container-highest text-on-surface px-12 py-4 rounded-lg font-label-sm text-label-sm border border-outline-variant hover:bg-surface-variant transition-all flex items-center justify-center gap-2">
+                        Download Compliance Guide <span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-stack-lg bg-surface-container-highest dark:bg-on-surface border-t border-outline-variant dark:border-outline">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin max-w-container-max mx-auto space-y-4 md:space-y-0">
+<div class="text-body-base font-bold text-on-surface dark:text-surface-bright">SteelStream Industrial Logistics</div>
+<nav class="flex flex-wrap justify-center gap-stack-md">
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Compliance</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Investor Relations</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim hover:underline transition-all" href="#">Global Support</a>
+</nav>
+<div class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant">© 2024 SteelStream Industrial Logistics. All rights reserved.</div>
+</div>
+</footer>
+</body></html>

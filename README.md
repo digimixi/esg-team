@@ -58,6 +58,15 @@
 
 ---
 
+### 🚨 核心安全禁令 (CRITICAL SAFETY PROTOCOLS)
+為了防止 2026-05-13 發生的「全站頁面消失事件」重演，所有開發者與 AI 助手必須嚴格遵守以下紅線：
+
+1.  **保底數據 (Fallback) 絕對主權**：在 `page.js` 和 `solutions/page.js` 等核心入口，必須保留 `defaultSolutions` 等硬編碼數組。禁止為了追求「全動態化」而刪除這些保底內容。
+2.  **特殊路徑保護**：`src/app/solutions/ [slug]` (帶空格的目錄) 是遺留實驗路徑，**嚴禁刪除或重新命名**，否則會導致大量歷史連結 404。
+3.  **數據編碼校驗**：所有的 ingestion 採集腳本必須強制標註 `UTF-8` 編碼，禁止導入任何亂碼數據。
+
+---
+
 ### 🚀 部署流程 (Deploy Process)
 1.  **環境檢查**：確保 `.env.local` 具備所有 `NEXT_PUBLIC_` 變數及 `SANITY_WRITE_TOKEN`。
 2.  **執行部署腳本**：

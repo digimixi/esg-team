@@ -1,17 +1,18 @@
 import { client } from '@/sanity/lib/client';
+import Navbar from '@/components/Navbar';
+import Link from 'next/link';
+import MarketIndexBar from '@/components/MarketIndexBar';
 
 export const revalidate = 0; // 強制不快取，隨時抓取最新資料
 
 export default async function Home() {
-    // 1. 向 Sanity 後台要「市場即時指數」的資料，並依據您在後台設定的 order 排序
+    // ... (數據抓取邏輯保持不變)
     const indices = await client.fetch('*[_type == "marketIndex"] | order(order asc)');
-    // 2. 向 Sanity 後台取得「全域版面設定」
     const settings = await client.fetch(`*[_type == "siteSettings"][0] {
     ...,
     "homeHeroImageUrl": homeHeroImage.asset->url
   }`);
 
-    // 如果後台沒填，給予預設值防呆
     const macroTitle = settings?.macroSectionTitle || '全球永續宏觀數據';
     const macroSubtitle = settings?.macroSectionSubtitle || 'Global ESG Macros';
     const homeHeroTitle = settings?.homeHeroTitle || '建構重工業與供應鏈的未來';
@@ -19,7 +20,6 @@ export default async function Home() {
     const homeHeroDescription = settings?.homeHeroDescription || 'esg.team 是一個跨領域的永續聚合入口。我們聚焦具備戰略意義的工業板塊，為全球買家與供應商提供去碳化路徑與精準的資源配置系統。';
     const homeHeroImageUrl = settings?.homeHeroImageUrl;
 
-    // 3. 向 Sanity 後台取得所有的 Hubs (排除被手動關閉的)
     const hubs = await client.fetch(`*[_type == "hub" && isActive != false] {
     _id,
     title,
@@ -33,7 +33,17 @@ export default async function Home() {
     tags
   } | order(isFeatured desc, _createdAt asc)`);
 
-    // 4. 取得最新採集的情報文章 (只抓「已採用」的最新的 4 篇)
+    const solutions = await client.fetch(`*[_type == "solution"] | order(_createdAt asc) {
+    _id,
+    title,
+    titleEnglish,
+    "slug": slug.current,
+    category,
+    description,
+    badgeText,
+    badgeIcon
+  }`);
+
     const latestInsights = await client.fetch(`*[_type == "insight" && isActive == true] | order(publishedAt desc) [0...4] {
         _id,
         title,
@@ -47,41 +57,11 @@ export default async function Home() {
         "hubTitle": hub->title
     }`);
 
-    // 5. 獲取全球碳基準數據 (用於首頁展示)
     const benchmarks = await client.fetch(`*[_type == "industryBenchmark" && category == "intensity"] | order(currentValue asc)`, {}, { useCdn: false });
-
 
     return (
         <>
-            {/* TopNavBar */}
-            <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
-                <div className="flex justify-between items-center px-4 md:px-margin h-16 max-w-container-max mx-auto">
-                    <div className="flex items-center gap-2 md:gap-stack-lg min-w-0">
-                        <span className="text-body-base md:text-headline-md font-headline-md text-primary flex items-center gap-1 shrink-0">
-                            esg<span className="text-esg-emerald hidden sm:inline">.</span><span className="hidden sm:inline">team</span>
-                        </span>
-                        <nav className="hidden lg:flex gap-stack-md ml-4 xl:ml-stack-lg">
-                            <a className="flex flex-col text-primary font-bold border-b-2 border-primary pb-1 group whitespace-nowrap" href="#">
-                                <span className="font-body-base text-body-base">全域入口</span>
-                                <span className="text-[10px] uppercase tracking-tighter opacity-70">Global Portal</span>
-                            </a>
-                            <a className="flex flex-col text-secondary hover:text-primary transition-colors group whitespace-nowrap" href="#">
-                                <span className="font-body-base text-body-base">碳資產管理</span>
-                                <span className="text-[10px] uppercase tracking-tighter opacity-70">Carbon Assets</span>
-                            </a>
-                            <a className="flex flex-col text-secondary hover:text-primary transition-colors group whitespace-nowrap" href="#">
-                                <span className="font-body-base text-body-base">永續洞察</span>
-                                <span className="text-[10px] uppercase tracking-tighter opacity-70">Insights</span>
-                            </a>
-                        </nav>
-                    </div>
-                    <div className="flex items-center gap-2 md:gap-stack-md shrink-0">
-                        <button className="hidden sm:block cursor-pointer active:scale-95 duration-150 text-secondary font-label-sm text-label-sm px-2 md:px-4 py-2 whitespace-nowrap">聯繫團隊 <span className="text-[10px] ml-1 opacity-70 italic">Contact</span></button>
-                        <button className="cursor-pointer active:scale-95 duration-150 bg-primary text-on-primary px-3 md:px-6 py-2 font-label-sm text-label-sm rounded whitespace-nowrap">企業登錄 <span className="hidden md:inline text-[10px] ml-1 opacity-80">Enterprise Login</span></button>
-                    </div>
-                </div>
-            </header>
-
+            <Navbar />
             <main className="pt-16">
                 <section className="relative h-[500px] flex items-center overflow-hidden border-b border-outline-variant">
                     <div className="absolute inset-0 z-0 bg-surface-container-high">
@@ -107,73 +87,7 @@ export default async function Home() {
                     </div>
                 </section>
 
-                <section className="bg-surface-container py-stack-md border-b border-outline-variant">
-                    <div className="max-w-container-max mx-auto px-margin">
-                        <div className="flex flex-wrap items-center justify-between gap-stack-lg">
-                            <div className="flex items-center gap-stack-sm">
-                                <span className="material-symbols-outlined text-secondary">public</span>
-                                <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">{macroTitle} <span className="text-[10px] lowercase opacity-70 ml-1">{macroSubtitle}</span></span>
-                            </div>
-                            <div className="flex flex-1 justify-around items-center divide-x divide-outline-variant overflow-x-auto no-scrollbar">
-                                {/* 2. 把剛剛要到的資料 (indices) 迴圈印出來 */}
-                                {indices.map((index) => {
-                                    const isUp = index.trendStatus === 'up';
-                                    const isDown = index.trendStatus === 'down';
-                                    const trendColor = isUp ? '#059669' : (isDown ? '#dc2626' : '#6b7280');
-                                    const history = index.history || [];
-
-                                    // 繪製簡單的 Sparkline
-                                    const renderSparkline = (data, color) => {
-                                      if (!data || data.length < 2) return null;
-                                      const min = Math.min(...data);
-                                      const max = Math.max(...data);
-                                      const range = (max - min) || 1;
-                                      const width = 60;
-                                      const height = 16;
-                                      const points = data.map((v, i) => ({
-                                        x: (i / (data.length - 1)) * width,
-                                        y: height - ((v - min) / range) * (height - 4) - 2
-                                      }));
-                                      const path = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
-                                      return (
-                                        <svg width={width} height={height} className="ml-2">
-                                          <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                      );
-                                    };
-
-                                    return (
-                                        <div key={index._id} className="px-gutter text-center min-w-[180px] group">
-                                            <div className="font-label-sm text-[10px] text-on-surface-variant mb-1 flex items-center justify-center gap-1">
-                                                {index.name} {index.unit && <span className="opacity-60">{index.unit}</span>}
-                                            </div>
-                                            <div className="flex items-center justify-center gap-2">
-                                                <div className="font-data-mono text-data-mono text-primary font-bold">
-                                                    {index.value}
-                                                </div>
-                                                <div className={`flex items-center text-[11px] font-bold`} style={{ color: trendColor }}>
-                                                    {isUp && <span className="material-symbols-outlined text-[14px]">trending_up</span>}
-                                                    {isDown && <span className="material-symbols-outlined text-[14px]">trending_down</span>}
-                                                    {index.trendPercentage}
-                                                </div>
-                                            </div>
-                                            <div className="mt-1 flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
-                                                {renderSparkline(history, trendColor)}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-
-                                {/* 如果後台還沒建資料，顯示提示 */}
-                                {indices.length === 0 && (
-                                    <div className="px-gutter text-center w-full">
-                                        <div className="font-label-sm text-label-sm text-outline">Sanity 尚無數據，請至後台新增</div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />
 
                 {/* Global Benchmarks Section - 極簡橫向儀表板佈局 (依據用戶截圖重構) */}
                 <section className="bg-surface-container-low py-4 border-b border-outline-variant">
@@ -254,7 +168,7 @@ export default async function Home() {
                             const displaySubtitle = hub.heroSubtitle || '';
 
                             return (
-                                <a
+                                <Link
                                     key={hub._id}
                                     href={`/hubs/${hub.slug}`}
                                     className={`${isFeatured ? 'md:col-span-8 h-[400px]' : 'md:col-span-4 h-[400px]'} relative rounded-2xl overflow-hidden group border border-outline-variant transition-all hover:shadow-2xl hover:-translate-y-1`}
@@ -307,7 +221,7 @@ export default async function Home() {
                                             style={{ backgroundColor: hub.themeColor }}
                                         />
                                     )}
-                                </a>
+                                </Link>
                             );
                         })}
 
@@ -342,6 +256,49 @@ export default async function Home() {
                             </div>
                         </div>
                     </div>
+                </section>
+
+                {/* Solutions Matrix Section - 動態化入口 */}
+                <section className="bg-surface-container-high py-32 border-t border-outline-variant">
+                  <div className="max-w-container-max mx-auto px-margin">
+                    <div className="flex flex-col lg:flex-row items-end justify-between mb-16 gap-8">
+                      <div className="max-w-2xl">
+                        <span className="font-label-sm text-label-sm text-primary uppercase tracking-[0.3em] mb-4 block">Service Matrix</span>
+                        <h2 className="font-display-md text-display-md text-primary mb-4">企業永續解決方案</h2>
+                        <p className="font-body-base text-body-base text-on-surface-variant">
+                          我們不僅提供情報，更提供工具。esg.team 的解決方案矩陣協助企業從原始數據中提取價值，實現可驗證的轉型成果。
+                        </p>
+                      </div>
+                      <Link href="/solutions" className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-sm text-label-sm flex items-center gap-2 hover:bg-on-secondary-fixed transition-all group">
+                        探索全系列方案 <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                      </Link>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                      {(solutions.length > 0 ? solutions : [
+                        { _id: 'default-1', title: '數位合規', titleEnglish: 'Digital Compliance', slug: 'compliance', badgeIcon: 'verified_user', description: '為重工業打造的高效率數位合規解決方案。透過自動化數據採集與分析，確保您的企業符合全球供應鏈 ESG 標準與碳關稅法規。' },
+                        { _id: 'default-2', title: '永續實踐', titleEnglish: 'Sustainable Practices', slug: 'practices', badgeIcon: 'rebase_edit', description: '將永續理念轉化為可衡量的工業實踐。我們專注於循環經濟模型建立與智慧綠色建築系統，協助企業實現資源價值的最大化利用。' },
+                        { _id: 'default-3', title: '綠色材料', titleEnglish: 'Green Materials', slug: 'materials', badgeIcon: 'biotech', description: '定義低碳工業的未來。我們提供高性能、低足跡的鋼鐵與石墨材料解決方案，助力企業從源頭降低供應鏈碳強度。' },
+                        { _id: 'default-4', title: '戰略金融', titleEnglish: 'Strategy & Finance', slug: 'finance', badgeIcon: 'trending_up', description: '連接永續戰略與金融價值。我們協助企業提升 ESG 評級，並對接全球綠色金融資源，加速低碳轉型進程。' }
+                      ]).map((item, i) => (
+                        <Link 
+                          key={item._id || i} 
+                          href={`/solutions/${item.slug}`}
+                          className="bg-white border border-[#E0E0E0] p-8 rounded-lg hover:shadow-xl transition-all group cursor-pointer flex flex-col"
+                        >
+                          <div className="text-primary mb-6">
+                            <span className="material-symbols-outlined text-3xl">{item.badgeIcon || 'verified'}</span>
+                          </div>
+                          <h3 className="font-bold text-xl mb-1 text-[#1A1C1E]">{item.title}</h3>
+                          <p className="text-[10px] text-[#5F6368] font-bold uppercase tracking-wider mb-6">{item.titleEnglish || item.category}</p>
+                          <p className="text-sm text-[#44474E] mb-12 leading-relaxed flex-grow">{item.description}</p>
+                          <div className="mt-auto border border-[#1A1C1E] text-[#1A1C1E] px-4 py-2 rounded text-[12px] font-bold flex justify-between items-center group-hover:bg-[#1A1C1E] group-hover:text-white transition-all">
+                            了解更多 <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </section>
 
                 {/* Latest Insights Section - 採集成果展示區 */}

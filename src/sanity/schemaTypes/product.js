@@ -6,7 +6,8 @@ export const product = {
     { 
       name: 'title', 
       title: '產品名稱 (Title)', 
-      type: 'string' 
+      type: 'string',
+      validation: Rule => Rule.required()
     },
     { 
       name: 'subtitle', 
@@ -21,19 +22,40 @@ export const product = {
         source: 'title',
         maxLength: 96,
       },
+      validation: Rule => Rule.required()
     },
     {
       name: 'hub',
       title: '所屬專題 (Hub)',
       type: 'reference',
       to: [{ type: 'hub' }],
-      description: '選擇此產品屬於哪個專題生態系 (選填)',
+      description: '選擇此產品屬於哪個專題生態系',
+    },
+    {
+      name: 'category',
+      title: '產品分類 (Category)',
+      type: 'string',
+      options: {
+        list: [
+          { title: '原料 Raw Materials', value: 'raw_materials' },
+          { title: '成品 Finished Products', value: 'finished_products' },
+          { title: '化學品 Chemicals', value: 'chemicals' },
+          { title: '設備 Equipment', value: 'equipment' },
+          { title: '服務 Services', value: 'services' },
+        ],
+      },
     },
     { 
       name: 'image', 
-      title: '產品圖片 (Image)', 
+      title: '產品主圖 (Main Image)', 
       type: 'image', 
       options: { hotspot: true }
+    },
+    {
+      name: 'images',
+      title: '產品圖庫 (Gallery)',
+      type: 'array',
+      of: [{ type: 'image', options: { hotspot: true } }]
     },
     { 
       name: 'gradeBadge', 
@@ -45,6 +67,26 @@ export const product = {
       name: 'description', 
       title: '產品描述 (Description)', 
       type: 'text' 
+    },
+    {
+      name: 'specifications',
+      title: '技術規格 (Specifications)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'label', title: '規格名稱', type: 'string' },
+            { name: 'value', title: '規格數值', type: 'string' },
+          ]
+        }
+      ]
+    },
+    {
+      name: 'applications',
+      title: '應用場景 (Applications)',
+      type: 'array',
+      of: [{ type: 'string' }]
     },
     { 
       name: 'stock', 
@@ -62,7 +104,15 @@ export const product = {
   preview: {
     select: { 
       title: 'title', 
+      subtitle: 'subtitle',
       media: 'image' 
+    },
+    prepare({ title, subtitle, media }) {
+      return {
+        title,
+        subtitle: subtitle,
+        media
+      }
     }
   }
 }
