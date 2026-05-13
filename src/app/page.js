@@ -89,12 +89,12 @@ export default async function Home() {
 
                 <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />
 
-                {/* Global Benchmarks Section - 極簡橫向儀表板佈局 (依據用戶截圖重構) */}
-                <section className="bg-surface-container-low py-4 border-b border-outline-variant">
-                  <div className="max-w-container-max mx-auto px-margin flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+                {/* Global Benchmarks Section - 極簡橫向儀表板佈局 */}
+                <section className="bg-surface-container-low py-4 border-b border-outline-variant overflow-hidden">
+                  <div className="max-w-container-max mx-auto px-4 sm:px-margin flex flex-col xl:flex-row xl:items-center justify-between gap-6">
                     
                     {/* 左側資訊群組 */}
-                    <div className="flex flex-col gap-2 min-w-[420px]">
+                    <div className="flex flex-col gap-2 w-full xl:min-w-[420px] xl:max-w-md">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
                           <span className="material-symbols-outlined text-secondary text-lg">fact_check</span>
@@ -114,8 +114,8 @@ export default async function Home() {
                       </p>
                     </div>
 
-                    {/* 右側數據群組 - 一字排開 */}
-                    <div className="flex-1 flex flex-wrap xl:flex-nowrap items-end justify-start xl:justify-end gap-x-8 gap-y-4">
+                    {/* 右側數據群組 - 響應式網格 */}
+                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 xl:flex xl:flex-nowrap items-end justify-items-start xl:justify-end gap-x-6 gap-y-4 w-full xl:w-auto">
                       {benchmarks.map((item) => {
                         const maxWidth = 0.6;
                         const percentage = Math.min((item.currentValue / maxWidth) * 100, 100);

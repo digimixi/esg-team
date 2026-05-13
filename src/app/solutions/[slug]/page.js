@@ -21,7 +21,10 @@ export default async function SolutionDetail({ params }) {
     cta,
     bentoSection,
     journeySection,
-    caseStudySection
+    caseStudySection[] {
+      ...,
+      "imageUrl": image.asset->url
+    }
   }`, { slug });
 
   // --------------------------------------------------------------------------
@@ -391,25 +394,34 @@ export default async function SolutionDetail({ params }) {
       )}
 
       {data.caseStudySection && data.caseStudySection.map((item, idx) => (
-        <section key={idx} className="bg-surface-container-lowest border border-outline-variant overflow-hidden">
+        <section key={idx} className="bg-surface-container-lowest border border-outline-variant overflow-hidden group">
           <div className="flex flex-col lg:flex-row">
             <div className="flex-1 p-stack-lg space-y-stack-md">
               <span className="text-label-sm text-secondary font-bold uppercase tracking-widest">Case Study</span>
-              <h2 className="text-headline-lg font-headline-lg text-primary">{item.title}</h2>
+              <h2 className="text-headline-lg font-headline-lg text-primary group-hover:text-secondary transition-colors">{item.title}</h2>
               <p className="text-body-base text-on-surface-variant leading-relaxed">
                 {item.description}
               </p>
               {item.tags && (
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {item.tags.map((tag, tIdx) => (
-                    <span key={tIdx} className="px-2 py-1 bg-outline-variant text-[10px] rounded">{tag}</span>
+                    <span key={tIdx} className="px-3 py-1 bg-surface-container-high border border-outline-variant text-[10px] rounded-full font-medium">{tag}</span>
                   ))}
                 </div>
               )}
             </div>
-            {/* Image handled via simple img tag for demo purposes */}
-            <div className="flex-1 min-h-[300px] bg-outline-variant relative">
-              <div className="absolute inset-0 flex items-center justify-center text-outline opacity-20">IMAGE PLACEHOLDER</div>
+            <div className="flex-1 min-h-[350px] bg-surface-container-highest relative overflow-hidden">
+              {item.imageUrl ? (
+                <img 
+                  src={item.imageUrl} 
+                  alt={item.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-outline opacity-20">
+                  <span className="material-symbols-outlined text-display-lg">image</span>
+                </div>
+              )}
             </div>
           </div>
         </section>

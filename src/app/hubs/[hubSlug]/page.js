@@ -127,14 +127,14 @@ export default async function HubHome({ params }) {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
-        <div className="flex justify-between items-center px-4 md:px-margin h-16 max-w-container-max mx-auto">
+      <header className="fixed top-0 w-full z-[999] bg-surface/95 backdrop-blur-lg border-b border-outline-variant shadow-sm">
+        <div className="flex justify-between items-center px-4 md:px-margin h-16 max-w-container-max mx-auto w-full relative z-[1000]">
           <div className="flex items-center gap-2 md:gap-stack-lg min-w-0">
-            <a href="/" className="text-body-base md:text-headline-md font-headline-md text-primary flex items-center gap-1 shrink-0">
+            <a href="/" className="text-headline-sm font-bold text-primary flex items-center gap-1 shrink-0">
               esg<span className="text-esg-emerald">.</span>team
             </a>
             <span className="text-outline-variant shrink-0">|</span>
-            <span className="text-label-sm md:text-body-base font-bold text-secondary truncate">
+            <span className="text-[12px] md:text-body-base font-bold text-secondary truncate max-w-[120px] md:max-w-none">
               {hub.title}
             </span>
             <nav className="hidden lg:flex gap-4 xl:gap-gutter ml-2 xl:ml-stack-lg">
@@ -144,8 +144,8 @@ export default async function HubHome({ params }) {
               <a className="text-secondary hover:text-primary transition-colors font-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/supply-chain`}>供應鏈</a>
             </nav>
           </div>
-          <div className="flex items-center gap-2 md:gap-gutter">
-            <button className="px-3 md:px-gutter py-2 bg-primary text-on-primary font-label-sm rounded-lg">
+          <div className="flex items-center gap-2">
+            <button className="px-3 py-1.5 bg-primary text-on-primary font-label-sm text-[11px] rounded-lg shrink-0">
               聯絡銷售
             </button>
           </div>
@@ -165,17 +165,17 @@ export default async function HubHome({ params }) {
         <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />
 
         {/* Global Benchmarks (Simplified for Hub) */}
-        <section className="bg-surface-container-low py-4 border-b border-outline-variant">
-          <div className="max-w-container-max mx-auto px-margin flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-            <div className="flex flex-col gap-1 min-w-[300px]">
+        <section className="bg-surface-container-low py-4 border-b border-outline-variant overflow-hidden">
+          <div className="max-w-container-max mx-auto px-4 sm:px-margin flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+            <div className="flex flex-col gap-1 w-full xl:min-w-[300px]">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-secondary text-lg">fact_check</span>
                 <span className="font-bold text-primary text-[13px]">全球碳基準 (gCO2e/kWh)</span>
               </div>
             </div>
-            <div className="flex-1 flex flex-wrap xl:flex-nowrap items-end justify-start xl:justify-end gap-x-8 gap-y-4">
+            <div className="flex-1 grid grid-cols-2 sm:grid-cols-5 xl:flex xl:flex-nowrap items-end justify-items-start xl:justify-end gap-x-6 gap-y-4 w-full xl:w-auto">
               {benchmarks.slice(0, 5).map((item) => (
-                <div key={item._id} className="w-[100px] flex flex-col gap-1 shrink-0">
+                <div key={item._id} className="w-full sm:w-[100px] flex flex-col gap-1 shrink-0">
                   <div className="flex justify-between items-end px-0.5">
                     <span className="text-[9px] font-bold text-primary opacity-70 uppercase">{item.title.split(' ')[0]}</span>
                     <span className="font-data-mono text-[10px] font-bold text-secondary">{item.currentValue}</span>
