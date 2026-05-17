@@ -1,4 +1,8 @@
 import { client } from '@/sanity/lib/client';
+import CbamCalculator from '@/components/CbamCalculator';
+import Scope3TrustLedger from '@/components/Scope3TrustLedger';
+import HubHeader from '@/components/HubHeader';
+
 
 export const revalidate = 0;
 
@@ -33,6 +37,11 @@ export default async function SupplyChain({ params }) {
     isTopRated
   } | order(isTopRated desc, rating desc)`, { slug: hubSlug });
 
+  // Get dynamic EU ETS carbon price from indices
+  const indices = await client.fetch('*[_type == "marketIndex"] | order(order asc)') || [];
+  const euEtsIndex = indices.find(idx => idx.name?.includes('EU') || idx.name?.includes('歐盟') || idx.name?.includes('ETS') || idx.name?.includes('Carbon') || idx.name?.includes('碳價'));
+  const liveEtsPrice = euEtsIndex ? parseFloat(euEtsIndex.value) || 85 : 85;
+
   // Map category values to display titles
   const categoryMap = {
     logistics: '物流 Logistics',
@@ -42,51 +51,14 @@ export default async function SupplyChain({ params }) {
 
   return (
     <>
-      {/* TopNavBar */}
-      <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
-        <div className="flex justify-between items-center px-4 md:px-margin h-16 max-w-container-max mx-auto">
-          <div className="flex items-center gap-2 md:gap-stack-lg min-w-0">
-            <a href="/" className="text-body-base md:text-headline-md font-headline-md text-primary flex items-center gap-1 shrink-0">
-              esg<span className="text-esg-emerald hidden sm:inline">.</span><span className="hidden sm:inline">team</span>
-            </a>
-            <span className="text-outline-variant shrink-0">|</span>
-            <a href={`/hubs/${hubSlug}`} className="text-label-sm md:text-body-base font-bold text-secondary truncate">
-              {hub?.title || 'Industrial Hub'}
-            </a>
-            <nav className="hidden lg:flex gap-4 xl:gap-gutter ml-2 xl:ml-stack-lg">
-              <a className="text-secondary hover:text-primary transition-colors font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}`}>首頁 Home</a>
-              <a className="text-secondary hover:text-primary transition-colors font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/products`}>產品 Products</a>
-              <a className="text-secondary hover:text-primary transition-colors font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/market`}>市場 Market</a>
-              <a className="text-primary font-bold border-b-2 border-primary pb-1 font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/supply-chain`}>供應鏈 Supply Chain</a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-2 md:gap-gutter shrink-0 pl-2">
-            <div className="hidden xl:flex items-center bg-surface-container-low px-stack-md py-stack-sm rounded-lg border border-outline-variant">
-              <span className="material-symbols-outlined text-on-surface-variant mr-stack-sm">search</span>
-              <input className="bg-transparent border-none focus:ring-0 text-label-sm w-48 outline-none" placeholder="Search partners..." type="text"/>
-            </div>
-            <div className="flex items-center gap-2 md:gap-stack-sm">
-              <button className="hidden md:block px-2 md:px-gutter py-2 md:py-stack-sm text-secondary font-label-sm whitespace-nowrap hover:underline transition-all cursor-pointer">登錄 Sign In</button>
-              <button className="px-3 md:px-gutter py-2 md:py-stack-sm bg-primary text-on-primary font-label-sm rounded-lg cursor-pointer active:scale-95 duration-150 whitespace-nowrap">
-                <span className="hidden sm:inline">聯絡銷售 Contact Sales</span>
-                <span className="sm:hidden">Contact</span>
-              </button>
-            </div>
-          </div>
-        </div>
+      <HubHeader 
+        hubSlug={hubSlug} 
+        title={hub?.title} 
+        contactUrl={hub?.contactUrl} 
+        activeTab="supply-chain" 
+      />
 
-        {/* Mobile Navigation */}
-        <div className="lg:hidden border-t border-outline-variant bg-surface overflow-hidden">
-          <nav className="flex overflow-x-auto no-scrollbar px-4 h-10 items-center gap-6">
-            <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}`}>首頁 Home</a>
-            <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/products`}>產品 Products</a>
-            <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/market`}>市場 Market</a>
-            <a className="text-primary font-bold border-b-2 border-primary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/supply-chain`}>供應鏈 Supply Chain</a>
-          </nav>
-        </div>
-      </header>
-
-      <main className="pt-[104px] lg:pt-24 pb-stack-lg">
+      <main className="pt-[104px] lg:pt-16 pb-stack-lg">
         <div className="max-w-container-max mx-auto px-margin">
           
           {/* Hero / Value Proposition */}
@@ -114,6 +86,16 @@ export default async function SupplyChain({ params }) {
             <div className="relative h-[400px] rounded-xl overflow-hidden shadow-sm border border-outline-variant">
               <img className="object-cover w-full h-full" alt="Logistics Hub" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHBt0ug7GxQfyuSRsQP4E-D6lFeKg7kPjqxyZ316x0lEp6_txjiyhrcQ7ij9h2X_tV4f0LOBz-TzLw5ysANPv7YOZdSbhQoEVTS7hS7debreGsj7xaKd5DK1eZY6tp7k1h-5vP2YeoAXZRldWESwuZEYRfwxzapfrDq85iTHZoj1XX4GxZgtJmlJD8bufm0EocD1xf593lO5VIWheK-Pb-3xtcOEopgIkW9urT3Ry4FX3MDmAJ4JXKbJYHS0zFQyK91SFhU2aTp8aI"/>
             </div>
+          </section>
+
+          {/* CBAM Simulator Section */}
+          <section className="mb-20">
+            <CbamCalculator initialEtsPrice={liveEtsPrice} />
+          </section>
+
+          {/* Scope 3 Carbon Trust Ledger Section */}
+          <section className="mb-20">
+            <Scope3TrustLedger />
           </section>
 
           {/* Service Modules */}

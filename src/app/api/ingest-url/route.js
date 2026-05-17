@@ -70,8 +70,9 @@ export async function POST(req) {
       【分析規則】:
       1. 判斷每一篇文章是否與上述任何專題相關。
       2. 如果文章內容提及鋼鐵、電爐、石墨電極、碳素材料、減碳技術等關鍵字，請優先分類至對應的專題。
-      3. 輸出格式必須是純 JSON 陣列。
-      4. hubIds 欄位必須是一個陣列，包含所有匹配的專題 ID。如果不匹配任何專題，請留空陣列 []。
+      3. 自動分析並提取與文章直接相關的國際/區域 ESG 合規或申報標準（例如：ISO 14064, ISO 14067, CBAM, TCFD, GRI, ISSB, SBTi）。如果完全無關，則留空陣列。
+      4. 輸出格式必須是純 JSON 陣列。
+      5. hubIds 欄位必須是一個陣列，包含所有匹配的專題 ID。如果不匹配任何專題，請留空陣列 []。
       
       【輸出 JSON 格式範例】:
       [
@@ -80,6 +81,7 @@ export async function POST(req) {
           "summary": "100字以內的精簡摘要",
           "category": "政策 / 產業 / 市場",
           "hubIds": ["hub-id-1", "hub-id-2"],
+          "standards": ["ISO 14067", "CBAM"],
           "source": "媒體名稱"
         }
       ]
@@ -120,7 +122,8 @@ export async function POST(req) {
         isActive: true,
         hubs: item.hubIds && item.hubIds.length > 0 
           ? item.hubIds.map(id => ({ _type: 'reference', _ref: id }))
-          : []
+          : [],
+        standards: item.standards && item.standards.length > 0 ? item.standards : []
       };
       
       // 使用 createIfNotExists 確保不重複

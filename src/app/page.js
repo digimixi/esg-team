@@ -2,6 +2,7 @@ import { client } from '@/sanity/lib/client';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import MarketIndexBar from '@/components/MarketIndexBar';
+import InsightCard from '@/components/InsightCard';
 
 export const revalidate = 0; // 強制不快取，隨時抓取最新資料
 
@@ -54,6 +55,7 @@ export default async function Home() {
         externalUrl,
         category,
         isActive,
+        standards,
         "hubTitle": hub->title
     }`);
 
@@ -320,36 +322,7 @@ export default async function Home() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
                             {latestInsights.map((insight) => (
-                                <a 
-                                    key={insight._id} 
-                                    href={insight.externalUrl || '#'} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="flex flex-col bg-surface border border-outline-variant rounded-xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all group relative cursor-pointer"
-                                >
-                                    <div className="flex justify-between items-start mb-4">
-                                        <span className="text-[10px] bg-outline-variant/30 text-secondary px-2 py-0.5 rounded font-bold uppercase tracking-wider">
-                                            {insight.source || 'Intelligence'}
-                                        </span>
-                                        <span className="text-[10px] text-outline font-mono">
-                                            {new Date(insight.publishedAt).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                    <h3 className="font-bold text-primary mb-3 line-clamp-2 group-hover:text-esg-emerald transition-colors">
-                                        {insight.title}
-                                    </h3>
-                                    <p className="text-on-surface-variant text-xs leading-relaxed line-clamp-3 mb-6 opacity-80">
-                                        {insight.summary || insight.excerpt || '點擊進入閱讀 AI 生成的專業摘要內容。'}
-                                    </p>
-                                    <div className="mt-auto flex justify-between items-center pt-4 border-t border-outline-variant/50">
-                                        <span className="text-[10px] text-esg-emerald font-bold">
-                                            #{insight.hubTitle || '全域情報'}
-                                        </span>
-                                        <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all">
-                                            <span className="material-symbols-outlined text-sm">arrow_outward</span>
-                                        </div>
-                                    </div>
-                                </a>
+                                <InsightCard key={insight._id} insight={insight} />
                             ))}
                             
                             {latestInsights.length === 0 && (

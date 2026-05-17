@@ -21,6 +21,11 @@ Every AI agent working on this repository MUST follow these rules to maintain de
 ## 3. Maintenance Protocols
 - **No Fragmentation**: Do not create one-off custom code snippets inside page files. If a design pattern appears twice, it MUST be componentized.
 - **AI Sovereignty**: If you are a new AI taking over, read the existing `src/components/solutions/` library before creating new UI code.
+- **Industrial Hub Unified Header Rule**: All pages under `/hubs/[hubSlug]/` (including index, products, market, and supply chain) MUST render the `<HubHeader />` component located at `src/components/HubHeader.js`.
+    - **NO INLINE HEADERS**: Under no circumstances should an AI agent write an inline HTML `<header>` block for any hub page.
+    - **Configuration over Hardcoding**: Nav tabs in `HubHeader.js` are managed via the standard `tabs` configuration array. If a new tab needs to be added, edit this array inside the component.
+    - **Props Discipline**: Pass `hubSlug`, `title` (hub title), `contactUrl`, and the correct `activeTab` value (`'home' | 'products' | 'market' | 'supply-chain'`) to enable visual synchronization.
+    - **Future-proofing & Specialization**: If a hub page requires extreme sub-header customization (e.g., custom search inputs, tickers), extend `HubHeader` using React slots (Composition) or optional props rather than breaking the componentized structure.
 
 ## 4. CRITICAL SAFETY & STABILITY (Red Lines)
 - **Fallback Content Sovereignty**: NEVER remove the hardcoded fallback data arrays (e.g., `defaultSolutions`) from the dynamic fetching logic. These are the ONLY reason the site doesn't go blank when Sanity APIs fail or are empty.

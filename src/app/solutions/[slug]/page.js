@@ -9,7 +9,7 @@ export const revalidate = 0;
 
 export default async function SolutionDetail({ params }) {
   const { slug } = await params;
-  
+
   // Fetch dynamic content from Sanity
   const solution = await client.fetch(`*[_type == "solution" && slug.current == $slug][0] {
     title,
@@ -30,11 +30,11 @@ export default async function SolutionDetail({ params }) {
   // --------------------------------------------------------------------------
   // LEGACY FALLBACKS (Hardcoded content for original 4 solutions)
   // --------------------------------------------------------------------------
-  
+
   // 1. 數位合規佈局 (Compliance)
   const renderCompliance = () => (
     <div className="space-y-12">
-      <SolutionHero 
+      <SolutionHero
         title="數位合規"
         subtitle="Digital Compliance"
         description="為重工業打造的高效率數位合規解決方案。透過自動化數據採集與分析，確保您的企業符合全球供應鏈 ESG 標準與碳關稅法規。"
@@ -45,7 +45,7 @@ export default async function SolutionDetail({ params }) {
       />
 
       <BentoGrid>
-        <BentoCard 
+        <BentoCard
           title="碳盤查"
           subtitle="Carbon Accounting"
           description="ISO 14064-1 / ISO 14067 國際標準自動對應"
@@ -70,7 +70,7 @@ export default async function SolutionDetail({ params }) {
           </div>
         </BentoCard>
 
-        <BentoCard 
+        <BentoCard
           title="合規狀態"
           icon="fact_check"
           className="md:col-span-4"
@@ -91,7 +91,7 @@ export default async function SolutionDetail({ params }) {
         </BentoCard>
       </BentoGrid>
 
-      <JourneySteps 
+      <JourneySteps
         title="合規實施路徑"
         subtitle="從基礎盤查到全球披露的完整生命週期"
         steps={[
@@ -127,7 +127,7 @@ export default async function SolutionDetail({ params }) {
   // 2. 永續實踐佈局 (Practices)
   const renderPractices = () => (
     <div className="space-y-12">
-      <SolutionHero 
+      <SolutionHero
         title="永續實踐"
         subtitle="Sustainable Practices"
         description="將永續理念轉化為可衡量的工業實踐。我們專注於循環經濟模型建立與智慧綠色建築系統，協助企業實現資源價值的最大化利用。"
@@ -138,7 +138,7 @@ export default async function SolutionDetail({ params }) {
       />
 
       <BentoGrid>
-        <BentoCard 
+        <BentoCard
           title="循環經濟矩陣"
           subtitle="Circular Loop"
           icon="sync_alt"
@@ -159,7 +159,7 @@ export default async function SolutionDetail({ params }) {
           </div>
         </BentoCard>
 
-        <BentoCard 
+        <BentoCard
           title="智慧能效"
           subtitle="Smart Building"
           icon="hub"
@@ -210,7 +210,7 @@ export default async function SolutionDetail({ params }) {
   // 3. 綠色材料佈局 (Materials)
   const renderMaterials = () => (
     <div className="space-y-12">
-      <SolutionHero 
+      <SolutionHero
         title="綠色材料"
         subtitle="Green Materials"
         description="定義低碳工業的未來。我們提供高性能、低足跡的鋼鐵與石墨材料解決方案，助力企業從源頭降低供應鏈碳強度。"
@@ -221,7 +221,7 @@ export default async function SolutionDetail({ params }) {
       />
 
       <BentoGrid>
-        <BentoCard 
+        <BentoCard
           title="低碳鋼鐵"
           subtitle="EcoSteel™"
           description="廢鋼比 95% + 氫能冶煉工藝"
@@ -234,7 +234,7 @@ export default async function SolutionDetail({ params }) {
           </div>
         </BentoCard>
 
-        <BentoCard 
+        <BentoCard
           title="高性能石墨"
           subtitle="Graphite+"
           description="全自動化低能耗提純技術"
@@ -283,7 +283,7 @@ export default async function SolutionDetail({ params }) {
   // 4. 轉型顧問佈局 (Finance)
   const renderFinance = () => (
     <div className="space-y-12">
-      <SolutionHero 
+      <SolutionHero
         title="轉型顧問"
         subtitle="Strategy & Finance"
         description="連接永續戰略與金融價值。我們協助企業提升 ESG 評級，並對接全球綠色金融資源，加速低碳轉型進程。"
@@ -294,7 +294,7 @@ export default async function SolutionDetail({ params }) {
       />
 
       <BentoGrid>
-        <BentoCard 
+        <BentoCard
           title="ESG 評級優化"
           subtitle="Rating Boost"
           icon="analytics"
@@ -312,7 +312,7 @@ export default async function SolutionDetail({ params }) {
           </ul>
         </BentoCard>
 
-        <BentoCard 
+        <BentoCard
           title="綠色金融對接"
           subtitle="Green Finance"
           icon="payments"
@@ -325,7 +325,7 @@ export default async function SolutionDetail({ params }) {
         </BentoCard>
       </BentoGrid>
 
-      <JourneySteps 
+      <JourneySteps
         title="四階段轉型藍圖"
         subtitle="從現狀評估到價值實現的標準化流程"
         steps={[
@@ -341,10 +341,10 @@ export default async function SolutionDetail({ params }) {
   // --------------------------------------------------------------------------
   // DYNAMIC RENDERING (From Sanity Data)
   // --------------------------------------------------------------------------
-  
+
   const renderDynamic = (data) => (
     <div className="space-y-12">
-      <SolutionHero 
+      <SolutionHero
         title={data.title}
         subtitle={data.titleEnglish}
         description={data.description}
@@ -357,7 +357,7 @@ export default async function SolutionDetail({ params }) {
       {data.bentoSection && data.bentoSection.blocks && (
         <BentoGrid title={data.bentoSection.title}>
           {data.bentoSection.blocks.map((block, idx) => (
-            <BentoCard 
+            <BentoCard
               key={idx}
               title={block.title}
               subtitle={block.subtitle}
@@ -386,7 +386,7 @@ export default async function SolutionDetail({ params }) {
       )}
 
       {data.journeySection && data.journeySection.steps && (
-        <JourneySteps 
+        <JourneySteps
           title={data.journeySection.title}
           subtitle={data.journeySection.subtitle}
           steps={data.journeySection.steps}
@@ -412,8 +412,8 @@ export default async function SolutionDetail({ params }) {
             </div>
             <div className="flex-1 min-h-[350px] bg-surface-container-highest relative overflow-hidden">
               {item.imageUrl ? (
-                <img 
-                  src={item.imageUrl} 
+                <img
+                  src={item.imageUrl}
                   alt={item.title}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -442,10 +442,10 @@ export default async function SolutionDetail({ params }) {
       case 'practices': return renderPractices();
       case 'materials': return renderMaterials();
       case 'finance': return renderFinance();
-      default: 
+      default:
         // 如果連 Hardcoded 都沒有，且有基本的 solution 數據，至少渲染基本訊息
         if (solution) return renderDynamic(solution);
-        
+
         return (
           <div className="py-32 text-center">
             <h2 className="text-display-sm text-outline mb-4">方案內容建設中</h2>

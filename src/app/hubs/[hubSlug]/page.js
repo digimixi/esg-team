@@ -3,7 +3,9 @@ import { urlFor } from '@/sanity/lib/image';
 import { PortableText } from '@portabletext/react';
 import MarketIndexBar from '@/components/MarketIndexBar';
 import AIInsightBox from '@/components/AIInsightBox';
+import HubHeader from '@/components/HubHeader';
 import SolutionHero from '@/components/solutions/SolutionHero';
+import InsightCard from '@/components/InsightCard';
 
 export const revalidate = 60;
 
@@ -106,7 +108,8 @@ export default async function HubHome({ params }) {
       authorName,
       publishedAt,
       source,
-      externalUrl
+      externalUrl,
+      standards
     }
   `, { 
     hubId: hub._id 
@@ -127,32 +130,14 @@ export default async function HubHome({ params }) {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-[999] bg-surface/95 backdrop-blur-lg border-b border-outline-variant shadow-sm">
-        <div className="flex justify-between items-center px-4 md:px-margin h-16 max-w-container-max mx-auto w-full relative z-[1000]">
-          <div className="flex items-center gap-2 md:gap-stack-lg min-w-0">
-            <a href="/" className="text-headline-sm font-bold text-primary flex items-center gap-1 shrink-0">
-              esg<span className="text-esg-emerald">.</span>team
-            </a>
-            <span className="text-outline-variant shrink-0">|</span>
-            <span className="text-[12px] md:text-body-base font-bold text-secondary truncate max-w-[120px] md:max-w-none">
-              {hub.title}
-            </span>
-            <nav className="hidden lg:flex gap-4 xl:gap-gutter ml-2 xl:ml-stack-lg">
-              <a className="text-primary font-bold border-b-2 border-primary pb-1 font-body-base whitespace-nowrap" href={`/hubs/${hubSlug}`}>首頁</a>
-              <a className="text-secondary hover:text-primary transition-colors font-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/products`}>產品</a>
-              <a className="text-secondary hover:text-primary transition-colors font-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/market`}>市場</a>
-              <a className="text-secondary hover:text-primary transition-colors font-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/supply-chain`}>供應鏈</a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-1.5 bg-primary text-on-primary font-label-sm text-[11px] rounded-lg shrink-0">
-              聯絡銷售
-            </button>
-          </div>
-        </div>
-      </header>
+      <HubHeader 
+        hubSlug={hubSlug} 
+        title={hub.title} 
+        contactUrl={hub.contactUrl} 
+        activeTab="home" 
+      />
 
-      <main className="pt-16">
+      <main className="pt-[104px] lg:pt-16">
         <SolutionHero 
           title={hub.title}
           subtitle={hub.heroSubtitle}
@@ -228,11 +213,7 @@ export default async function HubHome({ params }) {
             <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg">供應鏈情報</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
               {insights.map((insight) => (
-                <a key={insight._id} href={insight.externalUrl || '#'} target="_blank" rel="noopener noreferrer" className="bg-surface-container-lowest border border-outline-variant p-stack-md rounded-xl hover:shadow-xl transition-all">
-                  <span className="text-xs text-on-tertiary-container mb-2 block">{insight.category}</span>
-                  <h3 className="font-bold text-primary mb-2 line-clamp-2">{insight.title}</h3>
-                  <p className="text-xs text-on-surface-variant line-clamp-3">{insight.summary}</p>
-                </a>
+                <InsightCard key={insight._id} insight={{ ...insight, hubTitle: hub.title }} />
               ))}
             </div>
           </div>

@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { client } from '@/sanity/lib/client';
 import TradingViewChart from '@/components/TradingViewChart';
+import HubHeader from '@/components/HubHeader';
 
 export const revalidate = 0;
 
@@ -17,11 +18,13 @@ export default async function Market({ params }) {
   const insights = await client.fetch(`*[_type == "insight" && hub->slug.current == $slug] | order(publishedAt desc)[0...3]{
     _id,
     title,
-    "summary": excerpt,
+    summary,
+    "excerpt": excerpt,
     category,
     publishedAt,
     source,
-    externalUrl
+    externalUrl,
+    standards
   }`, { slug: hubSlug }) || [];
 
   // 輔助函式：判斷漲跌顏色
@@ -33,50 +36,12 @@ export default async function Market({ params }) {
 
   return (
     <>
-      {/* TopNavBar */}
-      <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
-        <div className="flex justify-between items-center px-4 md:px-margin h-16 max-w-container-max mx-auto">
-          <div className="flex items-center gap-2 md:gap-stack-lg min-w-0">
-            <a href="/" className="text-body-base md:text-headline-md font-headline-md text-primary flex items-center gap-1 shrink-0">
-              esg<span className="text-esg-emerald hidden sm:inline">.</span><span className="hidden sm:inline">team</span>
-            </a>
-            <span className="text-outline-variant shrink-0">|</span>
-            <a href={`/hubs/${hubSlug}`} className="text-label-sm md:text-body-base font-bold text-secondary truncate">
-              {hub?.title || 'Industrial Hub'}
-            </a>
-            <nav className="hidden lg:flex gap-4 xl:gap-gutter ml-2 xl:ml-stack-lg">
-              <a className="text-secondary hover:text-primary transition-colors font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}`}>首頁 Home</a>
-              <a className="text-secondary hover:text-primary transition-colors font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/products`}>產品 Products</a>
-              <a className="text-primary font-bold border-b-2 border-primary pb-1 font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/market`}>市場 Market</a>
-              <a className="text-secondary hover:text-primary transition-colors font-body-base text-body-base whitespace-nowrap" href={`/hubs/${hubSlug}/supply-chain`}>供應鏈 Supply Chain</a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-2 md:gap-gutter shrink-0 pl-2">
-            <div className="flex items-center gap-2 md:gap-stack-sm">
-              <button className="hidden md:block px-2 md:px-gutter py-2 md:py-stack-sm text-secondary font-label-sm whitespace-nowrap hover:underline transition-all cursor-pointer">登錄 Sign In</button>
-              <a 
-                href={hub?.contactUrl || '#'} 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 md:px-gutter py-2 md:py-stack-sm bg-primary text-on-primary font-label-sm rounded-lg cursor-pointer active:scale-95 duration-150 whitespace-nowrap"
-              >
-                <span className="hidden sm:inline">聯絡銷售 Contact Sales</span>
-                <span className="sm:hidden">Contact</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className="lg:hidden border-t border-outline-variant bg-surface overflow-hidden">
-          <nav className="flex overflow-x-auto no-scrollbar px-4 h-10 items-center gap-6">
-            <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}`}>首頁 Home</a>
-            <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/products`}>產品 Products</a>
-            <a className="text-primary font-bold border-b-2 border-primary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/market`}>市場 Market</a>
-            <a className="text-secondary h-full flex items-center whitespace-nowrap shrink-0 text-label-sm" href={`/hubs/${hubSlug}/supply-chain`}>供應鏈 Supply Chain</a>
-          </nav>
-        </div>
-      </header>
+      <HubHeader 
+        hubSlug={hubSlug} 
+        title={hub?.title} 
+        contactUrl={hub?.contactUrl} 
+        activeTab="market" 
+      />
 
       {/* 動態 Price Ticker */}
       <div className="mt-[104px] lg:mt-16 bg-surface-container-highest border-b border-outline-variant overflow-hidden">
@@ -188,7 +153,24 @@ export default async function Market({ params }) {
                       </span>
                     </div>
                     <h4 className="font-bold text-body-base leading-tight mb-2">{insight.title}</h4>
-                    <p className="text-on-primary-container text-label-sm line-clamp-3 opacity-90">{insight.summary}</p>
+                    
+                    {/* 🏷️ ESG Standards Compliance Anchors (Google Stitch Light Mode for Dark Background) */}
+                    {insight.standards && insight.standards.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1 mb-2">
+                        {insight.standards.map((std) => (
+                          <span 
+                            key={std} 
+                            className="inline-flex items-center text-[8px] font-mono font-bold tracking-tight px-1 py-0.2 rounded border border-white/20 bg-white/5 text-white/80 hover:border-esg-emerald/50 hover:text-white transition-all duration-300"
+                            title={`關聯標準: ${std}`}
+                          >
+                            <span className="w-1 h-1 rounded-full bg-esg-emerald mr-1 shrink-0 animate-pulse"></span>
+                            {std}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <p className="text-on-primary-container text-label-sm line-clamp-3 opacity-90">{insight.summary || insight.excerpt}</p>
                     <a 
                       href={insight.externalUrl || '#'} 
                       target="_blank"

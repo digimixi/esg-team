@@ -93,12 +93,25 @@ export const structure = (S) =>
 
       S.divider(),
 
-      // 6. 自動掃描區 (防止遺漏)
+      // 6. 系統技術導入 (System Tech)
+      S.listItem()
+        .id('system_tech_center')
+        .title('🛠️ 系統技術導入 (System Tech)')
+        .child(
+          S.documentTypeList('systemTech')
+            .id('system_tech_list')
+            .title('平台已導入技術與模組清單')
+        ),
+
+      S.divider(),
+
+      // 7. 自動掃描區 (防止遺漏)
       ...S.documentTypeListItems().filter(
         (listItem) => ![
           'siteSettings', 'hub', 'partner', 'eduPage',
           'product', 'marketIndex', 'sourceBookmark',
-          'insight', 'company', 'emissionFactor', 'inventoryEntry'
+          'insight', 'company', 'emissionFactor', 'inventoryEntry',
+          'systemTech'
         ].includes(listItem.getId())
       ),
     ])

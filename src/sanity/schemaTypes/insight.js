@@ -75,6 +75,13 @@ export const insight = {
       type: 'boolean', 
       initialValue: false,
       description: '勾選後將在情報網格中佔據 2x2 的大版面'
+    },
+    {
+      name: 'standards',
+      title: '關聯 ESG 標準 (Standards)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: '由 AI 自動識別之關聯標準，例如: ISO 14064, ISO 14067, CBAM, TCFD, ISSB, SBTi'
     }
   ],
   preview: {

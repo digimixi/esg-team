@@ -12,6 +12,7 @@ import industryBenchmark from './industryBenchmark'
 import { company } from './company'
 import { emissionFactor } from './emissionFactor'
 import { inventoryEntry } from './inventoryEntry'
+import { systemTech } from './systemTech'
 
 export const schema = {
   types: [
@@ -27,6 +28,7 @@ export const schema = {
     industryBenchmark,
     company,
     emissionFactor,
-    inventoryEntry
+    inventoryEntry,
+    systemTech
   ],
 }

@@ -1,7 +1,7 @@
 import { client } from '@/sanity/lib/client';
-import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import SolutionHero from '@/components/solutions/SolutionHero';
+import HubHeader from '@/components/HubHeader';
 
 export const revalidate = 0;
 
@@ -38,27 +38,14 @@ export default async function HubProductsPage({ params }) {
 
   return (
     <>
-      <Navbar />
-      <main className="pt-16 min-h-screen bg-surface">
-        {/* Hub 專屬頁面導航 - 保持與首頁一致的風格 */}
-        <div className="bg-surface-container-high border-b border-outline-variant sticky top-16 z-30">
-          <div className="max-w-container-max mx-auto px-margin h-14 flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <Link href={`/hubs/${hubSlug}`} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase tracking-wider">
-                首頁
-              </Link>
-              <Link href={`/hubs/${hubSlug}/products`} className="text-primary font-bold border-b-2 border-primary h-14 flex items-center font-label-sm text-label-sm uppercase tracking-wider">
-                產品目錄
-              </Link>
-              <Link href={`/hubs/${hubSlug}/market`} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase tracking-wider">
-                市場情報
-              </Link>
-              <Link href={`/hubs/${hubSlug}/supply-chain`} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm uppercase tracking-wider">
-                供應鏈
-              </Link>
-            </div>
-          </div>
-        </div>
+      <HubHeader 
+        hubSlug={hubSlug} 
+        title={hub.title} 
+        contactUrl={hub.contactUrl} 
+        activeTab="products" 
+      />
+
+      <main className="pt-[104px] lg:pt-16 min-h-screen bg-surface">
 
         <SolutionHero 
           title={hub.productSectionTitle || `${hub.title} 資源目錄`}

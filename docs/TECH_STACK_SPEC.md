@@ -78,6 +78,32 @@
     3. **Automated Synthesis**：生成帶有打字機動態效果的分析文字與信心指數。
 - **視覺規範 (Neural UI Pattern)**：AI 區塊必須具備「發光神經網絡背景」與「即時處理呼吸燈」，以視覺方式強調系統的智能化特質。
 
+### K. 情報源追溯與知識圖譜自動產生 (Linked Intelligence & ESG Standards Mapping)
+- **路徑**：`src/app/api/ingest-url/route.js` & `src/sanity/schemaTypes/insight.js`
+- **機制**：
+    - 在情報採集時，由 Gemini AI (gemini-flash-latest) 自動分析網頁內容，判斷並自動標記直接關聯的國際/區域 ESG 合規或申報標準（例如：ISO 14064, ISO 14067, CBAM, TCFD, GRI, ISSB, SBTi）。
+    - 數據存儲於 `insight` 模型的 `standards` 欄位（`array` of `string`）。
+- **目的**：建立高度信賴與智慧化的情報溯源網絡，消除人工標籤成本，支撐前台知識圖譜與標準導航。
+
+### L. 歐盟 CBAM 碳邊境稅動態模擬器 (Dynamic CBAM Simulator)
+- **路徑**：`src/components/CbamCalculator.js` & `src/app/hubs/[hubSlug]/supply-chain/page.js`
+- **機制**：
+    - 作為一個獨立的客戶端互動式元件（Client Component），模擬歐盟 CBAM 官方規章中的碳關稅曝險。
+    - 整合歐盟 2026-2034 官方逐年遞減之免費額度比率（Phase-in rate），並引進 CBAM Article 9 條款以抵免原產國已支付的碳費/碳稅。
+    - **實時碳價連動**：在伺服器端抓取 Sanity 中的跑馬燈指數（`marketIndex`），若偵測到 EU ETS/歐盟碳價數據，則自動作為計算器的預設碳價基準。
+- **目的**：打通後台市場行情與前台合規計算，為全球鋼鐵與重工業買家提供直接的碳邊境稅曝險評估與綠色避險工具。
+
+### M. 供應鏈碳排信任帳本 (Scope 3 Carbon Trust Ledger)
+- **路徑**：[Scope3TrustLedger.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/Scope3TrustLedger.js) & [supply-chain/page.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/app/hubs/[hubSlug]/supply-chain/page.js)
+- **機制**：
+    - 作為一個獨立的客戶端互動式元件（Client Component），用以呈現與追蹤企業 Scope 3 供應鏈採購原物料與服務之生命週期評估 (LCA) 數據與合規查證狀態。
+    - **安全防偽信任鏈**：每筆交易紀錄皆內嵌國際第三方機構（如 SGS、TÜV）的查證證書，並配備不可篡改的「密碼學防偽雜湊值（Ledger Hash 0x...）」，確保 Scope 3 碳盤查數據具備無可置疑的法律審計效力。
+    - **動態 LCA A1-A3 排放細分**：視覺化展示原物料在開採（A1）、生產（A2）、運輸（A3）階段之排放佔比，並支援一鍵下載證書 PDF 與同步企業內部碳資產庫。
+    - **新供應商安全填報對接 (Secure Invitation Flow)**：內建發起對接彈窗，生成具備時效與防偽安全金鑰 (Token) 的表單鏈結給上游供應商，完成數據的安全封閉採集。
+    - **操作導航面板 (Manual Panel)**：整合極簡互動式問號按鈕，點擊後即時展開功能目的與使用者操作指南，極大降低系統的學習成本。
+- **目的**：打通重工業 Scope 3 供應鏈數據黑盒，防範綠洗風險，助企業構建穩固的碳信託邊界。
+
+
 ---
 
 ## 3. 性能與視覺優化規範 (Performance & UI/UX)
