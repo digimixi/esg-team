@@ -2,6 +2,7 @@ import React from 'react';
 import { client } from '@/sanity/lib/client';
 import { notFound } from 'next/navigation';
 import EduImageGallery from '@/components/EduImageGallery';
+import HubHeader from '@/components/HubHeader';
 
 export const revalidate = 60;
 
@@ -22,27 +23,26 @@ export default async function GenericEduPage({ params }) {
   if (!page) notFound();
 
   return (
-    <div className="bg-[#f7f9fb] text-[#191c1e] selection:bg-secondary-container font-sans">
-      {/* TopNavBar */}
-      <header className="fixed top-0 w-full z-50 bg-white border-b border-[#c6c6cd]">
-        <div className="flex justify-between items-center px-margin h-16 max-w-container-max mx-auto">
-          <div className="flex items-center gap-gutter">
-            <a href="/" className="text-2xl font-bold text-primary tracking-tighter">esg.team</a>
-            <div className="hidden md:flex items-center gap-1">
-               <span className="text-outline-variant">|</span>
-               <a href={`/hubs/${hubSlug}`} className="ml-2 font-bold text-secondary hover:text-primary transition-colors">
-                 {page.hub?.title}
-               </a>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-             <button className="px-gutter py-2 text-secondary hover:underline cursor-pointer font-label-sm">Sign In</button>
-             <button className="px-gutter py-2 bg-primary text-on-primary font-bold rounded-lg cursor-pointer active:scale-95 transition-all">Contact Sales</button>
-          </div>
-        </div>
-      </header>
+    <div className="bg-[#f7f9fb] text-[#191c1e] selection:bg-secondary-container font-sans min-h-screen">
+      {/* 統一專題導航 Header */}
+      <HubHeader 
+        hubSlug={hubSlug} 
+        title={page.hub?.title || 'ESG 專題'} 
+        activeTab="" 
+      />
 
-      <main className="pt-24 pb-32 max-w-container-max mx-auto px-margin">
+      <main className="pt-32 pb-32 max-w-container-max mx-auto px-margin">
+        {/* 精緻微動畫麵包屑 (Breadcrumbs) */}
+        <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-500">
+          <a 
+            href={`/hubs/${hubSlug}`} 
+            className="group inline-flex items-center gap-2 text-sm text-secondary hover:text-primary font-bold transition-all px-3 py-1.5 bg-white border border-[#c6c6cd]/50 rounded-full shadow-sm hover:shadow hover:bg-slate-50"
+          >
+            <span className="material-symbols-outlined text-[16px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+            <span>返回 {page.hub?.title || '專題首頁'}</span>
+          </a>
+        </div>
+
         {/* Hero Section */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-12">
           <div className="lg:col-span-8">
