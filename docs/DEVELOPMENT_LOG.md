@@ -4,6 +4,49 @@
 
 ---
 
+## [2026-05-18] 雲端自動化編譯與正式發布部署 (Google Cloud Run Continuous CD Deployment)
+
+### 🚀 新增功能 (New Features)
+1. **Google Cloud Run 雲端構建與部署上線**：
+    * 透過 Google Cloud SDK 與 Cloud Build，順利將本地最新的 Next.js 16 重構版本編譯並部署至 **GCP Cloud Run**（`asia-east1` 區域，專案 ID `esg-team-portal`）。
+    * 成功完成 100% 流量無縫路由至最新版本，並將專案內所有的環境變數（包括 `NEXT_PUBLIC_SANITY_PROJECT_ID`、`NEXT_PUBLIC_SANITY_DATASET`、`SANITY_WRITE_TOKEN` 及 `GEMINI_API_KEY`）安全注入雲端運行容器中，保證前後端運作完全同步。
+2. **本地生產級 Build 預檢成功**：
+    * 於本地執行 Next.js (Turbopack) Production Build 通過驗證，無任何 TypeScript 類型錯誤、語法解析異常或靜態路徑失效問題。
+
+### 💡 技術決策 (Key Decisions)
+* **雲端與本地環境零偏差**：在發布新模組前，透過完整且自動化的 Cloud Build 容器化編譯，確保了專案在 `esg.team` 網域下的所有真實路由（包括動態 Ingestion API 與 Sanity API 動態拉取）與本地開發的行為完全一致。
+
+---
+
+## [2026-05-18] 科普頁面導航大一統與 Hybrid UX 藥丸型微動畫返回麵包屑 (Education Page Unification & Hybrid UX Breadcrumbs)
+
+### 🚀 新增功能 (New Features)
+1. **科普知識庫詳情頁導航列統一**：
+    * 重構科普知識庫詳情頁面 [page.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/app/hubs/[hubSlug]/edu/[eduSlug]/page.js)，全面引入專題的中央控制組件 `<HubHeader />`，替代過去碎片化的 Inline Header，使平台在不同層級的文章閱讀頁仍保持 100% 一致的專題頂部導航。
+2. **增設 Google Stitch 風格的藥丸型微動畫麵包屑**：
+    * 於文章標題的正上方新增高密度的「藥丸型返回鍵」：`← 返回 [專題標題] 專題首頁`。
+    * **交互效果**：Hover 時觸發內部 SVG 箭頭 `←` 向左滑移的平滑過渡微動畫，按鈕背景呈現高級的極簡灰色漸變與柔和陰影，提供深具質感的「無干擾閱讀導航」。
+3. **響應式邊距修正**：
+    * 將閱讀頁 `<main>` 的 `pt-24` 升級為 `pt-32`，完美解決了頂部統一導航列與文章標題的遮擋問題，並在手機版下自動適配最舒適的留白比例。
+
+### 💡 技術決策 (Key Decisions)
+* **Hybrid 混合導航策略 (Unified Header + Back Breadcrumbs)**：避免純「返回上一頁」所導致的外部流量丟失問題。保留中央頂部導航讓直接從 Google 搜尋點進來的用戶有直覺的跳轉通道去體驗「CBAM 模擬器」或「區塊鏈帳本」；同時在內容區上方給予精緻的返回按鈕，滿足專注閱讀者流暢的返回需求，達到 Stripe / Vercel 級別的 UX 水準。
+
+---
+
+## [2026-05-18] AI 憲章大一統導航規範寫入 (Governance Manifesto AGENTS.md Update)
+
+### 🚀 新增功能 (New Features)
+1. **寫入 Industrial Hub Unified Header Rule（工業專題統一導航規範）**：
+    * 於 [AGENTS.md](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/AGENTS.md) 中正式寫入第三章維護協議新規範。
+    * **嚴禁硬編碼 (NO INLINE HEADERS)**：明文禁止未來接手的 AI 助理手寫 Inline Header 區塊。
+    * **配置化與防禦性擴充**：確立選單項目統一由 `HubHeader.js` 配置陣列管理，若未來頁面有客製化需求，必須採用 React 組件插槽（Composition）或選擇性參數進行擴充，絕不可破壞共用結構。
+
+### 💡 技術決策 (Key Decisions)
+* **AI 永續治理防禦 (Defensive AI Architecture)**：由於專案會經歷多輪 AI 助理迭代，將「全體一致性導航規則」寫入最高治理憲章，是杜絕未來 AI 助理因缺乏脈絡而隨意寫入破碎代碼、確保架構永遠不會隨著維護退化的唯一最佳實踐。
+
+---
+
 ## [2026-05-18] 專題四大業務頁面導航列與商標編排極致統一 (Full Header & Navigation Unification)
 
 ### 🚀 新增功能 (New Features)
