@@ -508,8 +508,14 @@ export default function AdminSources() {
                     </div>
                     <div className="text-[10px] text-amber-400">React Client / Crypto Proof-of-Trust</div>
                   </td>
-                  <td className="px-6 py-4 font-mono text-[10px] text-slate-400">
-                    src/components/Scope3TrustLedger.js
+                  <td className="px-6 py-4 font-mono text-[10px] text-slate-400 leading-relaxed">
+                    src/components/Scope3TrustLedger.js<br />
+                    └─ src/components/ledger/<br />
+                    &nbsp;&nbsp;&nbsp;├─ mockData.js<br />
+                    &nbsp;&nbsp;&nbsp;├─ LedgerHelpPanel.js<br />
+                    &nbsp;&nbsp;&nbsp;├─ LedgerMetrics.js<br />
+                    &nbsp;&nbsp;&nbsp;├─ SupplierInviteModal.js<br />
+                    &nbsp;&nbsp;&nbsp;└─ LedgerTable.js
                   </td>
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center gap-1 text-[10px] text-rose-400 font-bold px-2 py-0.5 rounded-full bg-rose-400/10 border border-rose-500/20">

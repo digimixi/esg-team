@@ -111,7 +111,7 @@ export const structure = (S) =>
           'siteSettings', 'hub', 'partner', 'eduPage',
           'product', 'marketIndex', 'sourceBookmark',
           'insight', 'company', 'emissionFactor', 'inventoryEntry',
-          'systemTech'
+          'systemTech', 'solution', 'industryBenchmark'
         ].includes(listItem.getId())
       ),
     ])

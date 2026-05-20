@@ -91,15 +91,38 @@
     - 作為一個獨立的客戶端互動式元件（Client Component），模擬歐盟 CBAM 官方規章中的碳關稅曝險。
     - 整合歐盟 2026-2034 官方逐年遞減之免費額度比率（Phase-in rate），並引進 CBAM Article 9 條款以抵免原產國已支付的碳費/碳稅。
     - **實時碳價連動**：在伺服器端抓取 Sanity 中的跑馬燈指數（`marketIndex`），若偵測到 EU ETS/歐盟碳價數據，則自動作為計算器的預設碳價基準。
+    - **實時碳價自動更新對接機制 (Real-time Carbon Price Integration)**:
+        - **核心數據鏈路 (方案 A - Yahoo Finance)**:
+            - 利用系統已有的 [yahoo.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/lib/market/providers/yahoo.js) 轉接器，將 Sanity 中的 `index-carbon-eu` (歐盟碳配額 EUA) 的 `sourceProvider` 設為 `yahoo_finance`，`sourceSymbol` 設為 `CFI2Y.F`。
+            - 執行 [sync-market-data.mjs](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/scripts/sync-market-data.mjs) 時，會定時從 Yahoo Finance 抓取 ICE 交易所之 EUA 期貨行情並更新至 Sanity。
+            - 計算器 `CbamCalculator.js` 從 Sanity 拉取該 EUA 行情，作為動態預設碳價基準，打通「計算器 ➔ 資料庫 ➔ 實時行情」。
+        - **前台視覺增強 (方案 B - TradingView Widget)**:
+            - 前端嵌入 TradingView 免費提供的官方互動圖表元件，代號為 `EUA1!` (ICE 歐盟碳配額期貨)，免付費且無縫整合，提供高科技感金融走勢圖。
 - **目的**：打通後台市場行情與前台合規計算，為全球鋼鐵與重工業買家提供直接的碳邊境稅曝險評估與綠色避險工具。
 
 ### M. 供應鏈碳排信任帳本 (Scope 3 Carbon Trust Ledger)
-- **路徑**：[Scope3TrustLedger.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/Scope3TrustLedger.js) & [supply-chain/page.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/app/hubs/[hubSlug]/supply-chain/page.js)
+- **路徑**：
+    - 主控調度器：[Scope3TrustLedger.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/Scope3TrustLedger.js)
+    - 數據頁面：[supply-chain/page.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/app/hubs/[hubSlug]/supply-chain/page.js)
+    - 核心子組件目錄：`src/components/ledger/`
+        - [mockData.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/ledger/mockData.js)：隔離模擬交易數據庫
+        - [LedgerHelpPanel.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/ledger/LedgerHelpPanel.js)：操作手冊與 Tesla 案例說明面板
+        - [LedgerMetrics.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/ledger/LedgerMetrics.js)：碳資產統計指標卡片與動態 SVG 環
+        - [SupplierInviteModal.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/ledger/SupplierInviteModal.js)：安全對接彈窗表單（狀態隔離）
+        - [LedgerTable.js](file:///c:/Users/hence/.gemini/antigravity/scratch/esg-team/src/components/ledger/LedgerTable.js)：搜尋過濾工具、分頁與交易列表表格（詳情抽屜）
 - **機制**：
-    - 作為一個獨立的客戶端互動式元件（Client Component），用以呈現與追蹤企業 Scope 3 供應鏈採購原物料與服務之生命週期評估 (LCA) 數據與合規查證狀態。
+    - 作為一個獨立的高內聚模組化元件群，用以呈現與追蹤企業 Scope 3 供應鏈採購原物料與服務之生命週期評估 (LCA) 數據與合規查證狀態。
     - **安全防偽信任鏈**：每筆交易紀錄皆內嵌國際第三方機構（如 SGS、TÜV）的查證證書，並配備不可篡改的「密碼學防偽雜湊值（Ledger Hash 0x...）」，確保 Scope 3 碳盤查數據具備無可置疑的法律審計效力。
     - **動態 LCA A1-A3 排放細分**：視覺化展示原物料在開採（A1）、生產（A2）、運輸（A3）階段之排放佔比，並支援一鍵下載證書 PDF 與同步企業內部碳資產庫。
     - **新供應商安全填報對接 (Secure Invitation Flow)**：內建發起對接彈窗，生成具備時效與防偽安全金鑰 (Token) 的表單鏈結給上游供應商，完成數據的安全封閉採集。
+    - **安全供應商無密碼對接郵件流 (Secure Passwordless Onboarding Email Flow)**:
+        - **發送通道 (Resend Integration)**:
+            - 整合業界成熟的 `Resend` 郵件派發服務。利用其每日 100 封/每月 3,000 封之免費額度，實現 **$0 營運成本**。
+        - **安全無密碼填報路徑**:
+            - 買方點擊發起對接時，Next.js API 路由利用 Node.js 內建 `crypto` 模組動態生成唯一的時效安全金鑰（Secure Token），並透過 Resend 向供應商發送邀請信。
+            - 供應商點擊信中連結（如 `/hubs/[hubSlug]/supply-chain/onboard?token=xxxx`）直接進入免密碼安全填報表單（Light-weight Declaring Form）。
+        - **資產儲存與雜湊存證**:
+            - 供應商上傳之認證證書直接利用 Sanity API 上傳至 Sanity 免費提供的 5GB 雲端空間，計算檔案 SHA-256 雜湊碼並寫入帳本作為防偽 Hash（Ledger Hash 0x...），完成 100% 零成本之合規信託鏈。
     - **操作導航面板 (Manual Panel)**：整合極簡互動式問號按鈕，點擊後即時展開功能目的與使用者操作指南，極大降低系統的學習成本。
 - **目的**：打通重工業 Scope 3 供應鏈數據黑盒，防範綠洗風險，助企業構建穩固的碳信託邊界。
 

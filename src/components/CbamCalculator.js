@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * @component CbamCalculator
@@ -296,6 +296,119 @@ const CbamCalculator = ({ initialEtsPrice = 85 }) => {
 
         </div>
 
+      </div>
+
+      {/* TradingView Chart Widget Section */}
+      <div className="mt-8 pt-6 border-t border-outline-variant/60 relative z-10">
+        <TradingViewWidget />
+      </div>
+    </div>
+  );
+};
+
+/**
+ * @component TradingViewWidget
+ * @description Renders a premium embedded TradingView Interactive Chart for ICE EUA Futures.
+ */
+const TradingViewWidget = () => {
+  const containerRef = useRef(null);
+  const [showPriceApiHelp, setShowPriceApiHelp] = useState(false);
+
+  useEffect(() => {
+    let script = document.getElementById('tradingview-widget-script');
+    
+    const initWidget = () => {
+      if (typeof window !== 'undefined' && window.TradingView && containerRef.current) {
+        try {
+          new window.TradingView.widget({
+            autosize: true,
+            symbol: 'ICE:ICEEUA', // tracks European Carbon Allowance Futures (EUA)
+            interval: 'D',
+            timezone: 'Etc/UTC',
+            theme: 'dark',
+            style: '1',
+            locale: 'zh_TW',
+            toolbar_bg: '#1e293b',
+            enable_publishing: false,
+            hide_side_toolbar: true,
+            allow_symbol_change: false,
+            container_id: containerRef.current.id,
+          });
+        } catch (e) {
+          console.error('[TradingView Widget] Initialization failed:', e);
+        }
+      }
+    };
+
+    if (!script) {
+      script = document.createElement('script');
+      script.id = 'tradingview-widget-script';
+      script.src = 'https://s3.tradingview.com/tv.js';
+      script.type = 'text/javascript';
+      script.async = true;
+      script.onload = initWidget;
+      document.head.appendChild(script);
+    } else {
+      if (window.TradingView) {
+        initWidget();
+      } else {
+        script.addEventListener('load', initWidget);
+      }
+    }
+
+    return () => {
+      if (script) {
+        script.removeEventListener('load', initWidget);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="bg-[#121824] border border-outline-variant/60 rounded-xl p-4 space-y-3 shadow-md">
+      <div className="flex justify-between items-center border-b border-outline-variant/40 pb-2">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-esg-emerald animate-pulse"></span>
+          <span className="text-xs font-bold text-slate-100">
+            歐盟碳配額 (EUA) 實時行情走勢 - ICE EUA 期貨 (TradingView)
+          </span>
+          <button 
+            type="button"
+            onClick={() => setShowPriceApiHelp(!showPriceApiHelp)}
+            className={`w-5 h-5 rounded-full flex items-center justify-center border text-[9px] transition-all duration-300 ${
+              showPriceApiHelp 
+                ? 'bg-esg-emerald text-white border-esg-emerald' 
+                : 'bg-slate-800/40 border-slate-700/60 text-slate-400 hover:border-esg-emerald hover:text-slate-200 hover:scale-105 active:scale-95 cursor-pointer'
+            }`}
+            title="顯示實時碳價 API 對接說明"
+          >
+            <span className="material-symbols-outlined text-[10px] font-bold">help</span>
+          </button>
+        </div>
+        <span className="text-[10px] text-slate-400 font-mono">Symbol: ICEEUA</span>
+      </div>
+
+      {showPriceApiHelp && (
+        <div className="bg-slate-900/80 border border-slate-800 rounded-lg p-3.5 space-y-2 text-[11px] leading-relaxed text-slate-300 animate-in fade-in slide-in-from-top-2 duration-300">
+          <span className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-xs text-esg-emerald">api</span>
+            實時碳價 API 對接機制與目的說明
+          </span>
+          <div className="text-[10px] text-slate-400 space-y-1 font-sans">
+            <p>
+              <strong>1. 數據來源與精度：</strong> 本行情系統底層透過自動腳本定時串接 Yahoo Finance API，鎖定倫敦交易所之 <code>CO2.L</code> (SparkChange Physical Carbon EUA ETC) 作為物理歐盟碳配額追蹤標的，保證資料與真實歐洲碳市場高度同步。
+            </p>
+            <p>
+              <strong>2. 行情與圖表對齊：</strong> 本行情面板嵌入了 TradingView 高頻即時行情圖表（Symbol: <code>ICE:ICEEUA</code>），供進口商與決策層進行技術面走勢與波動度分析。
+            </p>
+            <p>
+              <strong>3. 動態合規計算：</strong> 系統會自動將動態抓取的實時碳價，作為上方「CBAM 碳稅模擬器」的初始計算基準，無縫打通行情走勢與合規關稅風險評估。
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="w-full h-[280px] rounded-lg overflow-hidden border border-outline-variant/30">
+        <div id="tradingview_eua_chart" ref={containerRef} className="w-full h-full" />
       </div>
     </div>
   );
