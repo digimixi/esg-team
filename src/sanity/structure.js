@@ -88,6 +88,7 @@ export const structure = (S) =>
               S.documentTypeListItem('company').title('🏢 企業會員 (Companies)'),
               S.documentTypeListItem('emissionFactor').title('🧬 排放係數庫 (Emission Factors)'),
               S.documentTypeListItem('inventoryEntry').title('📝 排放分錄 (Inventory Entries)'),
+              S.documentTypeListItem('scope3Transaction').title('🔗 供應鏈碳帳本交易 (Scope 3 Transactions)'),
             ])
         ),
 
@@ -111,7 +112,7 @@ export const structure = (S) =>
           'siteSettings', 'hub', 'partner', 'eduPage',
           'product', 'marketIndex', 'sourceBookmark',
           'insight', 'company', 'emissionFactor', 'inventoryEntry',
-          'systemTech', 'solution', 'industryBenchmark'
+          'systemTech', 'solution', 'industryBenchmark', 'scope3Transaction'
         ].includes(listItem.getId())
       ),
     ])
