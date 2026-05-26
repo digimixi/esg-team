@@ -28,6 +28,7 @@ export default function Navbar() {
 
   const navLinks = [
     { title: '全域入口', sub: 'Global Portal', href: '/' },
+    { title: '資源目錄', sub: 'Catalog', href: '/catalog' },
     { title: '解決方案', sub: 'Solutions', href: '/solutions' },
     { title: '工具中心', sub: 'SaaS Tools', href: '/tools' },
     { title: '碳資產管理', sub: 'Carbon Assets', href: '/hubs/graphite' },
