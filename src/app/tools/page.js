@@ -63,7 +63,7 @@ export default async function ToolsHub() {
               <div className="w-16 h-16 rounded-full shadow-neu-pressed flex items-center justify-center mb-3 bg-[var(--color-neu-surface)]">
                 <span className="material-symbols-outlined text-3xl text-esg-emerald">person</span>
               </div>
-              <h2 className="font-bold text-lg text-primary">Welcome, Admin;</h2>
+              <h2 className="font-bold text-lg text-primary">Welcome, Partner!</h2>
               <div className="flex gap-2 mt-2">
                 <div className="px-3 py-1 rounded-full shadow-neu-pressed text-[10px] font-bold text-esg-emerald flex items-center gap-1">
                   <span className="material-symbols-outlined text-[12px]">verified</span> Pro
