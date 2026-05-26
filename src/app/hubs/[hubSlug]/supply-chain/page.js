@@ -71,10 +71,10 @@ export default async function SupplyChain({ params }) {
       {/* Sticky Secondary Navigation */}
       <StickyJumpNav links={[
         { label: '解決方案', href: `/hubs/${hubSlug}#solutions`, isPrimary: true },
-        { label: '市場實時指數', href: `/hubs/${hubSlug}#market-index` },
-        { label: '解碼核心資產', href: `/hubs/${hubSlug}#education` },
-        { label: '資源目錄', href: `/hubs/${hubSlug}#products` },
-        { label: '供應鏈情報', href: `/hubs/${hubSlug}#intelligence` }
+        { label: '碳排試算器', href: '#cbam-calculator' },
+        { label: '碳信任帳本', href: '#trust-ledger' },
+        { label: '服務模組', href: '#service-modules' },
+        { label: '認證夥伴', href: '#partners' }
       ]} />
 
 
@@ -109,17 +109,17 @@ export default async function SupplyChain({ params }) {
           </section>
 
           {/* CBAM Simulator Section */}
-          <section className="mb-20">
+          <section id="cbam-calculator" className="mb-20 scroll-mt-32">
             <CbamCalculator initialEtsPrice={liveEtsPrice} defaultFactorId={defaultFactorId} />
           </section>
 
           {/* Scope 3 Carbon Trust Ledger Section */}
-          <section className="mb-20">
+          <section id="trust-ledger" className="mb-20 scroll-mt-32">
             <Scope3TrustLedger />
           </section>
 
           {/* Service Modules */}
-          <section className="mb-20">
+          <section id="service-modules" className="mb-20 scroll-mt-32">
             <div className="flex justify-between items-end mb-stack-lg">
               <div>
                 <h2 className="text-headline-md font-headline-md text-primary">整合式服務模組 Integrated Service Modules</h2>
@@ -225,7 +225,7 @@ export default async function SupplyChain({ params }) {
           </section>
 
           {/* Partner Directory */}
-          <section className="mb-stack-lg">
+          <section id="partners" className="mb-stack-lg scroll-mt-32">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md mb-stack-lg">
               <div>
                 <h2 className="text-headline-md font-headline-md text-primary">已認證夥伴目錄 Verified Partner Directory</h2>

@@ -48,15 +48,15 @@ export default async function Market({ params }) {
       {/* Sticky Secondary Navigation */}
       <StickyJumpNav links={[
         { label: '解決方案', href: `/hubs/${hubSlug}#solutions`, isPrimary: true },
-        { label: '市場實時指數', href: `/hubs/${hubSlug}#market-index` },
-        { label: '解碼核心資產', href: `/hubs/${hubSlug}#education` },
-        { label: '資源目錄', href: `/hubs/${hubSlug}#products` },
-        { label: '供應鏈情報', href: `/hubs/${hubSlug}#intelligence` }
+        { label: '市場實時指數', href: '#indices' },
+        { label: '價格走勢圖', href: '#chart' },
+        { label: 'AI 專家簡報', href: '#ai-briefing' },
+        { label: '市場展望', href: '#outlook' }
       ]} />
 
 
       {/* 動態 Price Ticker */}
-      <div className="mt-[104px] lg:mt-16">
+      <div id="indices" className="mt-[104px] lg:mt-16 scroll-mt-32">
         <MarketIndexBar indices={indices} />
       </div>
 
@@ -77,7 +77,7 @@ export default async function Market({ params }) {
           <div className="md:col-span-8 bg-surface-container-lowest border border-outline-variant p-6 flex flex-col space-y-6">
             
             {/* 價格走勢圖 Chart Section */}
-            <div className="bg-white/5 rounded-2xl border border-white/10 p-6 md:p-8">
+            <div id="chart" className="bg-white/5 rounded-2xl border border-white/10 p-6 md:p-8 scroll-mt-32">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                 <div>
                   <h3 className="text-2xl font-bold text-white mb-2">價格走勢分析 <span className="text-white/40 font-normal text-lg ml-2">Price Trend Analysis</span></h3>
@@ -130,7 +130,7 @@ export default async function Market({ params }) {
 
           {/* 右側：AI 專家簡報 (動態接通) */}
           <div className="md:col-span-4 space-y-gutter">
-            <div className="bg-primary text-on-primary p-6">
+            <div id="ai-briefing" className="bg-primary text-on-primary p-6 scroll-mt-32">
               <div className="flex items-center space-x-2 mb-4">
                 <span className="material-symbols-outlined text-esg-emerald">psychology</span>
                 <h3 className="font-headline-md text-headline-md">AI 專家簡報 <span className="text-body-base block font-normal text-esg-emerald">AI Intelligence Briefing</span></h3>
@@ -176,7 +176,7 @@ export default async function Market({ params }) {
               </div>
             </div>
             
-            <div className="bg-surface-container-highest border border-outline-variant p-6">
+            <div id="outlook" className="bg-surface-container-highest border border-outline-variant p-6 scroll-mt-32">
               <h3 className="font-headline-md text-headline-md text-primary mb-4">市場展望 <span className="text-body-base font-normal text-secondary">Market Outlook</span></h3>
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-on-secondary font-bold shrink-0">E</div>
