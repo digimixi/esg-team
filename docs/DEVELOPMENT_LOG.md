@@ -4,6 +4,17 @@
 
 ---
 
+## [2026-05-26] 專題子導航架構決策與通用版型確立 (Hub Sub-navigation Architectural Decision & Template Standardization)
+
+### 💡 技術決策 (Key Decisions)
+* **固定結構單元與動態內容解耦 (Decoupling Fixed Structure from Dynamic Content)**：
+  * **決策背景**：釐清了 `hubs/[hubSlug]` 路由底下的各個子頁面（產品、市場、供應鏈）為「通用版型 (Universal Template)」。
+  * **導航定位**：確認 `StickyJumpNav` 子導航的職責是「頁面功能模塊的固定索引（如：資源目錄、AI 專家簡報）」，而非「動態文章標題（如：本週石墨評論）」。
+  * **拒絕後台連動 (Rejecting CMS Integration)**：為了防止 Sanity 後台欄位過度膨脹 (Schema Bloat) 以及防範「行銷人員修改標籤導致與前端真實模塊名實不符」的致命風險，決定**嚴格禁止**將 `StickyJumpNav` 的顯示標籤接入後台。將其視為與 UI 佈局深度綁定的硬體結構，強制寫死在前端代碼中，以確保 100% 的渲染穩定性與架構純潔度。
+* **精準頁內下錨 (Accurate Intra-page Anchoring)**：
+  * 修正了跨子頁面共用導航所造成的強迫跳轉問題。賦予 `market`、`supply-chain`、`products` 各頁面獨立專屬的 `StickyJumpNav` 陣列，精準對應當前頁面的實際 HTML `id` 區塊，並加上 `scroll-mt-32` 屬性確保不會被頂部導航遮擋，完全還原子導航「一目瞭然當前頁面單元」的初衷。
+
+---
 ## [2026-05-26] 全域與專題頁面導航體驗優化及懸浮工具列重構 (Global & Hub Navigation UX Optimization and FAB Refactoring)
 
 ### 🚀 介面與使用者體驗優化 (UI/UX Enhancements)
