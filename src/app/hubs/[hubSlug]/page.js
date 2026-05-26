@@ -140,12 +140,13 @@ export default async function HubHome({ params }) {
       />
 
       {/* Sticky Secondary Navigation */}
+      {/* Sticky Secondary Navigation */}
       <StickyJumpNav links={[
-        { label: '解決方案', href: '#solutions', isPrimary: true },
-        { label: '市場實時指數', href: '#market-index' },
-        { label: '解碼核心資產', href: '#education' },
-        { label: '資源目錄', href: '#products' },
-        { label: '供應鏈情報', href: '#intelligence' }
+        { label: '解決方案', href: `/hubs/${hubSlug}#solutions`, isPrimary: true },
+        { label: '市場實時指數', href: `/hubs/${hubSlug}#market-index` },
+        { label: '解碼核心資產', href: `/hubs/${hubSlug}#education` },
+        { label: '資源目錄', href: `/hubs/${hubSlug}#products` },
+        { label: '供應鏈情報', href: `/hubs/${hubSlug}#intelligence` }
       ]} />
 
       <main>

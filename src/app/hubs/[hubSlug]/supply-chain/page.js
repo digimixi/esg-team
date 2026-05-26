@@ -68,6 +68,16 @@ export default async function SupplyChain({ params }) {
         activeTab="supply-chain" 
       />
 
+      {/* Sticky Secondary Navigation */}
+      <StickyJumpNav links={[
+        { label: '解決方案', href: `/hubs/${hubSlug}#solutions`, isPrimary: true },
+        { label: '市場實時指數', href: `/hubs/${hubSlug}#market-index` },
+        { label: '解碼核心資產', href: `/hubs/${hubSlug}#education` },
+        { label: '資源目錄', href: `/hubs/${hubSlug}#products` },
+        { label: '供應鏈情報', href: `/hubs/${hubSlug}#intelligence` }
+      ]} />
+
+
       <main className="pt-[104px] lg:pt-16 pb-stack-lg">
         <div className="max-w-container-max mx-auto px-margin">
           

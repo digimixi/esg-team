@@ -44,6 +44,16 @@ export default async function Market({ params }) {
         activeTab="market" 
       />
 
+      {/* Sticky Secondary Navigation */}
+      <StickyJumpNav links={[
+        { label: '解決方案', href: `/hubs/${hubSlug}#solutions`, isPrimary: true },
+        { label: '市場實時指數', href: `/hubs/${hubSlug}#market-index` },
+        { label: '解碼核心資產', href: `/hubs/${hubSlug}#education` },
+        { label: '資源目錄', href: `/hubs/${hubSlug}#products` },
+        { label: '供應鏈情報', href: `/hubs/${hubSlug}#intelligence` }
+      ]} />
+
+
       {/* 動態 Price Ticker */}
       <div className="mt-[104px] lg:mt-16">
         <MarketIndexBar indices={indices} />
