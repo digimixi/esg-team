@@ -4,10 +4,11 @@ import { PortableText } from '@portabletext/react';
 import MarketIndexBar from '@/components/MarketIndexBar';
 import AIInsightBox from '@/components/AIInsightBox';
 import HubHeader from '@/components/HubHeader';
+import StickyJumpNav from '@/components/StickyJumpNav';
 import SolutionHero from '@/components/solutions/SolutionHero';
 import InsightCard from '@/components/InsightCard';
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 // 自定義 PortableText 渲染樣式
 const ptComponents = {
@@ -109,7 +110,8 @@ export default async function HubHome({ params }) {
       publishedAt,
       source,
       externalUrl,
-      standards
+      standards,
+      "sourceRef": sourceRef->{ title, url }
     }
   `, { 
     hubId: hub._id 
@@ -137,17 +139,28 @@ export default async function HubHome({ params }) {
         activeTab="home" 
       />
 
-      <main className="pt-[104px] lg:pt-16">
+      {/* Sticky Secondary Navigation */}
+      <StickyJumpNav links={[
+        { label: '解決方案', href: '#solutions', isPrimary: true },
+        { label: '市場實時指數', href: '#market-index' },
+        { label: '解碼核心資產', href: '#education' },
+        { label: '資源目錄', href: '#products' },
+        { label: '供應鏈情報', href: '#intelligence' }
+      ]} />
+
+      <main>
         <SolutionHero 
           title={hub.title}
           subtitle={hub.heroSubtitle}
           description={hub.heroDescription}
           imageUrl={hub.heroImageUrl}
-          cta={{ label: hub.quoteButtonText || "獲取報價", href: hub.contactUrl || "#" }}
+          features={['即時報價', '供應鏈地圖', '最新情報', '碳排試算']}
           isFullWidth={true}
         />
 
-        <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />
+        <div id="market-index">
+          <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />
+        </div>
 
         {/* Global Benchmarks (Simplified for Hub) */}
         <section className="bg-surface-container-low py-4 border-b border-outline-variant overflow-hidden">
@@ -177,7 +190,7 @@ export default async function HubHome({ params }) {
         <AIInsightBox insight={hub.aiInsight} />
 
         {/* Education Section */}
-        <section className="bg-surface-container-lowest py-stack-lg px-margin max-w-container-max mx-auto border-b border-outline-variant text-center">
+        <section id="education" className="bg-surface-container-lowest py-stack-lg px-margin max-w-container-max mx-auto border-b border-outline-variant text-center scroll-mt-24">
           <div className="mb-stack-lg max-w-3xl mx-auto">
             <span className="bg-secondary-container text-on-secondary-container px-3 py-1 font-label-sm text-label-sm rounded-full mb-4 inline-block">Industry Primer</span>
             <h2 className="font-display-lg text-display-lg text-primary mb-4">解碼核心資產價值</h2>
@@ -192,7 +205,7 @@ export default async function HubHome({ params }) {
         </section>
 
         {/* Products Section */}
-        <section className="py-stack-lg px-margin max-w-container-max mx-auto">
+        <section id="products" className="py-stack-lg px-margin max-w-container-max mx-auto scroll-mt-24">
           <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg">資源目錄</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             {products.map((product) => (
@@ -208,7 +221,7 @@ export default async function HubHome({ params }) {
         </section>
 
         {/* Intelligence Section */}
-        <section className="bg-surface-container-low py-stack-lg border-y border-outline-variant">
+        <section id="intelligence" className="bg-surface-container-low py-stack-lg border-y border-outline-variant scroll-mt-24">
           <div className="max-w-container-max mx-auto px-margin">
             <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg">供應鏈情報</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">

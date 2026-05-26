@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic';
 import { client } from '@/sanity/lib/client';
 import TradingViewChart from '@/components/TradingViewChart';
 import HubHeader from '@/components/HubHeader';
+import MarketIndexBar from '@/components/MarketIndexBar';
 
-export const revalidate = 0;
+export const revalidate = 86400;
 
 export default async function Market({ params }) {
   const { hubSlug } = await params;
@@ -24,7 +24,8 @@ export default async function Market({ params }) {
     publishedAt,
     source,
     externalUrl,
-    standards
+    standards,
+    "sourceRef": sourceRef->{ title, url }
   }`, { slug: hubSlug }) || [];
 
   // 輔助函式：判斷漲跌顏色
@@ -44,28 +45,8 @@ export default async function Market({ params }) {
       />
 
       {/* 動態 Price Ticker */}
-      <div className="mt-[104px] lg:mt-16 bg-surface-container-highest border-b border-outline-variant overflow-hidden">
-        <div className="ticker-animate whitespace-nowrap py-2 flex">
-          <div className="flex space-x-12 px-4 shrink-0">
-            {indices.map((idx, i) => (
-              <span key={i} className="flex items-center space-x-2">
-                <span className="font-bold">{idx.name}:</span> 
-                <span className="text-primary font-data-mono">{idx.value}</span> 
-                <span className={`${getTrendColor(idx.trend)} text-label-sm font-data-mono`}>{idx.trend}</span>
-              </span>
-            ))}
-          </div>
-          {/* 重複一次以達成無縫滾動 */}
-          <div className="flex space-x-12 px-4 shrink-0">
-            {indices.map((idx, i) => (
-              <span key={`dup-${i}`} className="flex items-center space-x-2">
-                <span className="font-bold">{idx.name}:</span> 
-                <span className="text-primary font-data-mono">{idx.value}</span> 
-                <span className={`${getTrendColor(idx.trend)} text-label-sm font-data-mono`}>{idx.trend}</span>
-              </span>
-            ))}
-          </div>
-        </div>
+      <div className="mt-[104px] lg:mt-16">
+        <MarketIndexBar indices={indices} />
       </div>
 
       <main className="max-w-container-max mx-auto px-margin py-stack-lg">

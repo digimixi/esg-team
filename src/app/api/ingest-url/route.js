@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
+import { isAdmin, forbiddenResponse } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -18,7 +19,13 @@ const writeClient = createClient({
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(req) {
+  // 後台安全攔截
+  if (!isAdmin(req)) {
+    return forbiddenResponse();
+  }
+
   try {
+
     const { url, keywords } = await req.json();
 
     if (!url) {
@@ -98,6 +105,31 @@ export async function POST(req) {
     text = text.replace(/```json\n?|\n?```/g, '').trim();
     const extractedData = JSON.parse(text);
 
+    // 2.8 查詢所有已存在的採集來源書籤 (Source Bookmarks) 用於雙向溯源匹配
+    let matchedBookmarkId = null;
+    try {
+      console.log(`[Ingest] Querying sourceBookmarks for domain matching...`);
+      const bookmarks = await writeClient.fetch(`*[_type == "sourceBookmark"] { _id, url }`);
+      const targetUrlObj = new URL(url);
+      const targetHost = targetUrlObj.hostname.replace('www.', '');
+
+      const foundBookmark = bookmarks.find(bm => {
+        try {
+          const bmUrlObj = new URL(bm.url);
+          return bmUrlObj.hostname.replace('www.', '') === targetHost;
+        } catch (e) {
+          return false;
+        }
+      });
+
+      if (foundBookmark) {
+        matchedBookmarkId = foundBookmark._id;
+        console.log(`[Ingest] Automatically matched sourceBookmark for domain ${targetHost}: ${matchedBookmarkId}`);
+      }
+    } catch (bookmarkErr) {
+      console.error(`[Ingest] Failed to fetch sourceBookmarks for matching:`, bookmarkErr);
+    }
+
     // 3. 將資料寫入 Sanity (加入去重機制)
     const results = [];
     for (const item of extractedData) {
@@ -117,6 +149,10 @@ export async function POST(req) {
         summary: item.summary,
         externalUrl: targetUrl,
         source: item.source || '外部採集',
+        sourceRef: matchedBookmarkId ? {
+          _type: 'reference',
+          _ref: matchedBookmarkId
+        } : undefined,
         publishedAt: new Date().toISOString(),
         category: item.category || 'Market Update',
         isActive: true,

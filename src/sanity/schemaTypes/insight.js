@@ -62,6 +62,13 @@ export const insight = {
       title: '原始網址 (Original URL)', 
       type: 'url' 
     },
+    {
+      name: 'sourceRef',
+      title: '雙向採集來源書籤 (Source Bookmark Reference)',
+      type: 'reference',
+      to: [{ type: 'sourceBookmark' }],
+      description: '此情報所關聯的原始採集來源書籤（建立雙向溯源鏈）'
+    },
     { 
       name: 'isActive', 
       title: '是否採用 (Adopted)', 

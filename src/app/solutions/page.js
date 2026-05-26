@@ -3,7 +3,7 @@ import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import SolutionHero from '@/components/solutions/SolutionHero';
 
-export const revalidate = 0;
+export const revalidate = 86400;
 
 export default async function SolutionsHub() {
   const solutions = await client.fetch(`*[_type == "solution"] | order(_createdAt asc) {

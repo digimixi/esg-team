@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
+import { isAdmin, forbiddenResponse } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,11 @@ export async function GET() {
 
 // 建立新書籤
 export async function POST(req) {
+  // 後台安全攔截
+  if (!isAdmin(req)) {
+    return forbiddenResponse();
+  }
+
   try {
     const { title, url } = await req.json();
     if (!url) return NextResponse.json({ error: 'Missing URL' }, { status: 400 });
@@ -41,6 +47,11 @@ export async function POST(req) {
 
 // 刪除書籤
 export async function DELETE(req) {
+  // 後台安全攔截
+  if (!isAdmin(req)) {
+    return forbiddenResponse();
+  }
+
   try {
     const { id } = await req.json();
     await writeClient.delete(id);
@@ -49,3 +60,4 @@ export async function DELETE(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

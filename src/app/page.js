@@ -1,10 +1,11 @@
 import { client } from '@/sanity/lib/client';
 import Navbar from '@/components/Navbar';
+import StickyJumpNav from '@/components/StickyJumpNav';
 import Link from 'next/link';
 import MarketIndexBar from '@/components/MarketIndexBar';
 import InsightCard from '@/components/InsightCard';
 
-export const revalidate = 0; // 強制不快取，隨時抓取最新資料
+export const revalidate = 86400; // 增量靜態生成 (ISR)，24 小時自癒快取
 
 export default async function Home() {
     // ... (數據抓取邏輯保持不變)
@@ -56,7 +57,8 @@ export default async function Home() {
         category,
         isActive,
         standards,
-        "hubTitle": hub->title
+        "hubTitle": hub->title,
+        "sourceRef": sourceRef->{ title, url }
     }`);
 
     const benchmarks = await client.fetch(`*[_type == "industryBenchmark" && category == "intensity"] | order(currentValue asc)`, {}, { useCdn: false });
@@ -64,8 +66,14 @@ export default async function Home() {
     return (
         <>
             <Navbar />
-            <main className="pt-16">
-                <section className="relative h-[500px] flex items-center overflow-hidden border-b border-outline-variant">
+            <StickyJumpNav links={[
+              { label: '產業專題', href: '#hubs', isPrimary: true },
+              { label: '數位工具', href: '#tools' },
+              { label: '實時指數', href: '#market-index' },
+              { label: '永續情報', href: '#insights' }
+            ]} />
+            <main>
+                <section className="relative min-h-[180px] md:h-[500px] py-6 md:py-0 flex items-center overflow-hidden border-b border-outline-variant">
                     <div className="absolute inset-0 z-0 bg-surface-container-high">
                         {homeHeroImageUrl ? (
                             <img src={homeHeroImageUrl} className="w-full h-full object-cover opacity-60" alt="Home Hero" />
@@ -75,21 +83,23 @@ export default async function Home() {
                         <div className="absolute inset-0 bg-gradient-to-b from-surface/30 via-surface/80 to-surface"></div>
                     </div>
                     <div className="relative z-10 max-w-container-max mx-auto px-margin w-full flex flex-col items-center text-center">
-                        <div className="mb-4 inline-flex items-center border border-outline-variant bg-surface-container-lowest px-3 py-1 rounded">
+                        <div className="mb-2 md:mb-4 inline-flex items-center border border-outline-variant bg-surface-container-lowest px-2 py-0.5 md:px-3 md:py-1 rounded scale-90 md:scale-100">
                             <span className="w-2 h-2 rounded-full bg-esg-emerald mr-2"></span>
                             <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">全球產業綠色轉型聚合平台</span>
                         </div>
-                        <h1 className="font-display-lg text-display-lg text-primary mb-stack-md max-w-4xl mx-auto">
+                        <h1 className="font-display-lg text-display-sm md:text-display-lg text-primary mb-4 md:mb-stack-md max-w-4xl mx-auto leading-tight">
                             <span className="block">{homeHeroTitle}</span>
-                            <span className="text-headline-md block text-secondary mt-2">{homeHeroTitleEnglish}</span>
+                            <span className="text-body-base md:text-headline-md block text-secondary mt-1 md:mt-2 hidden sm:block">{homeHeroTitleEnglish}</span>
                         </h1>
-                        <p className="font-body-base text-body-base text-on-surface-variant max-w-2xl mx-auto mb-stack-lg">
+                        <p className="font-body-base text-body-base text-on-surface-variant max-w-2xl mx-auto mb-0 hidden md:block">
                             {homeHeroDescription}
                         </p>
                     </div>
                 </section>
 
-                <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />
+                <div id="market-index" className="scroll-mt-24">
+                  <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />
+                </div>
 
                 {/* Global Benchmarks Section - 極簡橫向儀表板佈局 */}
                 <section className="bg-surface-container-low py-4 border-b border-outline-variant overflow-hidden">
@@ -144,7 +154,7 @@ export default async function Home() {
                 </section>
 
                 {/* Industry Hubs Section */}
-                <section className="bg-surface py-stack-lg px-margin max-w-container-max mx-auto">
+                <section id="hubs" className="bg-surface py-stack-lg px-margin max-w-container-max mx-auto scroll-mt-24">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
                         <div className="max-w-2xl">
                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full mb-4">
@@ -260,51 +270,86 @@ export default async function Home() {
                     </div>
                 </section>
 
-                {/* Solutions Matrix Section - 動態化入口 */}
-                <section className="bg-surface-container-high py-32 border-t border-outline-variant">
+                {/* ESG SaaS Toolkit App Store Section */}
+                <section id="tools" className="bg-surface-container-high py-32 border-t border-outline-variant scroll-mt-24">
                   <div className="max-w-container-max mx-auto px-margin">
                     <div className="flex flex-col lg:flex-row items-end justify-between mb-16 gap-8">
                       <div className="max-w-2xl">
-                        <span className="font-label-sm text-label-sm text-primary uppercase tracking-[0.3em] mb-4 block">Service Matrix</span>
-                        <h2 className="font-display-md text-display-md text-primary mb-4">企業永續解決方案</h2>
+                        <span className="font-label-sm text-label-sm text-primary uppercase tracking-[0.3em] mb-4 block">ESG Hub / Web Apps</span>
+                        <h2 className="font-display-md text-display-md text-primary mb-4">企業永續 SaaS 數位工具</h2>
                         <p className="font-body-base text-body-base text-on-surface-variant">
-                          我們不僅提供情報，更提供工具。esg.team 的解決方案矩陣協助企業從原始數據中提取價值，實現可驗證的轉型成果。
+                          專為重工業與全球供應鏈打造的企業級軟體模組。您可以像下載 App 一樣，自由挑選所需的碳計算與治理工具。
                         </p>
                       </div>
-                      <Link href="/solutions" className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-sm text-label-sm flex items-center gap-2 hover:bg-on-secondary-fixed transition-all group">
-                        探索全系列方案 <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                      <Link href="/tools" className="bg-primary text-on-primary px-8 py-4 rounded-xl font-label-sm text-label-sm flex items-center gap-2 hover:bg-on-secondary-fixed transition-all group shadow-lg">
+                        進入工具中心 <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">apps</span>
                       </Link>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                      {(solutions.length > 0 ? solutions : [
-                        { _id: 'default-1', title: '數位合規', titleEnglish: 'Digital Compliance', slug: 'compliance', badgeIcon: 'verified_user', description: '為重工業打造的高效率數位合規解決方案。透過自動化數據採集與分析，確保您的企業符合全球供應鏈 ESG 標準與碳關稅法規。' },
-                        { _id: 'default-2', title: '永續實踐', titleEnglish: 'Sustainable Practices', slug: 'practices', badgeIcon: 'rebase_edit', description: '將永續理念轉化為可衡量的工業實踐。我們專注於循環經濟模型建立與智慧綠色建築系統，協助企業實現資源價值的最大化利用。' },
-                        { _id: 'default-3', title: '綠色材料', titleEnglish: 'Green Materials', slug: 'materials', badgeIcon: 'biotech', description: '定義低碳工業的未來。我們提供高性能、低足跡的鋼鐵與石墨材料解決方案，助力企業從源頭降低供應鏈碳強度。' },
-                        { _id: 'default-4', title: '戰略金融', titleEnglish: 'Strategy & Finance', slug: 'finance', badgeIcon: 'trending_up', description: '連接永續戰略與金融價值。我們協助企業提升 ESG 評級，並對接全球綠色金融資源，加速低碳轉型進程。' }
-                      ]).map((item, i) => (
-                        <Link 
-                          key={item._id || i} 
-                          href={`/solutions/${item.slug}`}
-                          className="bg-white border border-[#E0E0E0] p-8 rounded-lg hover:shadow-xl transition-all group cursor-pointer flex flex-col"
-                        >
-                          <div className="text-primary mb-6">
-                            <span className="material-symbols-outlined text-3xl">{item.badgeIcon || 'verified'}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* CBAM Tool Card */}
+                      <Link href="/tools/cbam" className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <span className="material-symbols-outlined text-3xl">calculate</span>
                           </div>
-                          <h3 className="font-bold text-xl mb-1 text-[#1A1C1E]">{item.title}</h3>
-                          <p className="text-[10px] text-[#5F6368] font-bold uppercase tracking-wider mb-6">{item.titleEnglish || item.category}</p>
-                          <p className="text-sm text-[#44474E] mb-12 leading-relaxed flex-grow">{item.description}</p>
-                          <div className="mt-auto border border-[#1A1C1E] text-[#1A1C1E] px-4 py-2 rounded text-[12px] font-bold flex justify-between items-center group-hover:bg-[#1A1C1E] group-hover:text-white transition-all">
-                            了解更多 <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                          <span className="text-[9px] font-bold bg-blue-500 text-white px-2 py-1 rounded tracking-wider uppercase">FREE / 試用中</span>
+                        </div>
+                        <h3 className="font-bold text-xl mb-1 text-primary group-hover:text-blue-600 transition-colors">CBAM 碳邊境稅模擬器</h3>
+                        <p className="text-[10px] text-outline font-mono uppercase tracking-wider mb-4">CBAM Tariff Simulator</p>
+                        <p className="text-sm text-on-surface-variant mb-8 leading-relaxed flex-grow">
+                          動態對齊官方公開排放因子，一鍵預算歐盟進口碳關稅曝險。支援自訂製程碳強度與 Art.9 碳稅抵免計算。
+                        </p>
+                        <div className="mt-auto flex items-center text-xs font-bold text-blue-600 group-hover:gap-2 transition-all">
+                          開啟應用程式 <span className="material-symbols-outlined text-sm ml-1">launch</span>
+                        </div>
+                      </Link>
+
+                      {/* Ledger Tool Card */}
+                      <Link href="/tools/ledger" className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                            <span className="material-symbols-outlined text-3xl">account_balance_wallet</span>
                           </div>
-                        </Link>
-                      ))}
+                          <span className="text-[9px] font-bold bg-amber-500 text-white px-2 py-1 rounded tracking-wider uppercase">FREE / 沙盒模式</span>
+                        </div>
+                        <h3 className="font-bold text-xl mb-1 text-primary group-hover:text-amber-600 transition-colors">供應鏈碳排信任帳本</h3>
+                        <p className="text-[10px] text-outline font-mono uppercase tracking-wider mb-4">Scope 3 Trust Ledger</p>
+                        <p className="text-sm text-on-surface-variant mb-8 leading-relaxed flex-grow">
+                          具備密碼學雜湊防偽與 SGS/TÜV 第三方認證掛載的跨國碳足跡追蹤系統，杜絕供應商綠洗風險。
+                        </p>
+                        <div className="mt-auto flex items-center text-xs font-bold text-amber-600 group-hover:gap-2 transition-all">
+                          開啟應用程式 <span className="material-symbols-outlined text-sm ml-1">launch</span>
+                        </div>
+                      </Link>
+
+                      {/* ERP API Card */}
+                      <div className="bg-surface-container border border-outline-variant rounded-2xl p-8 transition-all duration-300 flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400">
+                            <span className="material-symbols-outlined text-3xl">api</span>
+                          </div>
+                          <span className="text-[9px] font-bold bg-slate-700 text-white px-2 py-1 rounded tracking-wider uppercase flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[10px]">lock</span>
+                            企業版限定
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-xl mb-1 text-primary">B2B ERP 自動直連 API</h3>
+                        <p className="text-[10px] text-outline font-mono uppercase tracking-wider mb-4">Enterprise API Gateway</p>
+                        <p className="text-sm text-on-surface-variant mb-8 leading-relaxed flex-grow">
+                          透過 OpenAPI 直連您的 SAP/Oracle 或廠區 EMS，實現全供應鏈數據秒級零時差同步，內建 Rate-limiting 防禦。
+                        </p>
+                        <button className="mt-auto w-full py-2 bg-surface-container-highest border border-outline-variant text-secondary rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors cursor-not-allowed">
+                          請聯絡銷售解鎖模組
+                        </button>
+                      </div>
+
                     </div>
                   </div>
                 </section>
 
                 {/* Latest Insights Section - 採集成果展示區 */}
-                <section className="bg-surface-container-lowest py-stack-lg border-t border-outline-variant">
+                <section id="insights" className="bg-surface-container-lowest py-stack-lg border-t border-outline-variant scroll-mt-24">
                     <div className="max-w-container-max mx-auto px-margin">
                         <div className="flex justify-between items-end mb-10">
                             <div>

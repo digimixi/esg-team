@@ -46,6 +46,18 @@ export const structure = (S) =>
 
       S.divider(),
 
+      // 2.8 SaaS 工具模組 (SaaS Tools)
+      S.listItem()
+        .id('saas_tool_center')
+        .title('📱 SaaS 工具模組 (SaaS Tools)')
+        .child(
+          S.documentTypeList('saasTool')
+            .id('saas_tool_list')
+            .title('前台工具市集管理')
+        ),
+
+      S.divider(),
+
       // 3. 工業資源與數據 (Industrial Data)
       S.listItem()
         .id('industrial_data_center')
@@ -89,6 +101,7 @@ export const structure = (S) =>
               S.documentTypeListItem('emissionFactor').title('🧬 排放係數庫 (Emission Factors)'),
               S.documentTypeListItem('inventoryEntry').title('📝 排放分錄 (Inventory Entries)'),
               S.documentTypeListItem('scope3Transaction').title('🔗 供應鏈碳帳本交易 (Scope 3 Transactions)'),
+              S.documentTypeListItem('supplierInvitation').title('🛡️ 安全對接邀請日誌 (Invitations)'),
             ])
         ),
 
@@ -112,7 +125,8 @@ export const structure = (S) =>
           'siteSettings', 'hub', 'partner', 'eduPage',
           'product', 'marketIndex', 'sourceBookmark',
           'insight', 'company', 'emissionFactor', 'inventoryEntry',
-          'systemTech', 'solution', 'industryBenchmark', 'scope3Transaction'
+          'systemTech', 'solution', 'industryBenchmark', 'scope3Transaction',
+          'supplierInvitation', 'saasTool'
         ].includes(listItem.getId())
       ),
     ])

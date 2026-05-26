@@ -40,6 +40,7 @@ const LedgerHelpPanel = ({ onClose }) => {
               </ul>
             </li>
             <li><strong className="text-primary">發起供應商對接</strong>：點擊右上角按鈕，填寫新供應商名稱與信箱，系統將發出具備密碼學安全 Token 的數據填報邀請信。</li>
+            <li><strong className="text-primary">⚡ ERP 系統直連 (Enterprise)</strong>：具備企業版授權的供應商，其數據來源將會標示為「ERP 直連」，代表數據是透過 OpenAPI 自客戶端的 SAP/Oracle 系統直接對接打入，未經人工竄改，具備最高真實性。</li>
           </ul>
         </div>
       </div>

@@ -40,7 +40,10 @@ async function syncMarketData() {
           symbol: activeSymbol
         });
 
-        if (!newData) continue;
+        if (!newData) {
+          console.warn(`⚠️ [API 同步異常] 無法獲取 "${index.name}" (${activeSymbol}) 的實時數據，啟用資料庫容災機制，保留上一次有效快取值。`);
+          continue;
+        }
 
         // 3. 處理歷史數據 (如果目前是空的，則嘗試抓取過去 7 天數據)
         let newHistory = index.history || [];

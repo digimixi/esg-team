@@ -45,6 +45,18 @@ export async function POST(req) {
       return NextResponse.json({ error: '請提供完整的產品名稱、採購重量與碳強度數值。' }, { status: 400 });
     }
 
+    // 2.5 預先生成交易編號與數據轉化
+    const txId = `TX-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+    const totalVolume = parseFloat(volume);
+    const totalIntensity = parseFloat(intensity);
+    const emissions = totalVolume * totalIntensity;
+
+    const breakdown = {
+      extraction: parseFloat(extraction),
+      manufacturing: parseFloat(manufacturing),
+      logistics: parseFloat(logistics)
+    };
+
     let fileAsset = null;
     let fileHash = '';
 
@@ -71,24 +83,34 @@ export async function POST(req) {
         return NextResponse.json({ error: '證書檔案上傳雲端失敗，請重試。' }, { status: 500 });
       }
     } else {
-      // 若無上傳憑證，使用申報數據雜湊作為 Base Hash，表示自我宣稱
-      const baseString = `${supplierName}-${materialName}-${volume}-${intensity}-${Date.now()}`;
-      fileHash = '0x' + crypto.createHash('sha256').update(baseString).digest('hex');
+      // 若無上傳憑證，生成與 CertificateAuditor 100% 同步的 Canonical 文字內容，並計算 SHA-256 作為存證 Hash
+      const cleanContent = `esg.team Scope 3 Carbon Trust Ledger Certificate
+--------------------------------------------------
+交易識別編號 (Transaction ID): ${txId}
+供應商名稱 (Supplier): ${supplierName}
+原物料品項 (Material): ${materialName}
+採購重量 (Volume): ${totalVolume.toLocaleString()} t
+碳足跡強度 (Carbon Intensity): ${totalIntensity.toFixed(2)} tCO2e/t
+總計碳排放量 (Emissions): ${emissions.toLocaleString()} tCO2e
+
+[🛡️ 密碼學存證防偽防護]
+標準合規標準 (ESG Standard): ${standard}
+第三方驗證機構 (Auditor): ${auditor}`;
+
+      // Normalize line endings and trim for canonicalization
+      const canonical = cleanContent
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .split('\n')
+        .map(line => line.trimEnd())
+        .join('\n')
+        .trim();
+
+      fileHash = '0x' + crypto.createHash('sha256').update(canonical, 'utf8').digest('hex');
+      console.log(`[Supplier Onboard] Computed canonical certificate SHA-256 Hash: ${fileHash}`);
     }
 
-    // 4. 計算總排放量與細分
-    const totalVolume = parseFloat(volume);
-    const totalIntensity = parseFloat(intensity);
-    const emissions = totalVolume * totalIntensity;
-
-    const breakdown = {
-      extraction: parseFloat(extraction),
-      manufacturing: parseFloat(manufacturing),
-      logistics: parseFloat(logistics)
-    };
-
     // 5. 寫入 Sanity 信任帳本交易 (scope3Transaction)
-    const txId = `TX-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
     const txDoc = {
       _type: 'scope3Transaction',
       id: txId,
@@ -116,6 +138,32 @@ export async function POST(req) {
     console.log(`[Supplier Onboard] Creating ledger transaction in Sanity:`, txId);
     const createdTx = await writeClient.create(txDoc);
     console.log(`✅ [Supplier Onboard] Transaction successfully written to ledger:`, createdTx._id);
+
+    // 5.5 閉環自動更新：更新供應商邀請日誌狀態為已對接並關聯 Hash
+    try {
+      console.log(`[Supplier Onboard] Checking audit log for token...`);
+      const invitation = await writeClient.fetch(
+        `*[_type == "supplierInvitation" && token == $token][0]`,
+        { token }
+      );
+      
+      if (invitation) {
+        console.log(`[Supplier Onboard] Found matching invite log: ${invitation._id}. Updating to 'accepted'...`);
+        await writeClient
+          .patch(invitation._id)
+          .set({
+            status: 'accepted',
+            transactionHash: fileHash
+          })
+          .commit();
+        console.log(`✅ [Supplier Onboard] Invite log updated successfully.`);
+      } else {
+        console.log(`[Supplier Onboard] ⚠️ No matching invite log found in Sanity for this token (possibly a legacy mock test).`);
+      }
+    } catch (auditError) {
+      console.error(`❌ [Supplier Onboard] Failed to update invite audit log:`, auditError);
+      // 我們不因為審計日誌寫入失敗而影響使用者填報成功的回傳
+    }
 
     return NextResponse.json({
       success: true,

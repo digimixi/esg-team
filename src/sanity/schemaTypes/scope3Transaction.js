@@ -67,6 +67,7 @@ export const scope3Transaction = {
       options: {
         list: [
           { title: '自主申報 (Self-Declared)', value: 'self-declared' },
+          { title: '⚡ ERP 系統直連 (ERP Synced)', value: 'erp-synced' },
           { title: '審查中 (Auditing)', value: 'auditing' },
           { title: '第三方已驗證 (Verified)', value: 'verified' }
         ]

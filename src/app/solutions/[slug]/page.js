@@ -5,7 +5,7 @@ import SolutionHero from '@/components/solutions/SolutionHero';
 import { BentoGrid, BentoCard } from '@/components/solutions/BentoGrid';
 import JourneySteps from '@/components/solutions/JourneySteps';
 
-export const revalidate = 0;
+export const revalidate = 86400;
 
 export default async function SolutionDetail({ params }) {
   const { slug } = await params;

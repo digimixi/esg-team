@@ -28,7 +28,8 @@ export default function Navbar() {
 
   const navLinks = [
     { title: '全域入口', sub: 'Global Portal', href: '/' },
-    { title: '解決方案', sub: 'Solutions', href: '/solutions', active: true },
+    { title: '解決方案', sub: 'Solutions', href: '/solutions' },
+    { title: '工具中心', sub: 'SaaS Tools', href: '/tools' },
     { title: '碳資產管理', sub: 'Carbon Assets', href: '/hubs/graphite' },
     { title: '永續洞察', sub: 'Insights', href: '#' },
   ];
@@ -69,73 +70,25 @@ export default function Navbar() {
               <span className="material-symbols-outlined text-[20px]">login</span>
               <span className="hidden sm:inline">企業登錄</span>
             </button>
-
-            {/* Hamburger Menu Button - Integrated into Layout Flow */}
-            <label 
-              htmlFor="menu-check"
-              className="lg:hidden w-10 h-10 flex flex-col justify-center items-center z-[10000] text-primary bg-white/90 backdrop-blur-md border border-outline-variant/50 rounded-full shadow-sm cursor-pointer active:scale-95 transition-all group"
-            >
-              <div className="relative w-5 h-4 flex flex-col justify-between pointer-events-none">
-                <span className="w-5 h-[2px] bg-current rounded-full transition-all duration-300"></span>
-                <span className="w-5 h-[2px] bg-current rounded-full transition-all duration-300"></span>
-                <span className="w-5 h-[2px] bg-current rounded-full transition-all duration-300"></span>
-              </div>
-            </label>
           </div>
         </div>
 
-        {/* CSS-Only Menu Toggle Controller */}
-        <input type="checkbox" id="menu-check" className="hidden peer" />
-        
-        {/* Backdrop for closing by clicking outside */}
-        <label 
-          htmlFor="menu-check" 
-          className="hidden peer-checked:block fixed inset-0 z-[9998] bg-black/10 backdrop-blur-[1px] transition-all"
-        ></label>
-
-        {/* CSS Trick for Icon Animation - Updated Selectors */}
-        <style jsx>{`
-          #menu-check:checked ~ div label div span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-          #menu-check:checked ~ div label div span:nth-child(2) { opacity: 0; }
-          #menu-check:checked ~ div label div span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
-        `}</style>
-
-        {/* CSS-Only Dropdown Menu - State of the Art Design */}
-        <div className="hidden peer-checked:flex fixed top-[72px] right-4 left-4 z-[9999] bg-surface flex-col rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-outline-variant/30 overflow-hidden animate-in fade-in zoom-in-95 duration-300 origin-top-right backdrop-blur-xl bg-white/98">
-          <div className="flex flex-col p-5 gap-1">
-            <div className="px-4 py-3 mb-2 flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-secondary opacity-50 font-sans">Explorer</span>
-              <div className="h-1 w-12 bg-outline-variant/30 rounded-full"></div>
-            </div>
-            
+        {/* Mobile Navigation (Scrollable Horizontal Tabs) */}
+        <div className="lg:hidden border-t border-outline-variant bg-surface overflow-hidden">
+          <nav className="flex overflow-x-auto no-scrollbar px-4 h-10 items-center gap-6">
             {navLinks.map((link, idx) => (
-              <Link 
+              <Link
                 key={idx}
                 href={link.href}
-                className="flex items-center justify-between p-4 hover:bg-surface-container-low active:bg-surface-container rounded-2xl transition-all group"
+                className="h-full flex flex-col justify-center whitespace-nowrap shrink-0 text-secondary hover:text-primary transition-colors"
               >
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-body-lg font-bold text-primary tracking-tight">{link.title}</span>
-                  <span className="text-[10px] text-secondary/60 uppercase tracking-widest font-medium">{link.sub}</span>
-                </div>
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high group-active:bg-primary group-active:text-white transition-colors">
-                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                <div className="flex items-center gap-1">
+                  <span className="font-body-base text-sm font-bold">{link.title}</span>
+                  <span className="text-[9px] uppercase tracking-tighter opacity-60">{link.sub}</span>
                 </div>
               </Link>
             ))}
-            
-            <div className="mt-6 p-2 space-y-4">
-              <button className="w-full py-4 bg-primary text-on-primary font-bold rounded-2xl shadow-lg active:scale-[0.97] transition-all flex items-center justify-center gap-3">
-                <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
-                即刻諮詢專家 Contact
-              </button>
-              
-              <div className="flex justify-center gap-6 py-2 opacity-40">
-                <span className="text-[10px] font-medium text-secondary">Privacy Policy</span>
-                <span className="text-[10px] font-medium text-secondary">ESG Matrix © 2024</span>
-              </div>
-            </div>
-          </div>
+          </nav>
         </div>
       </header>
     </>

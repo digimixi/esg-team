@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
+import { isAdmin, forbiddenResponse } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,12 @@ const writeClient = createClient({
   apiVersion: '2026-05-07',
 });
 
-export async function DELETE() {
+export async function DELETE(req) {
+  // 後台安全攔截
+  if (!isAdmin(req)) {
+    return forbiddenResponse();
+  }
+
   try {
     // 刪除所有類型為 insight 的文檔
     const query = '*[_type == "insight"]';
@@ -29,3 +35,4 @@ export async function DELETE() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

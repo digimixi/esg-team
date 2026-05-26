@@ -7,6 +7,7 @@ import LedgerHelpPanel from './ledger/LedgerHelpPanel';
 import LedgerMetrics from './ledger/LedgerMetrics';
 import SupplierInviteModal from './ledger/SupplierInviteModal';
 import LedgerTable from './ledger/LedgerTable';
+import { canonicalizeText } from './ledger/CertificateAuditor';
 
 /**
  * @component Scope3TrustLedger
@@ -25,9 +26,42 @@ const Scope3TrustLedger = () => {
 
   // Fetch dynamic transactions from Sanity and merge with fallback data
   useEffect(() => {
-    async function loadDynamicTransactions() {
+    async function loadTransactions() {
+      // 1. 先計算 mock 交易在 canonical 狀態下的真實密碼學雜湊值，保障 sandbox 下載與上傳比對 100% 吻合
+      const hashedMockTxs = await Promise.all(
+        initialTransactions.map(async (tx) => {
+          const cleanContent = `esg.team Scope 3 Carbon Trust Ledger Certificate
+--------------------------------------------------
+交易識別編號 (Transaction ID): ${tx.id}
+供應商名稱 (Supplier): ${tx.supplier}
+原物料品項 (Material): ${tx.material}
+採購重量 (Volume): ${tx.volume.toLocaleString()} t
+碳足跡強度 (Carbon Intensity): ${tx.intensity.toFixed(2)} tCO2e/t
+總計碳排放量 (Emissions): ${tx.emissions.toLocaleString()} tCO2e
+
+[🛡️ 密碼學存證防偽防護]
+標準合規標準 (ESG Standard): ${tx.standard}
+第三方驗證機構 (Auditor): ${tx.auditor}`;
+
+          const canonical = canonicalizeText(cleanContent);
+          const encoder = new TextEncoder();
+          const data = encoder.encode(canonical);
+          const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+          
+          return { ...tx, hash: hashHex };
+        })
+      );
+
+      // 初始化交易列表為已計算完真實雜湊的 mock 交易
+      setTransactions(hashedMockTxs);
+
       try {
-        const dynamicTxs = await client.fetch('*[_type == "scope3Transaction"] | order(date desc)');
+        const dynamicTxs = await client.fetch(`*[_type == "scope3Transaction"] | order(date desc) {
+          ...,
+          "certificateUrl": certificateFile.asset->url
+        }`);
         if (dynamicTxs && dynamicTxs.length > 0) {
           const formattedTxs = dynamicTxs.map(tx => ({
             id: tx.id,
@@ -42,18 +76,20 @@ const Scope3TrustLedger = () => {
             auditor: tx.auditor,
             standard: tx.standard,
             hash: tx.hash,
-            breakdown: tx.breakdown || { extraction: 0, manufacturing: 0, logistics: 0 }
+            breakdown: tx.breakdown || { extraction: 0, manufacturing: 0, logistics: 0 },
+            certificateUrl: tx.certificateUrl || null
           }));
-          // Merge dynamic transactions at the top of initial mock ones
-          setTransactions([...formattedTxs, ...initialTransactions]);
+          // 合併動態與更新過真實雜湊的 mock 交易
+          setTransactions([...formattedTxs, ...hashedMockTxs]);
         }
       } catch (error) {
         console.error('[Trust Ledger] Failed to load dynamic transactions:', error);
       }
     }
     
-    loadDynamicTransactions();
+    loadTransactions();
   }, []);
+
 
   // Filter Logic
   const filteredTransactions = useMemo(() => {

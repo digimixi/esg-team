@@ -3,7 +3,7 @@ import Link from 'next/link';
 import SolutionHero from '@/components/solutions/SolutionHero';
 import HubHeader from '@/components/HubHeader';
 
-export const revalidate = 0;
+export const revalidate = 86400;
 
 export default async function HubProductsPage({ params }) {
   const { hubSlug } = await params;

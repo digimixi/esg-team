@@ -50,6 +50,11 @@
   --color-primary-container: #131b2e;
   --color-esg-emerald: #059669;
 
+  /* Neumorphism Palette */
+  --color-neu-surface: #e6e9ef;
+  --color-neu-dark: #a3b1c6;
+  --color-neu-light: #ffffff;
+
   --radius-DEFAULT: 0.125rem;
   --radius-lg: 0.25rem;
   --radius-xl: 0.5rem;
@@ -125,5 +130,26 @@
   .animate-fade-in-up {
     animation: fade-in-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     opacity: 0;
+  }
+
+  /* Neumorphism Custom Shadows */
+  .shadow-neu-flat {
+    box-shadow: 9px 9px 16px rgba(163, 177, 198, 0.6), -9px -9px 16px rgba(255, 255, 255, 0.8);
+  }
+  
+  .shadow-neu-pressed {
+    box-shadow: inset 6px 6px 10px 0 rgba(163, 177, 198, 0.7), inset -6px -6px 10px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  /* Marquee Animation */
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
   }
 }

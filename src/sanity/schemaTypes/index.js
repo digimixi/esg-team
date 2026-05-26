@@ -14,6 +14,8 @@ import { emissionFactor } from './emissionFactor'
 import { inventoryEntry } from './inventoryEntry'
 import { systemTech } from './systemTech'
 import { scope3Transaction } from './scope3Transaction'
+import { supplierInvitation } from './supplierInvitation'
+import saasTool from './saasTool'
 
 export const schema = {
   types: [
@@ -31,6 +33,8 @@ export const schema = {
     emissionFactor,
     inventoryEntry,
     systemTech,
-    scope3Transaction
+    scope3Transaction,
+    supplierInvitation,
+    saasTool
   ],
 }

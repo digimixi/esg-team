@@ -4,7 +4,7 @@ import Scope3TrustLedger from '@/components/Scope3TrustLedger';
 import HubHeader from '@/components/HubHeader';
 
 
-export const revalidate = 0;
+export const revalidate = 86400;
 
 export default async function SupplyChain({ params }) {
   const { hubSlug } = await params;
@@ -49,6 +49,16 @@ export default async function SupplyChain({ params }) {
     manufacturing: '製造 Manufacturing'
   };
 
+  // Determine contextual defaults for tools based on the current hub
+  let defaultFactorId = 'ef-steel-traditional'; // Fallback
+  if (hubSlug === 'graphite' || hubSlug === 'graphite-electrode') {
+    defaultFactorId = 'ef-graphite-electrode';
+  } else if (hubSlug === 'aluminum') {
+    defaultFactorId = 'ef-aluminum-imported';
+  } else if (hubSlug === 'cement') {
+    defaultFactorId = 'ef-cement-portland';
+  }
+
   return (
     <>
       <HubHeader 
@@ -90,7 +100,7 @@ export default async function SupplyChain({ params }) {
 
           {/* CBAM Simulator Section */}
           <section className="mb-20">
-            <CbamCalculator initialEtsPrice={liveEtsPrice} />
+            <CbamCalculator initialEtsPrice={liveEtsPrice} defaultFactorId={defaultFactorId} />
           </section>
 
           {/* Scope 3 Carbon Trust Ledger Section */}

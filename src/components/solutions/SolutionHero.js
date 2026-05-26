@@ -20,11 +20,13 @@ const SolutionHero = ({
   badgeIcon = 'verified', 
   imageUrl, 
   cta,
+  features = [],
+  jumpLinks = [],
   isFullWidth = false
 }) => {
   if (isFullWidth) {
     return (
-      <section className="relative h-[450px] md:h-[500px] flex items-center overflow-hidden border-b border-outline-variant bg-surface-container-high">
+      <section className="relative min-h-[180px] md:h-[500px] py-6 md:py-0 flex items-center overflow-hidden border-b border-outline-variant bg-surface-container-high">
         <div className="absolute inset-0 z-0">
           <img src={imageUrl} className="w-full h-full object-cover opacity-60" alt={title} />
           <div className="absolute inset-0 bg-gradient-to-b from-surface/30 via-surface/80 to-surface"></div>
@@ -36,18 +38,46 @@ const SolutionHero = ({
               <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">{badgeText}</span>
             </div>
           )}
-          <h1 className="font-display-lg text-headline-md sm:text-display-lg text-primary mb-stack-md leading-tight">
+          <h1 className="font-display-lg font-extrabold text-headline-lg sm:text-headline-md md:text-display-lg text-primary mb-4 md:mb-stack-md leading-tight tracking-tight">
             <span className="block">{title}</span>
-            <span className="text-body-base sm:text-headline-md block text-secondary mt-2">{subtitle}</span>
+            <span className="text-body-base sm:text-headline-md block text-secondary mt-1 md:mt-2 font-normal hidden sm:block">{subtitle}</span>
           </h1>
-          <p className="font-body-base text-body-base text-on-surface-variant max-w-2xl mx-auto mb-stack-lg line-clamp-3 sm:line-clamp-none">
+          
+          {/* [2. 功能摘要徽章 Cognitive Badges] */}
+          {features && features.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {features.map((feature, idx) => (
+                <span key={idx} className="px-2.5 py-1 bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant/50 rounded-lg text-[11px] font-bold text-secondary uppercase tracking-widest shadow-sm flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[14px] text-esg-emerald">check_circle</span>
+                  {feature}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <p className="font-body-base text-body-base text-on-surface-variant max-w-2xl mx-auto mb-6 md:mb-stack-lg hidden md:block">
             {description}
           </p>
-          {cta && (
-            <a href={cta.href} className="bg-primary text-on-primary px-8 py-3 rounded-xl font-label-sm text-label-sm flex items-center gap-2 hover:opacity-90 transition-all shadow-lg active:scale-95">
-              {cta.label} <span className="material-symbols-outlined">arrow_forward</span>
-            </a>
-          )}
+
+          <div className="flex flex-col items-center gap-4 md:gap-6">
+            {cta && (
+              <a href={cta.href} className="bg-primary text-on-primary px-6 py-2.5 md:px-8 md:py-3 rounded-xl font-bold text-xs md:text-label-sm flex items-center gap-2 hover:opacity-90 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.15)] active:scale-95">
+                {cta.label} <span className="material-symbols-outlined">arrow_forward</span>
+              </a>
+            )}
+            
+            {/* [1. 頁內快顯導航 Action Jump Links] */}
+            {jumpLinks && jumpLinks.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-3">
+                {jumpLinks.map((link, idx) => (
+                  <a key={idx} href={link.href} className="text-[11px] font-bold text-primary bg-surface-container-lowest border border-outline-variant/60 px-4 py-1.5 rounded-full hover:bg-surface-container hover:border-outline-variant transition-all shadow-sm flex items-center gap-1 active:scale-95">
+                    <span className="material-symbols-outlined text-[14px] text-secondary opacity-70">south</span>
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </section>
     );

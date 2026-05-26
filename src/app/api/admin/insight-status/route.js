@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
+import { isAdmin, forbiddenResponse } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,11 @@ const writeClient = createClient({
 });
 
 export async function PATCH(req) {
+  // 後台安全攔截
+  if (!isAdmin(req)) {
+    return forbiddenResponse();
+  }
+
   try {
     const { id, isActive } = await req.json();
 
@@ -32,6 +38,11 @@ export async function PATCH(req) {
 }
 
 export async function DELETE(req) {
+  // 後台安全攔截
+  if (!isAdmin(req)) {
+    return forbiddenResponse();
+  }
+
   try {
     const { id } = await req.json();
 
@@ -46,3 +57,4 @@ export async function DELETE(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

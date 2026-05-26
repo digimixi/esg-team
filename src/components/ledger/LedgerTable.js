@@ -1,7 +1,9 @@
 import React from 'react';
+import CertificateAuditor from './CertificateAuditor';
 
 /**
  * @component LedgerTable
+
  * @description Encapsulated transactions list, filtering toolbar, and expandable detail drawer.
  */
 const LedgerTable = ({
@@ -105,16 +107,30 @@ const LedgerTable = ({
                     </td>
                     <td className="py-4 px-4 text-center">
                       <div className="flex justify-center">
-                        <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                          tx.status === 'verified' ? 'bg-esg-emerald/10 text-esg-emerald border border-esg-emerald/20' :
-                          tx.status === 'auditing' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
-                          'bg-outline-variant/60 text-secondary border border-outline-variant'
-                        }`}>
-                          <span className="material-symbols-outlined text-[10px]">
-                            {tx.status === 'verified' ? 'check_circle' : tx.status === 'auditing' ? 'pending' : 'help_outline'}
+                        {tx.status === 'erp-synced' ? (
+                          <span className="group/status relative inline-flex items-center gap-1 cursor-help select-none bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[9px] font-bold px-2 py-0.5 rounded-full">
+                            <span className="material-symbols-outlined text-[10px] animate-pulse">api</span>
+                            ERP 直連
+                            <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 scale-90 opacity-0 group-hover/status:scale-100 group-hover/status:opacity-100 transition-all duration-200 origin-bottom bg-slate-900 border border-slate-800 rounded-lg p-2 shadow-2xl z-50 text-[10px] leading-relaxed text-slate-300 font-sans text-left normal-case tracking-normal">
+                              <span className="font-bold text-slate-100 block border-b border-slate-800 pb-1 mb-1">
+                                ⚡ B2B ERP 自動化直連
+                              </span>
+                              此筆資料為外部企業 ERP/EMS 系統透過 OpenAPI 自動推送寫入，未經人工修改，具備極高真實性。
+                              <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></span>
+                            </span>
                           </span>
-                          {tx.status === 'verified' ? '已查證' : tx.status === 'auditing' ? '審核中' : '自主宣告'}
-                        </span>
+                        ) : (
+                          <span className={`inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                            tx.status === 'verified' ? 'bg-esg-emerald/10 text-esg-emerald border border-esg-emerald/20' :
+                            tx.status === 'auditing' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
+                            'bg-outline-variant/60 text-secondary border border-outline-variant'
+                          }`}>
+                            <span className="material-symbols-outlined text-[10px]">
+                              {tx.status === 'verified' ? 'check_circle' : tx.status === 'auditing' ? 'pending' : 'help_outline'}
+                            </span>
+                            {tx.status === 'verified' ? '已查證' : tx.status === 'auditing' ? '審核中' : '自主宣告'}
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="py-4 px-4 text-center">
@@ -202,34 +218,8 @@ const LedgerTable = ({
                           </div>
 
                           {/* Quick Actions / Actions Drawer */}
-                          <div className="space-y-3">
-                            <span className="text-[10px] font-bold text-secondary uppercase tracking-wider block">
-                              數據核決與導出 (Audit Action Desk)
-                            </span>
-                            <div className="bg-surface-container-high/40 p-4 rounded-xl border border-outline-variant flex flex-col justify-between h-[135px]">
-                              <p className="text-[10px] text-on-surface-variant leading-relaxed">
-                                您可以直接在平台上下載經過驗證的 PDF 原物料足跡認證書，此檔案內嵌有電子簽章與帳本防篡改鏈結，可用於向客戶導出合規聲明。
-                              </p>
-                              <div className="grid grid-cols-2 gap-2 mt-2">
-                                <button
-                                  type="button"
-                                  onClick={() => alert(`已啟動下載 ${tx.id} 的 SGS 官方檢驗憑證！`)}
-                                  className="py-2 bg-esg-emerald text-on-primary rounded text-[10px] font-bold hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-1"
-                                >
-                                  <span className="material-symbols-outlined text-xs">download</span>
-                                  下載合規認證書
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => alert(`已成功將此交易數據安全同步至您的企業碳資產管理儀表板！`)}
-                                  className="py-2 bg-surface-container-lowest border border-outline-variant text-secondary hover:border-primary hover:text-primary rounded text-[10px] font-bold active:scale-95 transition-all flex items-center justify-center gap-1"
-                                >
-                                  <span className="material-symbols-outlined text-xs">sync</span>
-                                  同步內稽資產
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                          <CertificateAuditor tx={tx} />
+
 
                         </div>
                       </td>

@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 
 /**
@@ -17,7 +19,8 @@ const InsightCard = ({ insight }) => {
     externalUrl,
     category,
     hubTitle,
-    standards
+    standards,
+    sourceRef
   } = insight;
 
   const formattedDate = publishedAt 
@@ -25,10 +28,12 @@ const InsightCard = ({ insight }) => {
     : '';
 
   return (
-    <a 
-      href={externalUrl || '#'} 
-      target="_blank" 
-      rel="noopener noreferrer"
+    <div 
+      onClick={(e) => {
+        // Prevent click if clicking a sub-link or button
+        if (e.target.closest('.no-card-click')) return;
+        if (externalUrl) window.open(externalUrl, '_blank', 'noopener,noreferrer');
+      }}
       className="flex flex-col bg-surface border border-outline-variant rounded-xl p-5 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group relative cursor-pointer min-h-[220px]"
     >
       {/* Top Metadata Section */}
@@ -69,14 +74,28 @@ const InsightCard = ({ insight }) => {
 
       {/* Card Footer */}
       <div className="mt-auto flex justify-between items-center pt-4 border-t border-outline-variant/50">
-        <span className="text-[10px] text-esg-emerald font-bold font-mono tracking-wide">
-          #{hubTitle || category || '全域情報'}
-        </span>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] text-esg-emerald font-bold font-mono tracking-wide">
+            #{hubTitle || category || '全域情報'}
+          </span>
+          {sourceRef && sourceRef.title && (
+            <a 
+              href={sourceRef.url || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="no-card-click text-[9px] text-outline hover:text-esg-emerald transition-colors font-sans flex items-center gap-0.5 mt-0.5"
+              title={`原始書籤來源: ${sourceRef.title}`}
+            >
+              <span className="material-symbols-outlined text-[10px]">link</span>
+              採集來源：<span className="underline decoration-dotted">{sourceRef.title}</span>
+            </a>
+          )}
+        </div>
         <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">
           <span className="material-symbols-outlined text-sm">arrow_outward</span>
         </div>
       </div>
-    </a>
+    </div>
   );
 };
 

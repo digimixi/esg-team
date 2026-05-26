@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 import { generateOnboardingToken } from '@/lib/onboarding';
+import { createClient } from 'next-sanity';
 
 export const dynamic = 'force-dynamic';
+
+const writeClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+  token: process.env.SANITY_WRITE_TOKEN,
+  useCdn: false,
+  apiVersion: '2026-05-07',
+});
 
 export async function POST(req) {
   try {
@@ -26,8 +35,31 @@ export async function POST(req) {
     console.log(`[Supplier Invite] Secure token generated for ${supplierName}:`);
     console.log(`[Supplier Invite] Link: ${onboardUrl}`);
 
-    // 3. 整合 Resend 郵件派發 API ($0 成本, REST API 直連)
+    // 2.5 寫入 Sanity 供應商邀請審計日誌 (supplierInvitation)
     const resendApiKey = process.env.RESEND_API_KEY;
+    const sentAt = new Date().toISOString();
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(); // 48小時時效
+    
+    try {
+      console.log(`[Supplier Invite] Creating audit log in Sanity for ${supplierName}...`);
+      await writeClient.create({
+        _type: 'supplierInvitation',
+        supplierName,
+        email,
+        materialType: type,
+        token: token,
+        status: 'sent',
+        sentAt,
+        expiresAt,
+        sandboxMode: !resendApiKey,
+      });
+      console.log(`✅ [Supplier Invite] Audit log successfully written to Sanity.`);
+    } catch (dbError) {
+      console.error(`❌ [Supplier Invite] Failed to write audit log to Sanity:`, dbError);
+      // 我們不因為寫入日誌失敗而中斷主流程，但記錄錯誤
+    }
+
+    // 3. 整合 Resend 郵件派發 API ($0 成本, REST API 直連)
     let emailSent = false;
     let apiError = null;
 

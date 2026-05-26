@@ -209,3 +209,21 @@
 
 ---
 *ç”± AI å»ºæ§‹å¸«è¨˜éŒ„*
+
+---
+
+## [2026-05-25] Phase 3: B2B ERP ¦Û°Êª½³s API ¹ê§@ (B2B ERP Auto-Sync API)
+
+### ?? ·s¼W¥\¯à (New Features)
+1. **¥ø·~¸ê®Æ®wÂX¥Rª÷Æ_¨t²Î**¡G
+    * ©ó Sanity \company\ µ²ºc¤¤·s¼W \enterprisePlan\ ¥I¶O¤è®×¼ÐÃÑ¡A§@¬°°ª¶¥¥\¯àªºÅv­­Âê¡C
+    * ·s¼W \erpApiKey\ ¥Î¥H¦w¥þÀx¦s¥ø·~±MÄÝªº API ³s½uª÷Æ_¡C
+    * ©ó \scope3Transaction\ ¤¤·s¼W \erp-synced\ (? ERP ¨t²Îª½³s) ª¬ºA¼ÐÅÒ¡A¥Î¥H°Ï¤À¤H¤u¥Ó³ø»P¨t²Î¦Û°Ê¤Æ¹ï±µ¼Æ¾Ú¡A´£¤É¤½«H¤O¡C
+2. **OpenAPI ®Ö¤ßºÝÂI»P¦w¥þ¨¾Å@**¡G
+    * «Ø¥ß \src/app/api/erp/ingest/route.js\ POST ºÝÂI¡A±µ¦¬¥~³¡ ERP/EMS (¦p SAP/Oracle) ªº¦Û°Ê¤Æ±ÆºÒ¼Æ¾Ú±À°e¡C
+    * ¹ê§@ \src/lib/erpAuth.js\ ´£¨ÑÄY®æªº API Key ¤ñ¹ï¾÷¨î¡A¥H¤Î In-Memory ³æ¹ê¨Ò¬y¶q­­¨î¾¹ (Rate Limiter)¡A¨¾¿m DDoS ©Î²§±`­«¸Õ¡A«O»Ù¥­¥xÃ­©w©Ê¡C
+
+### ?? ¶}µo¥Øªº»P¹ï±µ§Þ³N (Purpose & Tech Specs)
+* **¶}µo¥Øªº**¡G®ø°£¨ÑÀ³Ãì¤¤°ª¶¥·|­û¤H¤u¹ï±µ»P¤â°Ê¿é¤Jªº®É¶¡¦¨¥»»P¿ù»~²v¡C³z¹L¾÷¾¹¦Û°Ê¤Æ¹ï±µ¡A¤£¶È±NªA°È¤É¯Å¬° Enterprise ¥ø·~ª©ªº®Ö¤ß¦¬¶O¼Ò²Õ¡A§ó¤j´T´£¤É¼Æ¾Úªº¥i«H«×»P¤£¥i¿y§ï©Ê¡]¦b¬d®Ö®É¡AERP ª½³s¸ê®Æªº¤½«H¤O»·¤j©ó¤H¤u \self-declared\¡^¡C
+* **¹ï±µ§Þ³N**¡G°ò©ó RESTful OpenAPI ¬[ºc¡C«È¤áºÝ¥H HTTP POST °e¥X JSON Payload ¦Ü \/api/erp/ingest\¡A¨Ã©ó Header §¨±a \Authorization: Bearer <API_KEY>\¡C«áºÝ¸g¥Ñ Next.js Edge/Node runtime ¸ÑªR«á¡A§Q¥Î Sanity Client ª½±µ¹ï±µ©³¼h¸ê®Æ®w¡A¨Ã±j¨î¸j©w \erp-synced\ ¼ÐÅÒ§¹¦¨¤J±b¡C
+

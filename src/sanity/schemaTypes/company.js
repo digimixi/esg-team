@@ -49,6 +49,20 @@ export const company = {
       name: 'description',
       title: '企業簡介',
       type: 'text'
+    },
+    {
+      name: 'enterprisePlan',
+      title: 'Enterprise 企業版授權',
+      description: '啟用後允許該企業使用 ERP/IoT API 系統直連與高階客製化服務',
+      type: 'boolean',
+      initialValue: false
+    },
+    {
+      name: 'erpApiKey',
+      title: 'ERP 直連 API Key',
+      description: '請將此金鑰提供給客戶的 IT 部門進行系統對接 (請妥善保管)',
+      type: 'string',
+      hidden: ({ document }) => !document?.enterprisePlan
     }
   ]
 }

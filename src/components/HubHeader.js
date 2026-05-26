@@ -19,7 +19,7 @@ export default function HubHeader({ hubSlug, title, contactUrl, activeTab }) {
             esg<span className="text-esg-emerald">.</span>team
           </Link>
           <span className="text-outline-variant shrink-0">|</span>
-          <Link href={`/hubs/${hubSlug}`} className="text-[12px] md:text-body-base font-bold text-secondary hover:text-primary transition-colors truncate max-w-[120px] md:max-w-none">
+          <Link href={`/hubs/${hubSlug}`} className="text-[12px] md:text-body-base font-bold text-secondary hover:text-primary transition-colors truncate flex-1 min-w-[150px]">
             {title}
           </Link>
           <nav className="hidden lg:flex gap-4 xl:gap-gutter ml-2 xl:ml-stack-lg">
@@ -38,7 +38,7 @@ export default function HubHeader({ hubSlug, title, contactUrl, activeTab }) {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="hidden sm:flex items-center gap-2">
           <a
             href={contactUrl || '#'}
             className="px-3 py-1.5 bg-primary text-on-primary font-label-sm text-[11px] rounded-lg shrink-0 hover:bg-primary/90 active:scale-95 transition-all duration-150 whitespace-nowrap"

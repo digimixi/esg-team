@@ -2,18 +2,22 @@ import { client } from '@/sanity/lib/client';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 
-export const revalidate = 0;
+export const revalidate = 86400;
 
 export default async function SolutionDetail({ params }) {
-  const { slug } = params;
-  const solution = await client.fetch(`*[_type == "solution" && slug.current == $slug][0] {
-    ...,
-    "heroImageUrl": heroImage.asset->url,
-    "features": features[] {
+  const { slug } = await params;
+  
+  let solution = null;
+  if (slug) {
+    solution = await client.fetch(`*[_type == "solution" && slug.current == $slug][0] {
       ...,
-      "imageUrl": image.asset->url
-    }
-  }`, { slug });
+      "heroImageUrl": heroImage.asset->url,
+      "features": features[] {
+        ...,
+        "imageUrl": image.asset->url
+      }
+    }`, { slug });
+  }
 
   if (!solution) {
     return (
