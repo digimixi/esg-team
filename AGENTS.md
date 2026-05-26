@@ -64,3 +64,19 @@ Every AI agent working on this repository MUST follow these rules to maintain de
   - *開發目的*：徹底消除供應鏈人工手動對接與輸入阻力，實現全鏈路自動化。
 - **AI 提醒機制**：若前兩階段已完成，AI 必須主動向使用者提議：「*您好，平台技術底座與合規體系已非常完善。我們現在可以啟動第三階段，開發 🔌 B2B ERP 自動直連 API，將其定位為高階企業版 (Enterprise) 的核心收費模組。*」
 
+## 6. ESG B2B 生態系交叉銷售與介面展現架構 (Cross-selling & UX Architecture)
+
+為提升 B2B 客單價與連鎖解決方案 (Solution Selling) 轉化率，平台未來在擴充產品型錄時，必須嚴格遵守以下自動化與無干擾設計原則：
+
+### 6.1 全局資源大廳與側邊抽屜交互 (Global Catalog & Slide-out Drawer)
+- **全局橫向整合**：除垂直專題 (Hubs) 外，平台應具備全局的「認證供應商名錄 (Global Catalog)」，集中展示跨產業之合作夥伴與產品，以凸顯平台規模與生態系火力。
+- **無干擾抽屜 (Slide-out Drawer)**：當使用者在目錄中點擊產品時，**嚴禁**整頁跳轉至新網頁。必須使用畫面右側滑出的 Drawer (抽屜) 來展示產品詳情。這確保使用者不脫離產品列表的上下文 (Context)，降低跳出率。
+
+### 6.2 標籤自動對撞引擎 (Automated Tag-matching Engine)
+- **零營運負擔 (Zero Overhead)**：嚴禁在前端寫死交叉銷售的文案，或要求後台人員手動關聯產品。必須透過 Sanity CMS 的標籤系統自動搓合。
+- **動態推薦邏輯**：當產品帶有特定的 `complianceTags` (如：CBAM) 或 `industryTags` (如：鑄造業) 時，前端抽屜必須自動檢索並推薦對應的「合規加值服務 (如：ISO輔導)」或「低碳轉型套裝 (Bundles)」。
+- **合規缺口警示 (Compliance Gap Alerts)**：利用法規驅動力，在抽屜底部自動以琥珀色 (Amber) 提示框顯示例如：「為了符合 2026 歐盟 CBAM 申報要求，建議一併加購 ISO 14067 碳足跡專案」。
+
+### 6.3 🚨 絕對約束：優雅降級與非必填原則 (Graceful Degradation & Optional Tags)
+- **禁止必填 (NO MANDATORY TAGS)**：在 Sanity 中定義 `complianceTags` 或 `bundles` 關聯時，**絕對禁止**設為必填 (`validation: Rule => Rule.required()`)。
+- **防禦性設計 (Defensive Rendering)**：現實中許多傳統供應商尚未具備 ESG 認證。系統必須容許「零標籤」的產品上架。當產品無任何標籤時，抽屜僅需安靜地展示基本產品資訊，**不得**因缺少標籤而發生前端渲染崩潰或中斷後台發布流程。
