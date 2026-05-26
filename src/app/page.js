@@ -67,7 +67,8 @@ export default async function Home() {
         <>
             <Navbar />
             <StickyJumpNav links={[
-              { label: '產業專題', href: '#hubs', isPrimary: true },
+              { label: '解決方案', href: '/solutions', isPrimary: true },
+              { label: '產業專題', href: '#hubs' },
               { label: '數位工具', href: '#tools' },
               { label: '實時指數', href: '#market-index' },
               { label: '永續情報', href: '#insights' }
