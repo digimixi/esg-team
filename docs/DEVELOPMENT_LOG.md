@@ -4,6 +4,25 @@
 
 ---
 
+## [2026-05-26] 全域與專題頁面導航體驗優化及懸浮工具列重構 (Global & Hub Navigation UX Optimization and FAB Refactoring)
+
+### 🚀 介面與使用者體驗優化 (UI/UX Enhancements)
+1. **雙效懸浮工具箱 (Dual-Purpose FAB Toolbar)**：
+   * 徹底重構 `BackToTopButton.js`，將「聯絡銷售」按鈕與「返回頂部」箭頭整合為無干擾的直列懸浮工具列。
+   * **解決行動裝置相容性 (Mobile Compatibility)**：移除了舊版的 CSS `opacity` 漸變與被 Android 瀏覽器攔截的 `window.scrollY` 事件。改用物理座標檢查 `getBoundingClientRect()` 配合 React 條件渲染，100% 解決了 Android Chrome / LINE 內建瀏覽器的 GPU 圖層繪製 Bug 與捲動失效問題。
+2. **全域與專題主視覺精簡 (Hero Section Simplification)**：
+   * 將首頁與產業專題頁的主圖最小高度由 `260px` 壓縮至 `180px`，大幅釋放行動版網頁的垂直空間。
+   * 移除原本位於主圖內的「聯絡銷售 / 獲取報價」重複按鈕，將轉換漏斗 (Conversion Funnel) 收斂至右下角全局常駐的懸浮工具箱。
+3. **高亮動線導航 (Primary Sticky Navigation)**：
+   * 擴充 `StickyJumpNav.js` 元件，新增 `isPrimary` 參數以支援綠色高亮樣式。
+   * 將專題頁首要行動「解決方案」與全域首頁首要行動「產業專題」設為導航列第一位，有效引導 B2B 客戶向下探索。
+4. **修復標題截斷問題 (Title Truncation Fix)**：
+   * 移除了 `HubHeader.js` 中對產業標題強制設定的 `max-w-[120px]`，確保長字元的產業主題名稱能在行動裝置上完整自動延伸顯示。
+
+### 🔧 系統與運營維護 (System & Ops)
+* **Dev Server 假死排除**：排除了本地端 Next.js background task 假死導致的手機端 HMR (Hot Module Replacement) 無法更新問題。
+
+
 ## [2026-05-20] 供應鏈碳排信任帳本元件群模組化重構與性能優化 (Scope 3 Carbon Trust Ledger Modular Refactoring & Performance Optimization)
 
 ### 🚀 新增功能與架構演進 (New Features & Architecture Evolution)
@@ -212,18 +231,18 @@
 
 ---
 
-## [2026-05-25] Phase 3: B2B ERP �۰ʪ��s API ��@ (B2B ERP Auto-Sync API)
+## [2026-05-25] Phase 3: B2B ERP �۰ʪ��s API ��@ (B2B ERP Auto-Sync API)
 
-### ?? �s�W�\�� (New Features)
-1. **���~��Ʈw�X�R���_�t��**�G
-    * �� Sanity \company\ ���c���s�W \enterprisePlan\ �I�O��׼��ѡA�@�������\�઺�v����C
-    * �s�W \erpApiKey\ �ΥH�w���x�s���~�M�ݪ� API �s�u���_�C
-    * �� \scope3Transaction\ ���s�W \erp-synced\ (? ERP �t�Ϊ��s) ���A���ҡA�ΥH�Ϥ��H�u�ӳ��P�t�Φ۰ʤƹﱵ�ƾڡA���ɤ��H�O�C
-2. **OpenAPI �֤ߺ��I�P�w�����@**�G
-    * �إ� \src/app/api/erp/ingest/route.js\ POST ���I�A�����~�� ERP/EMS (�p SAP/Oracle) ���۰ʤƱƺҼƾڱ��e�C
-    * ��@ \src/lib/erpAuth.js\ �����Y�檺 API Key ������A�H�� In-Memory ���Ҭy�q��� (Rate Limiter)�A���m DDoS �β��`���աA�O�٥��xí�w�ʡC
+### ?? �s�W�\�� (New Features)
+1. **���~��Ʈw�X�R���_�t��**�G
+    * �� Sanity \company\ ���c���s�W \enterprisePlan\ �I�O��׼��ѡA�@�������\�઺�v����C
+    * �s�W \erpApiKey\ �ΥH�w���x�s���~�M�ݪ� API �s�u���_�C
+    * �� \scope3Transaction\ ���s�W \erp-synced\ (? ERP �t�Ϊ��s) ���A���ҡA�ΥH�Ϥ��H�u�ӳ��P�t�Φ۰ʤƹﱵ�ƾڡA���ɤ��H�O�C
+2. **OpenAPI �֤ߺ��I�P�w�����@**�G
+    * �إ� \src/app/api/erp/ingest/route.js\ POST ���I�A�����~�� ERP/EMS (�p SAP/Oracle) ���۰ʤƱƺҼƾڱ��e�C
+    * ��@ \src/lib/erpAuth.js\ �����Y�檺 API Key ������A�H�� In-Memory ���Ҭy�q��� (Rate Limiter)�A���m DDoS �β��`���աA�O�٥��xí�w�ʡC
 
-### ?? �}�o�ت��P�ﱵ�޳N (Purpose & Tech Specs)
-* **�}�o�ت�**�G���������줤�����|���H�u�ﱵ�P��ʿ�J���ɶ������P���~�v�C�z�L�����۰ʤƹﱵ�A���ȱN�A�ȤɯŬ� Enterprise ���~�����֤ߦ��O�ҲաA��j�T���ɼƾڪ��i�H�׻P���i�y��ʡ]�b�d�֮ɡAERP ���s��ƪ����H�O���j��H�u \self-declared\�^�C
-* **�ﱵ�޳N**�G��� RESTful OpenAPI �[�c�C�Ȥ�ݥH HTTP POST �e�X JSON Payload �� \/api/erp/ingest\�A�é� Header ���a \Authorization: Bearer <API_KEY>\�C��ݸg�� Next.js Edge/Node runtime �ѪR��A�Q�� Sanity Client �����ﱵ���h��Ʈw�A�ñj��j�w \erp-synced\ ���ҧ����J�b�C
+### ?? �}�o�ت��P�ﱵ�޳N (Purpose & Tech Specs)
+* **�}�o�ت�**�G���������줤�����|���H�u�ﱵ�P��ʿ�J���ɶ������P���~�v�C�z�L�����۰ʤƹﱵ�A���ȱN�A�ȤɯŬ� Enterprise ���~�����֤ߦ��O�ҲաA��j�T���ɼƾڪ��i�H�׻P���i�y��ʡ]�b�d�֮ɡAERP ���s��ƪ����H�O���j��H�u \self-declared\�^�C
+* **�ﱵ�޳N**�G��� RESTful OpenAPI �[�c�C�Ȥ�ݥH HTTP POST �e�X JSON Payload �� \/api/erp/ingest\�A�é� Header ���a \Authorization: Bearer <API_KEY>\�C��ݸg�� Next.js Edge/Node runtime �ѪR��A�Q�� Sanity Client �����ﱵ���h��Ʈw�A�ñj��j�w \erp-synced\ ���ҧ����J�b�C
 
