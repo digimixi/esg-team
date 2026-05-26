@@ -2,7 +2,7 @@ import { client } from '@/sanity/lib/client';
 import CbamCalculator from '@/components/CbamCalculator';
 import Scope3TrustLedger from '@/components/Scope3TrustLedger';
 import HubHeader from '@/components/HubHeader';
-
+import StickyJumpNav from '@/components/StickyJumpNav';
 
 export const revalidate = 86400;
 

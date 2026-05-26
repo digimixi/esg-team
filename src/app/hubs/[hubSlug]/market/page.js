@@ -1,6 +1,7 @@
 import { client } from '@/sanity/lib/client';
 import TradingViewChart from '@/components/TradingViewChart';
 import HubHeader from '@/components/HubHeader';
+import StickyJumpNav from '@/components/StickyJumpNav';
 import MarketIndexBar from '@/components/MarketIndexBar';
 
 export const revalidate = 86400;
