@@ -63,6 +63,8 @@ export default async function HubHome({ params }) {
     ...,
     "heroImageUrl": heroImage.asset->url,
     "featureImageUrl": featureImage.asset->url,
+    features,
+    specGroups,
     "aiInsight": aiInsight {
       isActive,
       trendLabel,
@@ -155,9 +157,71 @@ export default async function HubHome({ params }) {
           subtitle={hub.heroSubtitle}
           description={hub.heroDescription}
           imageUrl={hub.heroImageUrl}
-          features={['即時報價', '供應鏈地圖', '最新情報', '碳排試算']}
+          features={hub.features?.map(f => f.title) || ['即時報價', '供應鏈地圖', '最新情報', '碳排試算']}
           isFullWidth={true}
         />
+
+        {/* Detailed Features & Specs Section */}
+        {(hub.features?.length > 0 || hub.specGroups?.length > 0) && (
+          <section id="solutions" className="py-stack-lg px-margin max-w-container-max mx-auto scroll-mt-24">
+            <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg text-center">核心特點與技術規格</h2>
+            
+            {/* Features */}
+            {hub.features && hub.features.length > 0 && (
+              <div className={`flex flex-col ${hub.featureImageUrl ? 'lg:flex-row' : ''} gap-8 mb-12`}>
+                <div className={`grid grid-cols-1 ${hub.features.length > 1 ? (hub.featureImageUrl ? 'md:grid-cols-2' : 'md:grid-cols-3') : ''} gap-8 flex-1`}>
+                  {hub.features.map((feat) => (
+                    <div key={feat._key} className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+                      <span className="material-symbols-outlined text-4xl text-primary mb-4">{feat.icon || 'star'}</span>
+                      <h3 className="font-bold text-lg text-primary mb-3">{feat.title}</h3>
+                      <div className="text-on-surface-variant text-sm">
+                        <PortableText value={feat.description} components={ptComponents} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Feature Image (Right Side) */}
+                {hub.featureImageUrl && (
+                  <div className="w-full lg:w-[400px] xl:w-[500px] rounded-2xl overflow-hidden bg-surface-container-high border border-outline-variant flex-shrink-0 relative min-h-[300px]">
+                    <img 
+                      src={hub.featureImageUrl} 
+                      alt="Feature illustration" 
+                      className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-700" 
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Spec Groups */}
+            {hub.specGroups && hub.specGroups.length > 0 && (
+              <div className="space-y-8">
+                {hub.specGroups.map((group) => (
+                  <div key={group._key} className="bg-surface-container-lowest border border-outline-variant rounded-2xl overflow-hidden shadow-sm">
+                    <div className="bg-surface-container-low p-6 border-b border-outline-variant flex items-center gap-4">
+                      {group.icon && <span className="material-symbols-outlined text-secondary text-2xl">{group.icon}</span>}
+                      <div>
+                        <h4 className="font-bold text-lg text-primary">{group.title}</h4>
+                        {group.description && <p className="text-sm text-on-surface-variant mt-1">{group.description}</p>}
+                      </div>
+                    </div>
+                    <div className="p-6 bg-white">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {group.specs?.map((spec) => (
+                          <div key={spec._key} className="flex flex-col border-l-2 border-primary/20 pl-4">
+                            <span className="text-[11px] text-on-surface-variant uppercase tracking-wider font-bold mb-1">{spec.label}</span>
+                            <span className="font-data-mono font-bold text-primary text-base">{spec.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         <div id="market-index">
           <MarketIndexBar indices={indices} lastUpdated={indices[0]?.lastSync} />

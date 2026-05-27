@@ -33,17 +33,45 @@ export const product = {
     },
     {
       name: 'category',
-      title: '產品分類 (Category)',
+      title: '主分類：工業價值鏈 (Primary Category)',
       type: 'string',
       options: {
         list: [
-          { title: '原料 Raw Materials', value: 'raw_materials' },
-          { title: '成品 Finished Products', value: 'finished_products' },
-          { title: '化學品 Chemicals', value: 'chemicals' },
-          { title: '設備 Equipment', value: 'equipment' },
-          { title: '服務 Services', value: 'services' },
+          { title: '關鍵原物料 Strategic Materials', value: 'strategic_materials' },
+          { title: '循環與再生資源 Circular Resources', value: 'circular_resources' },
+          { title: '特用化學與耗材 Specialty Consumables', value: 'specialty_consumables' },
+          { title: '節能與製程設備 Cleantech Equipment', value: 'cleantech_equipment' },
+          { title: '合規與數位工具 Compliance & Digital', value: 'compliance_digital' },
         ],
       },
+    },
+    {
+      name: 'subCategory',
+      title: '實體產品分類 (Product Type)',
+      type: 'string',
+      options: {
+        list: [
+          { title: '石墨電極 (Graphite Electrode)', value: 'graphite_electrode' },
+          { title: '石墨坩堝 (Graphite Crucible)', value: 'graphite_crucible' },
+          { title: '增碳劑 / 碳材 (Carbon Additive)', value: 'carbon_additive' },
+          { title: '石墨材料 / 其他 (Graphite Materials)', value: 'graphite_materials' },
+        ],
+      },
+    },
+    {
+      name: 'esgTags',
+      title: 'ESG 減碳驅動標籤 (ESG Tags)',
+      type: 'array',
+      description: '可複選。為此產品打上能解決什麼碳排痛點的屬性標籤。',
+      of: [{ type: 'string' }],
+      options: {
+        list: [
+          { title: '📉 低碳替代品 (Low-Carbon)', value: 'low_carbon' },
+          { title: '♻️ 資源再生 (Recovery)', value: 'recovery' },
+          { title: '🔋 能源效率 (Energy Efficiency)', value: 'energy_efficiency' },
+          { title: '⚖️ 碳權與合規 (Carbon Assets)', value: 'carbon_assets' },
+        ]
+      }
     },
     { 
       name: 'image', 

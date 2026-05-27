@@ -14,6 +14,7 @@ import {apiVersion, dataset, projectId} from './src/sanity/env'
 import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
 import {zhHantLocale} from '@sanity/locale-zh-hant'
+import { QuickCloneAction } from './src/sanity/actions/QuickCloneAction'
 
 export default defineConfig({
   basePath: '/studio',
@@ -30,7 +31,13 @@ export default defineConfig({
   ],
   document: {
     // 確保所有標準動作（發布、刪除、取消發布）都可用
-    actions: (prev) => prev
+    actions: (prev, context) => {
+      // 替產品模組加上一鍵複製按鈕
+      if (context.schemaType === 'product') {
+        return [QuickCloneAction, ...prev]
+      }
+      return prev
+    }
   },
   tools: (prev) => [
     ...prev,

@@ -80,3 +80,11 @@ Every AI agent working on this repository MUST follow these rules to maintain de
 ### 6.3 🚨 絕對約束：優雅降級與非必填原則 (Graceful Degradation & Optional Tags)
 - **禁止必填 (NO MANDATORY TAGS)**：在 Sanity 中定義 `complianceTags` 或 `bundles` 關聯時，**絕對禁止**設為必填 (`validation: Rule => Rule.required()`)。
 - **防禦性設計 (Defensive Rendering)**：現實中許多傳統供應商尚未具備 ESG 認證。系統必須容許「零標籤」的產品上架。當產品無任何標籤時，抽屜僅需安靜地展示基本產品資訊，**不得**因缺少標籤而發生前端渲染崩潰或中斷後台發布流程。
+
+## 7. Next.js 15 Security & Mobile Testing (CRITICAL)
+
+Next.js 15 has introduced highly restrictive CORS policies for dev resources (like `/_next/webpack-hmr`).
+
+- **The Hydration Block**: If a user is testing the local dev server from a mobile device on the same Wi-Fi network (e.g., `192.168.x.x`), Next.js 15 will default to blocking the device from downloading the JavaScript bundles. The page will render the HTML, but **all React `onClick` events will be dead**.
+- **The Fix**: You MUST ensure the user's IP is added to the root of `next.config.mjs` under `allowedDevOrigins: ['<ip>', 'localhost']`. Do not put it under `experimental`.
+- **Troubleshooting**: If the user reports "cannot click buttons on mobile but normal links work", check the server logs for `Blocked cross-origin request to Next.js dev resource` immediately before doing any CSS or z-index debugging.

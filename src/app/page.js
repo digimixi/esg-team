@@ -33,7 +33,7 @@ export default async function Home() {
     themeColor,
     isFeatured,
     tags
-  } | order(isFeatured desc, _createdAt asc)`);
+  } | order(coalesce(isFeatured, false) desc, _createdAt asc)`);
 
     const solutions = await client.fetch(`*[_type == "solution"] | order(_createdAt asc) {
     _id,

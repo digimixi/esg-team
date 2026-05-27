@@ -1,5 +1,6 @@
 import { client } from '@/sanity/lib/client';
 import CatalogClient from './CatalogClient';
+import Navbar from '@/components/Navbar';
 
 export const revalidate = 86400; // Cache for 24 hours (or until revalidated by webhook)
 
@@ -18,8 +19,10 @@ export default async function CatalogPage() {
       subtitle,
       slug,
       category,
+      subCategory,
       image,
       gradeBadge,
+      esgTags,
       description,
       specifications,
       isFeatured,
@@ -31,8 +34,11 @@ export default async function CatalogPage() {
   `, {}, { useCdn: false });
 
   return (
-    <main>
-      <CatalogClient products={products} />
-    </main>
+    <>
+      <Navbar />
+      <main className="pt-[64px] lg:pt-[104px]">
+        <CatalogClient products={products} />
+      </main>
+    </>
   );
 }

@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function BackToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // 終極防彈版捲動偵測：同時檢查所有可能的捲動參數
@@ -41,10 +43,15 @@ export default function BackToTopButton() {
     });
   };
 
+  // 隱藏在 Sanity Studio 介面，以免擋住「發布」按鈕
+  if (pathname && pathname.startsWith('/studio')) {
+    return null;
+  }
+
   return (
-    <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[9999] flex flex-col gap-3 items-end pointer-events-none">
+    <div className={`fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-[9999] flex flex-row-reverse gap-3 items-center pointer-events-none transition-opacity duration-300`}>
       
-      {/* Back To Top Button (Always Visible 測試) */}
+      {/* Back To Top Button (Always Visible) */}
       <button
         onClick={scrollToTop}
         className="pointer-events-auto shrink-0 w-12 h-12 bg-surface-container-highest/95 backdrop-blur border border-outline-variant rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.2)] flex items-center justify-center text-primary hover:bg-surface-container-high hover:text-esg-emerald transition-all duration-300 active:scale-90 group"
