@@ -176,7 +176,10 @@ export async function POST(req) {
       }
     } 
     else if (type === 'hub') {
-      // 產業專區變更：刷新該產業主頁、產品清單、市場動態與供應鏈子路徑
+      // 產業專區變更：刷新首頁(因為有首頁展位)、該產業主頁、產品清單、市場動態與供應鏈子路徑
+      revalidatePath('/');
+      revalidatedPaths.push('/');
+      
       if (slug) {
         const paths = [
           `/hubs/${slug}`,

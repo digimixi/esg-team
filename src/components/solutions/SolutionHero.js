@@ -28,7 +28,11 @@ const SolutionHero = ({
     return (
       <section className="relative min-h-[180px] md:h-[500px] py-6 md:py-0 flex items-center overflow-hidden border-b border-outline-variant bg-surface-container-high">
         <div className="absolute inset-0 z-0">
-          <img src={imageUrl} className="w-full h-full object-cover opacity-60" alt={title} />
+          {imageUrl ? (
+            <img src={imageUrl} className="w-full h-full object-cover opacity-60" alt={title} />
+          ) : (
+            <div className="w-full h-full opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-surface/30 via-surface/80 to-surface"></div>
         </div>
         <div className="relative z-10 max-w-container-max mx-auto px-4 sm:px-margin w-full flex flex-col items-center text-center">
@@ -111,11 +115,15 @@ const SolutionHero = ({
       </div>
       
       <div className="flex-1 w-full h-[240px] sm:h-[320px] md:h-[400px] bg-surface-container-high rounded-lg overflow-hidden relative border border-outline-variant shadow-inner">
-        <img 
-          className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
-          src={imageUrl} 
-          alt={title} 
-        />
+        {imageUrl ? (
+          <img 
+            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
+            src={imageUrl} 
+            alt={title} 
+          />
+        ) : (
+          <div className="w-full h-full opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
       </div>
     </section>

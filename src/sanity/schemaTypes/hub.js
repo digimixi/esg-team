@@ -202,6 +202,108 @@ export default defineType({
       ]
     }),
     defineField({
+      name: 'trustSection',
+      title: '為什麼可信 (Trust & Traceability Section)',
+      type: 'object',
+      fields: [
+        { name: 'isActive', title: '啟用此區塊', type: 'boolean', initialValue: true },
+        { name: 'title', title: '標題', type: 'string', initialValue: '不只供貨，更重視可追溯與可稽核' },
+        { name: 'description', title: '描述文案', type: 'text' },
+        {
+          name: 'points',
+          title: '信賴指標 (Trust Points)',
+          type: 'array',
+          of: [
+            {
+              type: 'object',
+              fields: [
+                { name: 'title', title: '指標標題', type: 'string', description: '例如：批次追溯' },
+                { name: 'description', title: '說明', type: 'string' }
+              ]
+            }
+          ]
+        }
+      ]
+    }),
+    defineField({
+      name: 'materialFocus',
+      title: '主打產品深度解析 (Material Focus)',
+      type: 'array',
+      description: '用於展示如「增碳劑」、「石墨電極」等特定主打產品的詳細供應方案',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'title', title: '區塊標題', type: 'string', description: '例如：以增碳劑作為低風險的供應鏈導入起點' },
+            { name: 'materialName', title: '產品名稱', type: 'string', description: '例如：增碳劑 / 石墨電極' },
+            { name: 'description', title: '介紹文案', type: 'text' },
+            { 
+              name: 'bullets', 
+              title: '條列重點群組 (如：可提供資料、適用對象)', 
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    { name: 'groupTitle', title: '群組標題 (例如：可提供資料)', type: 'string' },
+                    { name: 'items', title: '具體項目', type: 'array', of: [{type: 'string'}] }
+                  ]
+                }
+              ]
+            },
+            { name: 'ctaText', title: '按鈕文字', type: 'string', description: '例如：申請增碳劑樣品' },
+            { 
+              name: 'image', 
+              title: '產品情境圖片', 
+              type: 'image', 
+              options: { hotspot: true },
+              description: '展示產品或應用場景的圖片，若不上傳則會顯示預設科技底紋'
+            }
+          ]
+        }
+      ]
+    }),
+    defineField({
+      name: 'esgSupport',
+      title: 'ESG 與出口歐美支援 (ESG Support Section)',
+      type: 'object',
+      fields: [
+        { name: 'isActive', title: '啟用此區塊', type: 'boolean', initialValue: true },
+        { name: 'title', title: '標題', type: 'string', initialValue: '讓材料資料跟得上 ESG 與歐美供應鏈要求' },
+        { name: 'description', title: '前言文案', type: 'text' },
+        { 
+          name: 'capabilities', 
+          title: '可協助準備的資料項目', 
+          type: 'array',
+          of: [{type: 'string'}]
+        },
+        { name: 'footerText', title: '底部說明文字', type: 'text' }
+      ]
+    }),
+    defineField({
+      name: 'processSteps',
+      title: '導入流程 (Onboarding Process Steps)',
+      type: 'object',
+      fields: [
+        { name: 'isActive', title: '啟用此區塊', type: 'boolean', initialValue: true },
+        { name: 'title', title: '標題', type: 'string', initialValue: '從資料交換到試用導入，降低替換風險' },
+        {
+          name: 'steps',
+          title: '步驟列表',
+          type: 'array',
+          of: [
+            {
+              type: 'object',
+              fields: [
+                { name: 'title', title: '步驟名稱', type: 'string' },
+                { name: 'description', title: '說明', type: 'text' }
+              ]
+            }
+          ]
+        }
+      ]
+    }),
+    defineField({
       name: 'productSectionTitle',
       title: '資源目錄區塊標題 (Product Section Title)',
       type: 'string',
@@ -262,6 +364,96 @@ export default defineType({
         { name: 'analysisDate', title: '分析日期', type: 'datetime', initialValue: (new Date()).toISOString() }
       ],
       description: '由 AI 根據全球數據生成的自動分析摘要'
+    }),
+    defineField({
+      name: 'valueChainMap',
+      title: '顧問專用產業地圖 (Value Chain Map)',
+      type: 'object',
+      fields: [
+        { name: 'isActive', title: '啟用並顯示地圖', type: 'boolean', initialValue: false },
+        { name: 'mapTitle', title: '地圖大標題', type: 'string', initialValue: '台灣鋼鐵與鑄造產業鏈 ESG 互動地圖' },
+        { name: 'mapSubtitle', title: '地圖副標題', type: 'string', initialValue: 'ESG 顧問專用戰略視圖：整合產業佈局、關鍵物資與循環經濟切入點' },
+        {
+          name: 'columns',
+          title: '欄位設定 (Columns)',
+          type: 'array',
+          of: [
+            {
+              type: 'object',
+              fields: [
+                { name: 'title', title: '欄位標題', type: 'string' },
+                { 
+                  name: 'topColor', 
+                  title: '頂部線條顏色', 
+                  type: 'string', 
+                  options: { list: [
+                    { title: '工業藍 (Industrial Blue)', value: 'bg-primary' },
+                    { title: '永續綠 (ESG Emerald)', value: 'bg-esg-emerald' },
+                    { title: '碳灰黑 (Carbon Black)', value: 'bg-neutral-800' },
+                    { title: '科技青 (Tech Cyan)', value: 'bg-cyan-600' },
+                    { title: '鍛造紫 (Forge Indigo)', value: 'bg-indigo-600' },
+                    { title: '工業橙 (Industrial Amber)', value: 'bg-amber-600' },
+                    { title: '深海綠 (Deep Teal)', value: 'bg-teal-700' },
+                    { title: '次要灰藍 (Slate Blue)', value: 'bg-secondary' }
+                  ]} 
+                },
+                {
+                  name: 'items',
+                  title: '標籤項目',
+                  type: 'array',
+                  of: [
+                    {
+                      type: 'object',
+                      fields: [
+                        { name: 'label', title: '標籤文字', type: 'string' },
+                        { name: 'type', title: '標籤顏色', type: 'string', options: { list: [{title: '綠色', value: 'green'}, {title: '藍色', value: 'blue'}], layout: 'radio' }, initialValue: 'green' }
+                      ]
+                    }
+                  ]
+                },
+                { name: 'descriptionTitle', title: '底部列表標題', type: 'string', initialValue: '代表廠商：' },
+                { name: 'companies', title: '底部列表內容', type: 'array', of: [{type: 'string'}] }
+              ]
+            }
+          ]
+        }
+      ]
+    }),
+    defineField({
+      name: 'prospectMap',
+      title: '顧問開發客戶地圖 (Prospect Map)',
+      type: 'object',
+      fields: [
+        { name: 'isActive', title: '啟用開發地圖', type: 'boolean', initialValue: true },
+        { name: 'title', title: '區塊標題', type: 'string', initialValue: 'Taiwan Steel-Linked Prospect Map' },
+        { name: 'subtitle', title: '中文大標題', type: 'string', initialValue: '台灣鋼鐵關聯產業潛在客戶地圖' },
+        { name: 'description', title: '說明文字', type: 'text', initialValue: 'ESG 顧問不一定直接服務鋼鐵廠，但在碳盤查、永續報告、供應鏈盤點與客戶問卷過程中，會接觸大量使用鋼材、鑄件、扣件、金屬零件與高溫製程耗材的企業。這些企業正是 ESG Material Solutions 的導入場景。' },
+        {
+          name: 'rows',
+          title: '客戶名單資料庫 (Database Rows)',
+          type: 'array',
+          of: [
+            {
+              type: 'object',
+              fields: [
+                { name: 'priority', title: '優先級 (Priority)', type: 'string', options: { list: ['S級', 'A級', 'B級'] } },
+                { name: 'companyName', title: '公司名稱', type: 'string' },
+                { name: 'position', title: '產業位置', type: 'string', options: { list: ['上游 (煉鋼/鋼胚)', '中游 (熱軋/冷軋/製管)', '下游 (扣件/線材)', '下游 (鑄造/鍛造/熱處理)', '下游 (鋼構/營建)'] } },
+                { name: 'productType', title: '產品類型', type: 'string' },
+                { name: 'painPoints', title: 'ESG 痛點', type: 'string' },
+                { 
+                  name: 'materials', 
+                  title: '可導入材料', 
+                  type: 'array',
+                  of: [{ type: 'string', options: { list: ['石墨電極', '增碳劑', '石墨坩堝', '低碳鋼材', '鋼渣循環材料', 'Material Passport', '碳資料溯源'] } }]
+                },
+                { name: 'pitch', title: '顧問切入點 (Pitch)', type: 'string' },
+                { name: 'verification', title: '可信度', type: 'string', options: { list: ['Verified', 'Estimated', 'To Verify'] }, initialValue: 'Verified' }
+              ]
+            }
+          ]
+        }
+      ]
     }),
   ],
   orderings: [

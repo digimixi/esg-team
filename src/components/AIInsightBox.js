@@ -45,9 +45,8 @@ const AIInsightBox = ({ insight }) => {
 
               <div className="relative mb-8 min-h-[100px]">
                 <p className="text-body-lg text-primary leading-relaxed font-medium animate-in fade-in slide-in-from-bottom-2 duration-1000">
-                  {insightText || "當前 AI 正在解析全球碳強度波動與產業採購動向，請稍後..."}
+                  {insightText || "供應鏈風險與碳資料趨勢分析。"}
                 </p>
-                <span className="inline-block w-1 h-5 bg-esg-emerald animate-pulse ml-1 align-middle"></span>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -94,9 +93,10 @@ const AIInsightBox = ({ insight }) => {
                 <h4 className="text-[11px] font-bold text-outline uppercase tracking-widest mb-4">AI 掃描參數</h4>
                 <div className="space-y-4">
                   {[
-                    { label: 'Supply Chain Volatility', value: 'Low' },
-                    { label: 'Carbon Pricing Trend', value: 'Rising' },
-                    { label: 'Regional Compliance', value: 'Strict' }
+                    { label: '供應鏈波動', value: '中' },
+                    { label: '碳成本趨勢', value: '上升' },
+                    { label: '區域合規要求', value: '提高' },
+                    { label: '資料完整度要求', value: '提高' }
                   ].map((param, i) => (
                     <div key={i} className="flex justify-between items-center border-b border-outline-variant/30 pb-2">
                       <span className="text-[10px] text-secondary">{param.label}</span>
@@ -104,9 +104,9 @@ const AIInsightBox = ({ insight }) => {
                     </div>
                   ))}
                 </div>
-                <button className="w-full mt-6 py-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-2">
-                  獲取完整顧問報告 <span className="material-symbols-outlined text-sm">download</span>
-                </button>
+                <a href="#onboard-form" className="w-full mt-6 py-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-2">
+                  索取供應鏈評估資料 <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
               </div>
               <div className="absolute top-0 right-0 w-full h-full opacity-[0.03]" style={{ 
                 backgroundImage: 'linear-gradient(45deg, var(--m3-sys-color-primary) 1px, transparent 1px), linear-gradient(-45deg, var(--m3-sys-color-primary) 1px, transparent 1px)',

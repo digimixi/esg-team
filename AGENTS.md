@@ -88,3 +88,13 @@ Next.js 15 has introduced highly restrictive CORS policies for dev resources (li
 - **The Hydration Block**: If a user is testing the local dev server from a mobile device on the same Wi-Fi network (e.g., `192.168.x.x`), Next.js 15 will default to blocking the device from downloading the JavaScript bundles. The page will render the HTML, but **all React `onClick` events will be dead**.
 - **The Fix**: You MUST ensure the user's IP is added to the root of `next.config.mjs` under `allowedDevOrigins: ['<ip>', 'localhost']`. Do not put it under `experimental`.
 - **Troubleshooting**: If the user reports "cannot click buttons on mobile but normal links work", check the server logs for `Blocked cross-origin request to Next.js dev resource` immediately before doing any CSS or z-index debugging.
+
+## 8. Cloud Deployment Protocol (Google Cloud Run)
+
+Unlike standard Vercel deployments triggered by a Git push, this repository is deployed using Docker Standalone on Google Cloud Run. **Pushing to Git alone will NOT update the live site.**
+
+When a user requests a deployment or updates to the cloud:
+1. **Read `MAINTENANCE.md`**: Do not guess the deployment script. Always refer to `MAINTENANCE.md` for the exact PowerShell deployment commands.
+2. **Inject Environment Variables**: The `Dockerfile` requires variables (like `NEXT_PUBLIC_SANITY_PROJECT_ID`) to be passed via `gcloud run deploy --set-env-vars`.
+3. **Execute via Script**: Create a temporary script (e.g., `scratch/deploy.ps1`) to extract tokens from `.env.local` and run `gcloud run deploy`. DO NOT print sensitive tokens (like `SANITY_WRITE_TOKEN` or `GEMINI_API_KEY`) to the terminal.
+4. **Confirm to User**: After triggering the background task, explicitly inform the user that the Google Cloud Run deployment has started and may take a few minutes to build.

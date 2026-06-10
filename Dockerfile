@@ -11,13 +11,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# ?³å…¥?°å?è®Šæ•¸ï¼ˆæ?å»ºæ??€è¦ï?
-ARG NEXT_PUBLIC_SANITY_PROJECT_ID="2euox6d1"
-ARG NEXT_PUBLIC_SANITY_DATASET="production"
+# æ³¨å…¥?°å?è®Šæ•¸ï¼ˆç·¨è­¯æ??€è¦ï?
+ARG NEXT_PUBLIC_SANITY_PROJECT_ID=2euox6d1
+ARG NEXT_PUBLIC_SANITY_DATASET=production
 ENV NEXT_PUBLIC_SANITY_PROJECT_ID=$NEXT_PUBLIC_SANITY_PROJECT_ID
 ENV NEXT_PUBLIC_SANITY_DATASET=$NEXT_PUBLIC_SANITY_DATASET
 
-# å¼·åˆ¶å°‡è??¸å¯«??.env æª”æ?ï¼Œç¢ºä¿?Next.js ?¨ç·¨è­¯é?æ®µèƒ½è®€??RUN echo "NEXT_PUBLIC_SANITY_PROJECT_ID=$NEXT_PUBLIC_SANITY_PROJECT_ID" >> .env
+# å¼·åˆ¶å¯«å…¥ .env ç¢ºä? Next.js è®€??RUN echo "NEXT_PUBLIC_SANITY_PROJECT_ID=$NEXT_PUBLIC_SANITY_PROJECT_ID" >> .env
 RUN echo "NEXT_PUBLIC_SANITY_DATASET=$NEXT_PUBLIC_SANITY_DATASET" >> .env
 
 RUN npm run build

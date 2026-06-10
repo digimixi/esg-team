@@ -6,6 +6,7 @@ import { sourceBookmark } from './sourceBookmark'
 import hub from './hub'
 import partner from './partner'
 import solution from './solution'
+import lead from './lead'
 
 import eduPage from './eduPage'
 import industryBenchmark from './industryBenchmark'
@@ -27,6 +28,7 @@ export const schema = {
     insight, 
     sourceBookmark, 
     solution,
+    lead,
     eduPage,
     industryBenchmark,
     company,
