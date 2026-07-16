@@ -127,6 +127,8 @@ export default async function HubHome({ params }) {
     hubId: hub._id 
   }, { useCdn: false });
 
+  const actualHubId = hub._id.replace(/^drafts\./, '');
+
   const eduPages = await client.fetch(`*[_type == "eduPage" && (
     $hubId in relatedHubs[]._ref || 
     hub._ref == $hubId
@@ -134,7 +136,7 @@ export default async function HubHome({ params }) {
     _id,
     title,
     "slug": slug.current
-  }`, { hubId: hub._id }, { useCdn: false });
+  }`, { hubId: actualHubId }, { useCdn: false });
 
   const techObservations = await client.fetch(`*[_type == "techObservation" && (
     $hubId in relatedHubs[]._ref
@@ -144,11 +146,11 @@ export default async function HubHome({ params }) {
     subtitle,
     "slug": slug.current,
     "imageUrl": heroImage.asset->url
-  }`, { hubId: hub._id }, { useCdn: false });
+  }`, { hubId: actualHubId }, { useCdn: false });
 
   const benchmarks = await client.fetch(`*[_type == "industryBenchmark" && (
     hub._ref == $hubId || category == "intensity"
-  )] | order(currentValue asc)`, { hubId: hub._id }, { useCdn: false });
+  )] | order(currentValue asc)`, { hubId: actualHubId }, { useCdn: false });
 
   return (
     <>
