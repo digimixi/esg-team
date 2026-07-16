@@ -1,7 +1,10 @@
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
+
 export const product = {
   name: 'product',
   title: '工業資源目錄 (Product Catalog)',
   type: 'document',
+  orderings: [orderRankOrdering],
   fields: [
     { 
       name: 'title', 
@@ -9,6 +12,7 @@ export const product = {
       type: 'string',
       validation: Rule => Rule.required()
     },
+    orderRankField({ type: 'product' }),
     { 
       name: 'subtitle', 
       title: '英文名稱 (Subtitle)', 
@@ -30,6 +34,27 @@ export const product = {
       type: 'reference',
       to: [{ type: 'hub' }],
       description: '選擇此產品屬於哪個專題生態系',
+    },
+    {
+      name: 'vendor',
+      title: '所屬供應商 (Vendor)',
+      type: 'reference',
+      to: [{ type: 'vendor' }],
+      description: '選擇此產品所屬的供應商（若是官方自營則留空）',
+    },
+    {
+      name: 'status',
+      title: '上架審核狀態 (Status)',
+      type: 'string',
+      options: {
+        list: [
+          { title: '草稿 (Draft)', value: 'draft' },
+          { title: '待審核 (Under Review)', value: 'under_review' },
+          { title: '已發布 (Published)', value: 'published' }
+        ]
+      },
+      initialValue: 'published',
+      description: '供應商前台上架的產品預設為待審核'
     },
     {
       name: 'category',

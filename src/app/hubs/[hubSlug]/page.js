@@ -136,6 +136,16 @@ export default async function HubHome({ params }) {
     "slug": slug.current
   }`, { hubId: hub._id }, { useCdn: false });
 
+  const techObservations = await client.fetch(`*[_type == "techObservation" && (
+    $hubId in relatedHubs[]._ref
+  )] {
+    _id,
+    title,
+    subtitle,
+    "slug": slug.current,
+    "imageUrl": heroImage.asset->url
+  }`, { hubId: hub._id }, { useCdn: false });
+
   const benchmarks = await client.fetch(`*[_type == "industryBenchmark" && (
     hub._ref == $hubId || category == "intensity"
   )] | order(currentValue asc)`, { hubId: hub._id }, { useCdn: false });
@@ -154,6 +164,7 @@ export default async function HubHome({ params }) {
       <StickyJumpNav links={[
         { label: '解決方案', href: '#solutions', isPrimary: true },
         { label: '市場實時指數', href: '#market-index' },
+        { label: '技術觀察', href: '#observations' },
         { label: '解碼核心資產', href: '#education' },
         { label: '資源目錄', href: '#products' },
         { label: '供應鏈情報', href: '#intelligence' }
@@ -423,6 +434,39 @@ export default async function HubHome({ params }) {
         </section>
 
         <AIInsightBox insight={hub.aiInsight} />
+
+        {/* Tech Observations Section */}
+        {techObservations.length > 0 && (
+          <section id="observations" className="py-stack-lg px-margin max-w-container-max mx-auto scroll-mt-24 border-b border-outline-variant">
+            <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg text-center">技術觀察與企業採訪</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+              {techObservations.map((obs) => (
+                <a key={obs._id} href={`/insights/${obs.slug}`} className="group block bg-surface-container-lowest border border-outline-variant hover:border-primary/50 hover:shadow-xl transition-all rounded-2xl overflow-hidden text-left">
+                  <div className="h-48 w-full bg-surface-variant relative overflow-hidden border-b border-outline-variant">
+                    {obs.imageUrl ? (
+                      <img src={obs.imageUrl} alt={obs.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-outline-variant">
+                        <span className="material-symbols-outlined text-4xl">visibility</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <div className="inline-block px-3 py-1 bg-surface-container-high text-secondary text-[11px] font-bold tracking-widest uppercase mb-4 border border-outline-variant">
+                      Tech Observation
+                    </div>
+                    <h3 className="font-bold text-lg text-primary mb-2 line-clamp-2 group-hover:text-esg-emerald transition-colors">{obs.title}</h3>
+                    {obs.subtitle && <p className="text-sm text-on-surface-variant line-clamp-2 mb-4">{obs.subtitle}</p>}
+                    <div className="flex items-center text-primary font-bold text-sm">
+                      <span>閱讀完整觀察</span>
+                      <span className="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Education Section */}
         <section id="education" className="bg-surface-container-lowest py-stack-lg px-margin max-w-container-max mx-auto border-b border-outline-variant text-center scroll-mt-24">

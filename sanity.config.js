@@ -15,6 +15,7 @@ import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
 import {zhHantLocale} from '@sanity/locale-zh-hant'
 import { QuickCloneAction } from './src/sanity/actions/QuickCloneAction'
+import { KnowledgeOSManualTool } from './src/sanity/tools/KnowledgeOSManualTool'
 
 export default defineConfig({
   basePath: '/studio',
@@ -52,6 +53,11 @@ export default defineConfig({
           />
         </div>
       ),
+    },
+    {
+      name: 'knowledge-manual',
+      title: '📖 知識庫操作手冊',
+      component: KnowledgeOSManualTool,
     }
   ]
 })

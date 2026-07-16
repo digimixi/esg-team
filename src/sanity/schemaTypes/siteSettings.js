@@ -40,6 +40,14 @@ export const siteSettings = {
       type: 'string',
       description: '例如：Global ESG Macros',
       initialValue: 'Global ESG Macros',
+    },
+    {
+      name: 'visitorCount',
+      title: '總瀏覽人數 (Visitor Count)',
+      type: 'number',
+      description: '網站上線以來的總瀏覽人數 (自動累加)',
+      initialValue: 0,
+      readOnly: true
     }
   ],
 }

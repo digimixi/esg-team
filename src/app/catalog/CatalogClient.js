@@ -21,9 +21,13 @@ const ESG_TAGS = [
 export default function CatalogClient({ products }) {
   const [activeSubCategory, setActiveSubCategory] = useState('all');
   const [activeEsgFilters, setActiveEsgFilters] = useState([]);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [viewMode, setViewMode] = useState('list'); // 'grid' | 'list'
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Swipe State
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   // Filter Logic
   const filteredProducts = products.filter(p => {
@@ -53,6 +57,40 @@ export default function CatalogClient({ products }) {
     return products.filter(p => p.subCategory === catValue).length;
   };
 
+  // Presentation Mode Navigation
+  const currentProductIndex = selectedProduct ? filteredProducts.findIndex(p => p._id === selectedProduct._id) : -1;
+
+  const handlePrevProduct = () => {
+    if (currentProductIndex > 0) {
+      setSelectedProduct(filteredProducts[currentProductIndex - 1]);
+    }
+  };
+
+  const handleNextProduct = () => {
+    if (currentProductIndex !== -1 && currentProductIndex < filteredProducts.length - 1) {
+      setSelectedProduct(filteredProducts[currentProductIndex + 1]);
+    }
+  };
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) handleNextProduct();
+    if (isRightSwipe) handlePrevProduct();
+  };
+
   return (
     <div className="min-h-screen bg-surface-container-lowest">
       {/* Hero Section */}
@@ -61,15 +99,52 @@ export default function CatalogClient({ products }) {
           <span className="bg-primary/10 text-primary px-3 py-1 rounded-full font-label-sm mb-4 inline-block">
             Global Partner Network
           </span>
-          <h1 className="font-display-lg text-display-lg text-primary mb-4">ESG 認證供應鏈大廳</h1>
+          <h1 className="font-display-lg text-display-lg text-primary mb-4">供應鏈大廳</h1>
           <p className="text-on-surface-variant max-w-2xl mx-auto">
             探索經過嚴格稽核的高效能低碳材料、綠色設備與專業合規服務。一站式建構您的淨零排放價值鏈。
           </p>
+
+          {/* Mobile Quick Category Navigation */}
+          <div className="mt-8 grid grid-cols-2 gap-3 lg:hidden">
+            {PRODUCT_CATEGORIES.filter(c => c.value !== 'all').map(cat => {
+              const catConfig = {
+                'graphite_electrode': { icon: 'bolt', bg: 'bg-blue-50', text: 'text-blue-700' },
+                'graphite_crucible': { icon: 'soup_kitchen', bg: 'bg-orange-50', text: 'text-orange-700' },
+                'carbon_additive': { icon: 'scatter_plot', bg: 'bg-stone-50', text: 'text-stone-700' },
+                'graphite_materials': { icon: 'deployed_code', bg: 'bg-gray-50', text: 'text-gray-700' },
+              };
+              const conf = catConfig[cat.value] || { icon: 'category', bg: 'bg-gray-50', text: 'text-gray-700' };
+
+              return (
+                <button
+                  key={cat.value}
+                  onClick={() => {
+                    setActiveSubCategory(cat.value);
+                    const el = document.getElementById('catalog-content');
+                    if(el) window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' });
+                  }}
+                  className="flex items-center p-3 rounded-xl border border-gray-200 shadow-sm bg-white hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className={`w-10 h-10 rounded-lg ${conf.bg} ${conf.text} flex items-center justify-center mr-3 flex-shrink-0`}>
+                    <span className="material-symbols-outlined">{conf.icon}</span>
+                  </div>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="font-bold text-sm text-gray-900 leading-tight truncate">
+                      {cat.label.split(' ')[0]}
+                    </span>
+                    <span className="text-[10px] text-gray-500 uppercase mt-0.5 truncate">
+                      {cat.label.split(' ').slice(1).join(' ')}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* Main Content Area - Two Columns */}
-      <section className="py-stack-lg px-margin max-w-container-max mx-auto relative">
+      <section id="catalog-content" className="py-stack-lg px-margin max-w-container-max mx-auto relative">
         <div className="flex flex-col lg:flex-row gap-8">
           
           {/* Mobile Filter Button */}
@@ -84,11 +159,11 @@ export default function CatalogClient({ products }) {
             
             {/* View Toggles (Mobile) */}
             <div className="flex bg-gray-100 p-1 rounded-lg">
-              <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}>
-                <span className="material-symbols-outlined text-sm leading-none">grid_view</span>
-              </button>
               <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}>
                 <span className="material-symbols-outlined text-sm leading-none">view_list</span>
+              </button>
+              <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-gray-400'}`}>
+                <span className="material-symbols-outlined text-sm leading-none">grid_view</span>
               </button>
             </div>
           </div>
@@ -171,11 +246,11 @@ export default function CatalogClient({ products }) {
               
               {/* View Toggles (Desktop) */}
               <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
-                <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-900'}`}>
-                  <span className="material-symbols-outlined text-sm leading-none">grid_view</span>
-                </button>
                 <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-900'}`}>
                   <span className="material-symbols-outlined text-sm leading-none">view_list</span>
+                </button>
+                <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-900'}`}>
+                  <span className="material-symbols-outlined text-sm leading-none">grid_view</span>
                 </button>
               </div>
             </div>
@@ -291,9 +366,33 @@ export default function CatalogClient({ products }) {
           />
           
           {/* Drawer Panel */}
-          <div className="relative w-full max-w-md md:max-w-xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
+          <div 
+            className="relative w-full max-w-md md:max-w-xl bg-white h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
             {/* Drawer Header (Image) */}
             <div className="relative h-64 bg-gray-50 flex-shrink-0 flex items-center justify-center border-b border-gray-100">
+              {/* Prev/Next Controls */}
+              <div className="absolute top-4 left-4 z-10 flex gap-2">
+                <button 
+                  onClick={handlePrevProduct}
+                  disabled={currentProductIndex <= 0}
+                  className={`bg-black/40 text-white rounded-full p-2 backdrop-blur-md transition-colors ${currentProductIndex <= 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-black/60'}`}
+                  title="上一筆 (向右滑動)"
+                >
+                  <span className="material-symbols-outlined text-xl leading-none">chevron_left</span>
+                </button>
+                <button 
+                  onClick={handleNextProduct}
+                  disabled={currentProductIndex === -1 || currentProductIndex >= filteredProducts.length - 1}
+                  className={`bg-black/40 text-white rounded-full p-2 backdrop-blur-md transition-colors ${currentProductIndex === -1 || currentProductIndex >= filteredProducts.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-black/60'}`}
+                  title="下一筆 (向左滑動)"
+                >
+                  <span className="material-symbols-outlined text-xl leading-none">chevron_right</span>
+                </button>
+              </div>
               {selectedProduct.image ? (
                 <img 
                   src={urlFor(selectedProduct.image).width(800).url()} 

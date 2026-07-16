@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'next-sanity';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +43,21 @@ export async function POST(req) {
       hubSource: data.hubSource || 'unknown',
       status: 'new'
     };
+
+    const cookieStore = await cookies();
+    const partnerRefCode = cookieStore.get('esg_partner_ref')?.value;
+
+    if (partnerRefCode) {
+      console.log(`[Leads API] Found referral code: ${partnerRefCode}`);
+      const partnerQuery = `*[_type == "broker" && partnerCode == $code][0]`;
+      const partner = await writeClient.fetch(partnerQuery, { code: partnerRefCode });
+      if (partner) {
+        leadDoc.referral = {
+          _type: 'reference',
+          _ref: partner._id
+        };
+      }
+    }
 
     console.log('[Leads API] Creating new lead document in Sanity...');
     const createdLead = await writeClient.create(leadDoc);

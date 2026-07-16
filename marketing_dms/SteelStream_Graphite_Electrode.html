@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteelStream 石墨電極產品 DM - ESG.team</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        
+        :root {
+            --color-primary: #1E3A8A; /* Industrial Blue */
+            --color-esg: #10B981; /* ESG Emerald */
+            --color-surface: #F3F4F6; /* High-end Gray */
+            --color-surface-dark: #1F2937;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', 'Inter', sans-serif;
+            background-color: #52525B;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media print {
+            body { background-color: transparent; padding: 0; margin: 0; gap: 0; }
+            .page { box-shadow: none; margin: 0; page-break-after: always; }
+            @page { size: A4; margin: 0; }
+        }
+
+        .border-1px { border: 1px solid #E5E7EB; }
+        .text-primary { color: var(--color-primary); }
+        .bg-primary { background-color: var(--color-primary); }
+        .text-esg { color: var(--color-esg); }
+        .bg-esg { background-color: var(--color-esg); }
+        .bg-surface { background-color: var(--color-surface); }
+        .bg-surface-dark { background-color: var(--color-surface-dark); }
+        
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, #f1f1f1 1px, transparent 1px),
+                              linear-gradient(to bottom, #f1f1f1 1px, transparent 1px);
+        }
+        
+        .hero-pattern {
+            background-color: #1F2937;
+            background-image: radial-gradient(#374151 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page 1: Hero & Value Prop -->
+    <div class="page bg-grid p-12">
+        <header class="flex justify-between items-end border-b-2 border-gray-900 pb-4 mb-8">
+            <div>
+                <h2 class="text-4xl font-black text-gray-900 tracking-tight flex items-baseline">
+                    ESG.team <span class="text-2xl text-gray-400 font-light mx-2">|</span> <span class="text-primary">SteelStream</span>
+                </h2>
+                <p class="text-sm text-gray-500 font-semibold tracking-widest mt-1">石墨電極供應與 ESG 方案</p>
+            </div>
+            <div class="text-right">
+                <span class="inline-block bg-gray-900 text-white text-xs font-bold px-3 py-1 uppercase tracking-widest">PRODUCT BRIEF v0.3</span>
+            </div>
+        </header>
+
+        <main class="flex-grow flex flex-col justify-start">
+            <div class="hero-pattern w-full rounded-lg p-10 mb-8 border border-gray-700 shadow-lg relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/90 to-transparent z-0"></div>
+                <div class="relative z-10 text-white w-3/4">
+                    <div class="inline-block bg-esg text-white text-xs font-bold px-2 py-1 mb-4 rounded-sm">UHP 600mm / 700mm</div>
+                    <h1 class="text-5xl font-black leading-tight mb-4 tracking-tight">
+                        高階電爐煉鋼核心<br>
+                        石墨電極解決方案
+                    </h1>
+                    <p class="text-lg text-gray-300 font-medium border-l-4 border-esg pl-4 mb-2">
+                        試爐風險控管｜斷棒補償｜供應不中斷保障
+                    </p>
+                </div>
+            </div>
+
+            <p class="text-lg text-gray-700 font-medium mb-8 leading-relaxed text-center px-8">
+                不僅具備價格優勢，我們更以「技術規格、第三方檢測、試爐數據、斷棒責任控管、履約保障」協助鋼廠降低總持有成本與導入風險。
+            </p>
+
+            <div class="grid grid-cols-3 gap-6 mb-10">
+                <div class="bg-white p-6 border-t-4 border-primary shadow-sm">
+                    <div class="text-3xl font-black text-gray-200 mb-2 font-mono">01</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">高階定位</h3>
+                    <p class="text-gray-600 text-sm">涵蓋 RP/HP/UHP/SHP 系列，UHP 600mm 以上可依高功率電弧爐條件進行規格評估。</p>
+                </div>
+                <div class="bg-white p-6 border-t-4 border-primary shadow-sm">
+                    <div class="text-3xl font-black text-gray-200 mb-2 font-mono">02</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">導入價值</h3>
+                    <p class="text-gray-600 text-sm">拒絕單純比價。嚴格關注 kg/t 鋼單耗、接頭穩定、斷棒率與停爐風險，優化整體 TCO。</p>
+                </div>
+                <div class="bg-white p-6 border-t-4 border-esg shadow-sm">
+                    <div class="text-3xl font-black text-gray-200 mb-2 font-mono">03</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">ESG 支援</h3>
+                    <p class="text-gray-600 text-sm">依批次整理 TDS、COA、SDS、ISO、原產地聲明與碳足跡盤查路徑，完美應對合規審查。</p>
+                </div>
+            </div>
+
+            <!-- Application Scenarios -->
+            <div class="bg-surface p-8 border-1px rounded-lg">
+                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <span class="bg-primary w-4 h-4 inline-block mr-3"></span> 適用煉鋼場景
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-esg mr-3 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <span class="font-bold text-gray-900">電弧爐煉鋼 (EAF)：</span>
+                            <span class="text-gray-700 text-sm">普碳鋼、線材、螺紋鋼與型鋼生產，確保大產能連續運作。</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-esg mr-3 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <span class="font-bold text-gray-900">不鏽鋼 / 特殊鋼：</span>
+                            <span class="text-gray-700 text-sm">對接頭穩定度要求高，需進行極低雜質碳材管理。</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-esg mr-3 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <span class="font-bold text-gray-900">鑄造與金屬熔煉：</span>
+                            <span class="text-gray-700 text-sm">可依據爐型、功率與製程條件，客製化評估最適合的規格。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="mt-8 flex justify-between items-center text-xs text-gray-500 font-mono pt-4 border-t border-gray-200">
+            <span>// STEELSTREAM BY ESG.TEAM</span>
+            <span>PAGE 01 / 03</span>
+        </footer>
+    </div>
+
+    <!-- Page 2: Specs & Evaluation -->
+    <div class="page bg-white p-12">
+        <header class="flex justify-between items-end border-b-2 border-gray-900 pb-4 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">產品矩陣與技術評估重點</h2>
+            <span class="text-xs text-gray-500 font-mono uppercase">Specs & Evaluation Matrix</span>
+        </header>
+
+        <main class="flex-grow flex flex-col gap-8">
+            
+            <p class="text-gray-700 font-medium">從規格匹配到試爐指標，提供透明數據讓採購、技術與 ESG 部門可共同審查。</p>
+
+            <!-- Product Matrix -->
+            <div class="flex border-1px bg-surface overflow-hidden">
+                <div class="w-1/3 bg-gray-200 relative">
+                    <!-- Image placeholder -->
+                    <div class="absolute inset-0 flex items-center justify-center text-gray-400 font-mono text-xs text-center p-4">
+                        [ 石墨電極產品圖片區 ]<br>展示本體與精密接頭
+                    </div>
+                </div>
+                <div class="w-2/3 p-6 bg-white">
+                    <h3 class="text-lg font-bold text-primary mb-4 border-b border-gray-100 pb-2">功率與應用類型</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <span class="w-32 inline-block bg-gray-100 text-gray-800 font-bold px-3 py-1 rounded text-sm text-center">RP 普通功率</span>
+                            <span class="ml-4 text-gray-600 text-sm">標準 EAF 操作與通用鋼材生產</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-32 inline-block bg-gray-200 text-gray-800 font-bold px-3 py-1 rounded text-sm text-center">HP 高功率</span>
+                            <span class="ml-4 text-gray-600 text-sm">高產能煉鋼與較高電流負荷環境</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-32 inline-block bg-primary text-white font-bold px-3 py-1 rounded text-sm text-center">UHP / SHP</span>
+                            <span class="ml-4 text-gray-600 text-sm font-semibold">高強度、嚴苛工況與最大化產出需求 (主推)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deep Evaluation Metrics -->
+            <section class="mt-4">
+                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                    <span class="bg-gray-900 w-4 h-4 inline-block mr-2"></span> UHP 石墨電極審查指標 - 試爐前資料包
+                </h3>
+                <div class="overflow-hidden border border-gray-300 rounded-t-lg">
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead class="bg-primary text-white font-medium tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4 w-1/5">審查面向</th>
+                                <th class="px-6 py-4 w-2/5">關鍵資料與檢測項目</th>
+                                <th class="px-6 py-4 w-2/5">鋼廠關注與解決痛點</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-800 bg-white">
+                            <tr class="border-b border-gray-200">
+                                <td class="px-6 py-4 font-bold text-primary bg-gray-50">熱穩定</td>
+                                <td class="px-6 py-4 text-gray-700">CTE 熱膨脹係數、抗熱震能力</td>
+                                <td class="px-6 py-4 font-medium">影響爐況穩定、熱衝擊與斷裂風險</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="px-6 py-4 font-bold text-primary bg-gray-50">導電效率</td>
+                                <td class="px-6 py-4 text-gray-700">本體與接頭電阻率、電流穩定</td>
+                                <td class="px-6 py-4 font-medium">影響能耗 (電力成本)、熔化效率與電極單耗</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="px-6 py-4 font-bold text-primary bg-gray-50">機械強度</td>
+                                <td class="px-6 py-4 text-gray-700">體積密度、抗折強度、接頭精密度</td>
+                                <td class="px-6 py-4 font-medium">影響接頭穩定、斷棒率與非預期停爐風險</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="px-6 py-4 font-bold text-primary bg-gray-50">製程品質</td>
+                                <td class="px-6 py-4 text-gray-700">石墨化工法、浸漬與焙燒工序</td>
+                                <td class="px-6 py-4 font-medium">反映產品均質性、緻密度與批次穩定度</td>
+                            </tr>
+                            <tr class="border-b border-gray-200">
+                                <td class="px-6 py-4 font-bold text-primary bg-gray-50">原料來源</td>
+                                <td class="px-6 py-4 text-gray-700">針狀焦來源、灰分與雜質控制</td>
+                                <td class="px-6 py-4 font-medium">影響高階鋼種品質與 ESG / 供應鏈合法性審查</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-bold text-primary bg-gray-50">交付包裝</td>
+                                <td class="px-6 py-4 text-gray-700">批號溯源、吊裝保護、防潮與到貨照片</td>
+                                <td class="px-6 py-4 font-medium">降低運輸破損與現場倉儲管理風險</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TCO Reminder -->
+            <div class="bg-gray-50 border-l-4 border-esg p-5 mt-4 text-sm text-gray-700">
+                <strong class="text-gray-900">TCO 模型核心理念：</strong>「單價低不等於成本低」。透過上述指標的嚴格管控，我們致力於為您降低 <strong>每噸鋼水的石墨電極總耗用成本</strong>，包含隱性的斷棒停工與更換損失。
+            </div>
+
+        </main>
+
+        <footer class="mt-8 flex justify-between items-center text-xs text-gray-500 font-mono pt-4 border-t border-gray-200">
+            <span>// STEELSTREAM BY ESG.TEAM</span>
+            <span>PAGE 02 / 03</span>
+        </footer>
+    </div>
+
+    <!-- Page 3: Guarantees & Workflow -->
+    <div class="page bg-surface-dark text-white p-12">
+        <header class="flex justify-between items-end border-b-2 border-gray-600 pb-4 mb-8">
+            <h2 class="text-2xl font-bold text-white">導入保障：從不斷鏈到斷棒控管</h2>
+            <span class="text-xs text-gray-400 font-mono uppercase">Guarantees & Onboarding</span>
+        </header>
+
+        <main class="flex-grow flex flex-col gap-8">
+            
+            <p class="text-gray-300 font-medium">先驗證、再擴大；以試爐數據、文件化、補償機制與履約保障支援長期供貨。</p>
+
+            <!-- Core Guarantees -->
+            <div class="grid grid-cols-3 gap-5">
+                <div class="bg-gray-800 border border-gray-600 p-6 rounded-lg relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-esg"></div>
+                    <div class="text-4xl mb-4">🏭</div>
+                    <h3 class="text-lg font-bold text-white mb-2">A級工廠供應保障</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">供應端表示已取得中央 A 級工廠評定，可提供證明。有效降低政策性限產、環保管制與區域停工造成的斷供風險。</p>
+                </div>
+                <div class="bg-gray-800 border border-gray-600 p-6 rounded-lg relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                    <div class="text-4xl mb-4">🛡️</div>
+                    <h3 class="text-lg font-bold text-white mb-2">斷棒補償機制</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">依試爐條件、批號追蹤、操作紀錄與斷棒位置照片，進行客觀異常判定流程。啟動補貨、替換、折讓或下批抵扣等補償。</p>
+                </div>
+                <div class="bg-gray-800 border border-gray-600 p-6 rounded-lg relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gray-400"></div>
+                    <div class="text-4xl mb-4">📝</div>
+                    <h3 class="text-lg font-bold text-white mb-2">長約履約保險規劃</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">進入正式長約階段，可要求供應商導入履約保險或等效履約保障，大幅降低鋼廠首次導入新供應鏈的停爐與品質責任風險。</p>
+                </div>
+            </div>
+
+            <!-- 6-Step Workflow -->
+            <section class="mt-4">
+                <h3 class="text-xl font-bold text-esg mb-6 border-l-4 border-esg pl-3">標準化試爐導入流程</h3>
+                <div class="grid grid-cols-3 gap-y-8 gap-x-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">1</div>
+                        <div>
+                            <h4 class="font-bold text-white mb-1">需求盤點</h4>
+                            <p class="text-xs text-gray-400">確認爐型、功率、目前規格、月耗與當前痛點。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">2</div>
+                        <div>
+                            <h4 class="font-bold text-white mb-1">資料與 ESG 審查</h4>
+                            <p class="text-xs text-gray-400">提交 TDS / COA / SDS / ISO 50001 / 原產地 / 碳足跡路徑審查。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">3</div>
+                        <div>
+                            <h4 class="font-bold text-white mb-1">第三方檢測</h4>
+                            <p class="text-xs text-gray-400">確認物性、化性、接頭尺寸與批次一致性。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-esg text-white flex items-center justify-center font-bold shrink-0">4</div>
+                        <div>
+                            <h4 class="font-bold text-white mb-1">小批試爐</h4>
+                            <p class="text-xs text-gray-400">嚴格記錄單耗、斷棒、電耗、爐況、操作條件與異常照片。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-esg text-white flex items-center justify-center font-bold shrink-0">5</div>
+                        <div>
+                            <h4 class="font-bold text-white mb-1">TCO 評估</h4>
+                            <p class="text-xs text-gray-400">綜合比較單價、單耗、停爐風險與庫存成本。</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold shrink-0">6</div>
+                        <div>
+                            <h4 class="font-bold text-white mb-1">長期穩供</h4>
+                            <p class="text-xs text-gray-400">三維防斷鏈：主供/備援建立、物流文件同步、在地窗口對接。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <section class="mt-auto bg-gray-800 p-6 border border-primary text-center rounded-lg">
+                <h3 class="text-2xl font-bold text-white mb-2">啟動供應鏈優化計畫</h3>
+                <p class="text-esg font-bold text-lg mb-4">🔥 增碳劑免費試用 ＋ 石墨電極小批試爐</p>
+                <p class="text-sm text-gray-400 mb-4">請備妥您的目標鋼廠名單、現有耗材規格與採購技術窗口，與我們聯繫獲取完整評估。</p>
+                <div class="inline-block px-6 py-2 border border-gray-500 text-gray-300 text-sm font-mono tracking-widest">
+                    CONTACT@ESG.TEAM
+                </div>
+            </section>
+            
+            <p class="text-[10px] text-gray-500 mt-2">
+                * 聲明：本 DM 內容僅供參考，A級工廠證明、斷棒補償、履約保險、CBAM 碳資料等，均以正式商務文件、合約約定與試爐紀錄為準。
+            </p>
+
+        </main>
+
+        <footer class="mt-4 flex justify-between items-center text-xs text-gray-500 font-mono pt-4 border-t border-gray-700">
+            <span>// STEELSTREAM BY ESG.TEAM</span>
+            <span>PAGE 03 / 03</span>
+        </footer>
+    </div>
+
+</body>
+</html>

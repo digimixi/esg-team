@@ -136,6 +136,13 @@ export default defineType({
       readOnly: true,
       description: '紀錄客戶是從哪個專題頁面填寫此表單的'
     }),
+    defineField({
+      name: 'referral',
+      title: '引薦夥伴 (Referred By)',
+      type: 'reference',
+      to: [{ type: 'broker' }],
+      description: '透過推薦網址自動綁定的引薦人'
+    }),
   ],
   preview: {
     select: {

@@ -1,32 +1,20 @@
-$envPath = "C:\Users\hence\.gemini\antigravity\scratch\esg-team\.env.local"
-$dockerfilePath = "C:\Users\hence\.gemini\antigravity\scratch\esg-team\Dockerfile"
+$ErrorActionPreference = 'Stop'
 
-# Extract variables from .env.local safely
-$projectIdMatch = Select-String -Path $envPath -Pattern 'NEXT_PUBLIC_SANITY_PROJECT_ID="([^"]+)"'
-$datasetMatch = Select-String -Path $envPath -Pattern 'NEXT_PUBLIC_SANITY_DATASET="([^"]+)"'
-$writeTokenMatch = Select-String -Path $envPath -Pattern 'SANITY_WRITE_TOKEN="([^"]+)"'
-$geminiKeyMatch = Select-String -Path $envPath -Pattern 'GEMINI_API_KEY="([^"]+)"'
+# 1. Extract variables from .env.local
+$projectId = (Select-String -Path .env.local -Pattern "^NEXT_PUBLIC_SANITY_PROJECT_ID=(.*)").Matches.Groups[1].Value.Trim()
+$dataset = (Select-String -Path .env.local -Pattern "^NEXT_PUBLIC_SANITY_DATASET=(.*)").Matches.Groups[1].Value.Trim()
+$writeToken = (Select-String -Path .env.local -Pattern "^SANITY_WRITE_TOKEN=(.*)").Matches.Groups[1].Value.Trim()
+$geminiKey = (Select-String -Path .env.local -Pattern "^GEMINI_API_KEY=(.*)").Matches.Groups[1].Value.Trim()
 
-if (-not $projectIdMatch -or -not $datasetMatch) {
-    Write-Error "Failed to extract required environment variables."
+if (-not $projectId -or -not $dataset) {
+    Write-Error "Could not extract PROJECT_ID or DATASET from .env.local"
     exit 1
 }
 
-$projectId = $projectIdMatch.Matches.Groups[1].Value.Trim()
-$dataset = $datasetMatch.Matches.Groups[1].Value.Trim()
-$writeToken = $writeTokenMatch.Matches.Groups[1].Value.Trim()
-$geminiKey = $geminiKeyMatch.Matches.Groups[1].Value.Trim()
+# 2. Inject into Dockerfile
+(Get-Content Dockerfile) -replace "ARG NEXT_PUBLIC_SANITY_PROJECT_ID.*", "ARG NEXT_PUBLIC_SANITY_PROJECT_ID=$projectId" -replace "ARG NEXT_PUBLIC_SANITY_DATASET.*", "ARG NEXT_PUBLIC_SANITY_DATASET=$dataset" | Set-Content Dockerfile
 
-Write-Host "Variables extracted successfully. Updating Dockerfile..."
+Write-Host "Triggering deployment to Google Cloud Run (this will take a few minutes)..."
 
-# Inject into Dockerfile
-if (Test-Path $dockerfilePath) {
-    $content = Get-Content $dockerfilePath
-    $content = $content -replace "^ARG NEXT_PUBLIC_SANITY_PROJECT_ID.*", "ARG NEXT_PUBLIC_SANITY_PROJECT_ID=$projectId"
-    $content = $content -replace "^ARG NEXT_PUBLIC_SANITY_DATASET.*", "ARG NEXT_PUBLIC_SANITY_DATASET=$dataset"
-    $content | Set-Content $dockerfilePath
-}
-
-Write-Host "Deploying to Google Cloud Run..."
-# Execute gcloud run deploy
-gcloud run deploy esg-team --source C:\Users\hence\.gemini\antigravity\scratch\esg-team --region asia-east1 --allow-unauthenticated --set-env-vars="NEXT_PUBLIC_SANITY_PROJECT_ID=$projectId,NEXT_PUBLIC_SANITY_DATASET=$dataset,SANITY_WRITE_TOKEN=$writeToken,GEMINI_API_KEY=$geminiKey"
+# 3. Execute deployment
+gcloud run deploy esg-team --source . --region asia-east1 --allow-unauthenticated --set-env-vars="NEXT_PUBLIC_SANITY_PROJECT_ID=$projectId,NEXT_PUBLIC_SANITY_DATASET=$dataset,SANITY_WRITE_TOKEN=$writeToken,GEMINI_API_KEY=$geminiKey"

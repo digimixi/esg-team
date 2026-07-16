@@ -17,6 +17,13 @@ import { systemTech } from './systemTech'
 import { scope3Transaction } from './scope3Transaction'
 import { supplierInvitation } from './supplierInvitation'
 import saasTool from './saasTool'
+import { vendor } from './vendor'
+import { broker } from './broker'
+import { brokerCase } from './brokerCase'
+import { rfq } from './rfq'
+import { knowledgeCategory } from './knowledgeCategory'
+import { knowledgeArticle } from './knowledgeArticle'
+import techObservation from './techObservation'
 
 export const schema = {
   types: [
@@ -37,6 +44,13 @@ export const schema = {
     systemTech,
     scope3Transaction,
     supplierInvitation,
-    saasTool
+    saasTool,
+    vendor,
+    broker,
+    brokerCase,
+    rfq,
+    knowledgeCategory,
+    knowledgeArticle,
+    techObservation
   ],
 }

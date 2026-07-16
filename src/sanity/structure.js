@@ -1,5 +1,7 @@
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
-export const structure = (S) =>
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
+
+export const structure = (S, context) =>
   S.list()
     .id('root')
     .title('ESG.TEAM 企業總署')
@@ -76,11 +78,56 @@ export const structure = (S) =>
                     .title('產品過濾與歸檔')
                     .id('productFilters')
                     .items([
-                      S.listItem()
-                        .title('📦 所有產品 (All Products)')
-                        .id('allProducts')
-                        .child(S.documentTypeList('product').title('所有產品').id('allProductsList')),
+                      orderableDocumentListDeskItem({
+                        type: 'product',
+                        title: '📦 所有產品 (All Products)',
+                        id: 'allProducts',
+                        S,
+                        context
+                      }),
                       S.divider(),
+                      S.listItem()
+                        .title('🗃️ 依產品類別 (By Product Type)')
+                        .id('byProductType')
+                        .child(
+                          S.list()
+                            .title('實體產品分類')
+                            .id('productTypeList')
+                            .items([
+                              orderableDocumentListDeskItem({
+                                type: 'product',
+                                title: '石墨電極 (Graphite Electrode)',
+                                id: 'type_electrode',
+                                filter: '_type == "product" && subCategory == "graphite_electrode"',
+                                S,
+                                context
+                              }),
+                              orderableDocumentListDeskItem({
+                                type: 'product',
+                                title: '石墨坩堝 (Graphite Crucible)',
+                                id: 'type_crucible',
+                                filter: '_type == "product" && subCategory == "graphite_crucible"',
+                                S,
+                                context
+                              }),
+                              orderableDocumentListDeskItem({
+                                type: 'product',
+                                title: '增碳劑 / 碳材 (Carbon Additive)',
+                                id: 'type_additive',
+                                filter: '_type == "product" && subCategory == "carbon_additive"',
+                                S,
+                                context
+                              }),
+                              orderableDocumentListDeskItem({
+                                type: 'product',
+                                title: '石墨材料 / 其他 (Graphite Materials)',
+                                id: 'type_materials',
+                                filter: '_type == "product" && subCategory == "graphite_materials"',
+                                S,
+                                context
+                              }),
+                            ])
+                        ),
                       S.listItem()
                         .title('🗂️ 依價值鏈分類 (By Category)')
                         .id('byCategory')
@@ -173,6 +220,7 @@ export const structure = (S) =>
               S.documentTypeListItem('inventoryEntry').title('📝 排放分錄 (Inventory Entries)'),
               S.documentTypeListItem('scope3Transaction').title('🔗 供應鏈碳帳本交易 (Scope 3 Transactions)'),
               S.documentTypeListItem('supplierInvitation').title('🛡️ 安全對接邀請日誌 (Invitations)'),
+              S.documentTypeListItem('vendor').title('🏭 供應商資料庫 (Vendors)'),
             ])
         ),
 
@@ -197,7 +245,7 @@ export const structure = (S) =>
           'product', 'marketIndex', 'sourceBookmark',
           'insight', 'company', 'emissionFactor', 'inventoryEntry',
           'systemTech', 'solution', 'industryBenchmark', 'scope3Transaction',
-          'supplierInvitation', 'saasTool'
+          'supplierInvitation', 'saasTool', 'vendor'
         ].includes(listItem.getId())
       ),
     ])
