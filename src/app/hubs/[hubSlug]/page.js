@@ -11,7 +11,8 @@ import ValueChainMap from '@/components/solutions/ValueChainMap';
 import ProspectMap from '@/components/solutions/ProspectMap';
 import LeadCaptureForm from '@/components/solutions/LeadCaptureForm';
 
-export const revalidate = 86400;
+// Set ISR revalidation time to 60 seconds (1 minute) to avoid long CDN caching traps
+export const revalidate = 60;
 
 // 自定義 PortableText 渲染樣式
 const ptComponents = {
