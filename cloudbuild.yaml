@@ -1,0 +1,28 @@
+steps:
+  # 1. Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/esg-team:$COMMIT_SHA', '.']
+
+  # 2. Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/esg-team:$COMMIT_SHA']
+
+  # 3. Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'esg-team'
+      - '--image'
+      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/esg-team:$COMMIT_SHA'
+      - '--region'
+      - 'asia-east1'
+      - '--set-env-vars'
+      - 'NEXT_PUBLIC_SANITY_PROJECT_ID=2euox6d1,NEXT_PUBLIC_SANITY_DATASET=production,SANITY_WRITE_TOKEN=$_SANITY_WRITE_TOKEN,GEMINI_API_KEY=$_GEMINI_API_KEY'
+
+images:
+  - 'asia-east1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/esg-team:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
