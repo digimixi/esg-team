@@ -1,6 +1,7 @@
 import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
 import { PortableText } from '@portabletext/react';
+import { fallbackTechObservations } from './fallbackData';
 import MarketIndexBar from '@/components/MarketIndexBar';
 import AIInsightBox from '@/components/AIInsightBox';
 import HubHeader from '@/components/HubHeader';
@@ -12,7 +13,7 @@ import ProspectMap from '@/components/solutions/ProspectMap';
 import LeadCaptureForm from '@/components/solutions/LeadCaptureForm';
 
 // Set ISR revalidation time to 60 seconds (1 minute) to avoid long CDN caching traps
-export const revalidate = 60;
+export const revalidate = 0;
 
 // 自定義 PortableText 渲染樣式
 const ptComponents = {
@@ -106,6 +107,21 @@ export default async function HubHome({ params }) {
   const keywordConditions = keywordsArray.length > 0 
     ? `|| (${keywordsArray.map(k => `title match "${k}" || summary match "${k}" || excerpt match "${k}"`).join(' || ')})`
     : '';
+
+  const actualHubId = hub._id.replace(/^drafts\./, '');
+
+  let techObservations = await client.fetch(`*[_type == "techObservation" && references($hubId)] {
+    _id,
+    title,
+    subtitle,
+    "slug": slug.current,
+    "imageUrl": heroImage.asset->url
+  }`, { hubId: actualHubId }, { useCdn: false });
+
+  if (!techObservations || techObservations.length === 0) {
+    // FORCE fallback on empty, bypass ID check to debug Cloud Run mismatch
+    techObservations = fallbackTechObservations;
+  }
   
   const insights = await client.fetch(`
     *[_type == "insight" && isActive == true && (
@@ -128,8 +144,6 @@ export default async function HubHome({ params }) {
     hubId: hub._id 
   }, { useCdn: false });
 
-  const actualHubId = hub._id.replace(/^drafts\./, '');
-
   const eduPages = await client.fetch(`*[_type == "eduPage" && (
     $hubId in relatedHubs[]._ref || 
     hub._ref == $hubId
@@ -139,15 +153,7 @@ export default async function HubHome({ params }) {
     "slug": slug.current
   }`, { hubId: actualHubId }, { useCdn: false });
 
-  const techObservations = await client.fetch(`*[_type == "techObservation" && (
-    $hubId in relatedHubs[]._ref
-  )] {
-    _id,
-    title,
-    subtitle,
-    "slug": slug.current,
-    "imageUrl": heroImage.asset->url
-  }`, { hubId: actualHubId }, { useCdn: false });
+
 
   const benchmarks = await client.fetch(`*[_type == "industryBenchmark" && (
     hub._ref == $hubId || category == "intensity"
@@ -439,7 +445,7 @@ export default async function HubHome({ params }) {
         <AIInsightBox insight={hub.aiInsight} />
 
         {/* Tech Observations Section */}
-        {techObservations.length > 0 && (
+        {techObservations?.length > 0 && (
           <section id="observations" className="py-stack-lg px-margin max-w-container-max mx-auto scroll-mt-24 border-b border-outline-variant">
             <h2 className="font-headline-md text-headline-md text-primary mb-stack-lg text-center">技術觀察與企業採訪</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
