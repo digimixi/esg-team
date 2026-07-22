@@ -4,6 +4,21 @@
 
 ---
 
+## [2026-07-22] 雲端自動化佈署管線建立與 Sanity 備案機制修復 (Cloud Build CI/CD & Sanity Fallback Resolution)
+
+### 🚀 新增功能與基礎建設 (New Features & Infrastructure)
+1. **Google Cloud Build CI/CD 全自動管線建立**：
+    * 徹底解決 `gcloud run deploy --source .` 在本機端打包時所產生的「Docker 映像檔快取遺毒」問題。
+    * 正式建立 `cloudbuild.yaml` 腳本，並與 GitHub 倉庫 (`digimixi/esg-team`) 綁定觸發條件 (Cloud Build Triggers)。
+    * 實現 **Push to Deploy**：未來任何向 `main` 分支的推播，皆會自動於無快取 (Clean State) 的雲端環境中進行打包，並安全注入 `.env` 變數 (包含 Sanity 與 Gemini 金鑰) 後佈署至 Cloud Run，完全消除了本機手動佈署的營運癱瘓與版本不同步風險。
+2. **Sanity 資料庫強健性備案 (Robust Fallback Mechanism)**：
+    * 針對專題頁面 (`/hubs/[hubSlug]`) 中「技術觀察」區塊因 Sanity 回傳空陣列導致的畫面渲染缺失，實作了強制回退 (Fallback) 邏輯。
+    * 確保在 CMS 尚未完全建置或 API 短暫失效時，依然能穩定渲染寫死的「久富」商業案例，維持 B2B 業務展示頁面的完整性，遵循「優雅降級 (Graceful Degradation)」的設計原則。
+
+### 💡 技術決策 (Key Decisions)
+* **捨棄本機打包，擁抱雲端原生 CI/CD**：在釐清了 Google Cloud Build 在處理本地 `source` 上傳時嚴苛的快取判斷後，果斷停止使用手動 `deploy.ps1`，轉而建立正規的 Git 觸發管線，將部署職責交還給雲端基礎設施，這是確保專案能長期穩定擴展的關鍵決策。
+
+---
 ## [2026-05-26] 專題子導航架構決策與通用版型確立 (Hub Sub-navigation Architectural Decision & Template Standardization)
 
 ### 💡 技術決策 (Key Decisions)
